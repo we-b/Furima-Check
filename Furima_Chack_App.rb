@@ -9,7 +9,7 @@ b_password = "1111"
 @http ="http://#{b_id}:#{b_password}@"
 # 受講生の@URLをhttp://以降から記入
 
-# @url = "#{@http}furima-11111.herokuapp.com/"
+@url = "#{@http}furima-11111.herokuapp.com/"
 
 
 @item_image = "/Users/tech-camp/projects/furima_checkApp/photo/coat.jpg"
@@ -17,7 +17,7 @@ b_password = "1111"
 
 
 @nickname = "kusunnjyun"
-@email = "divssd13s1@co.jp"
+@email = "divssd13s8@co.jp"
 @password = "aaa111"
 @first_name = "愛"
 @last_name= "不時着"
@@ -25,7 +25,7 @@ b_password = "1111"
 @last_name_kana = "フジチャク"
 
 @nickname2 = "class"
-@email2 = "dssaf06s@co.jp"
+@email2 = "dssaf06s8@co.jp"
 @first_name2 = "梨泰"
 @user_last_name2 = "院"
 @first_name_kana2 = "イテウォン"
