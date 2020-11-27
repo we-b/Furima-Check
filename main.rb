@@ -2,8 +2,21 @@ def main
 
   @d.get(@url)
 
+  # ユーザー状態：ログアウト
+  # 出品：コート = ,サングラス =
+  # 購入：コート = ,サングラス =
+
+  # ユーザー状態：ログアウト
+  # 出品：コート = なし,サングラス = なし
+  # 購入：コート = なし,サングラス = なし
+
   # ログアウト状態では、ヘッダーに新規登録/ログインボタンが表示されること
   check_1
+  puts @d.page_source
+return
+  # ユーザー状態：user1
+  # 出品：コート = なし,サングラス = なし
+  # 購入：コート = なし,サングラス = なし
 
   # ユーザー新規登録
   # ニックネーム,誕生日未入力
@@ -17,6 +30,10 @@ def main
   # ログイン
   login_user1
 
+  # ユーザー状態：user1
+  # 出品：コート = user1,サングラス = なし
+  # 購入：コート = なし,サングラス = なし
+
   # 出品
   # 画像なしで出品
   item_new_no_image
@@ -25,11 +42,16 @@ def main
   # 入力必須項目を全て入力した状態で出品
   item_new_require_input
 
+  check_3
   # 自分で出品した商品の商品編集(エラーハンドリング)
   item_edit
 
   # ログアウトしてから商品の編集や購入ができるかチェック
   logout_item_edit_and_buy
+
+  # ユーザー状態：user2
+  # 出品：コート = user1,サングラス = なし
+  # 購入：コート = user2,サングラス = なし
 
   # 別名義のユーザーで登録 & ログイン
   login_user2
@@ -37,32 +59,61 @@ def main
   login_user2_item_buy
   # 購入後の商品状態や表示方法をチェック
   login_user2_after_purchase_check1
+
+
+  # ユーザー状態：user2
+  # 出品：コート = user1,サングラス = user2
+  # 購入：コート = user2,サングラス = なし
+
   # user2による出品(サングラス)
   login_user2_item_new
+
+
+  # ユーザー状態：user1
+  # 出品：コート = user1,サングラス = user2
+  # 購入：コート = user2,サングラス = user1
 
   # ログアウト → user1でログイン
   # サングラス購入
   login_user1_item_buy
 
+
+  # ユーザー状態：ログアウト
+  # 出品：コート = user1,サングラス = user2
+  # 購入：コート = user2,サングラス = user1
+
   # ログアウトしたユーザーで購入できるかチェック
   no_user_item_buy
+end
+
+def check_flags
+  @@check_1_flag = ""
+  @@check_2_flag = ""
+  @@check_3_flag = ""
+  @@check_4_flag = ""
+
 end
 
 
 # ログアウト状態
 # ログアウト状態では、ヘッダーに新規登録/ログインボタンが表示されること
 def check_1
+  @wait.until {@d.find_element(:class,"login").displayed?}
   @d.find_element(:class,"login").displayed? rescue puts "×：ログアウト状態では、ヘッダーにログインボタンが表示されない"
   @d.find_element(:class,"sign-up").displayed? rescue puts "×：ログアウト状態では、ヘッダーに新規登録ボタンが表示されない"
 end
 
-  # ログイン状態
-  # ログイン状態では、ヘッダーにユーザーのニックネーム/ログアウトボタンが表示されること
+# ログイン状態
+# ログイン状態では、ヘッダーにユーザーのニックネーム/ログアウトボタンが表示されること
 def check_2
   @d.find_element(:class,"user-nickname").displayed? rescue puts "×：ログアウト状態では、ヘッダーにユーザーのニックネームが表示されない"
   @d.find_element(:class,"logout").displayed? rescue puts "×：ログアウト状態では、ヘッダーにログアウトボタンが表示されない"
 end
 
+# 商品購入ページでは、一覧や詳細ページで選択した商品の情報が出力されること
+def check_3
+
+end
 
 # 新規登録
 # ニックネームは未入力
@@ -210,6 +261,9 @@ def login_user1
   puts "☒ログイン/ログアウトができない" 
   @wait.until {@d.find_element(:class,"purchase-btn").displayed?}
   end
+
+  # ログイン状態では、ヘッダーにユーザーのニックネーム/ログアウトボタンが表示されること
+  check_2
 
   # 出品ボタンを押して画面遷移できるかどうか
   if /出品する/ .match(@d.page_source)
@@ -445,7 +499,7 @@ def item_new_require_input
 
   @d.find_element(:class,"sell-btn").click
 
-
+  # check_3のチェック項目を実施している
   if /#{@item_name}/ .match(@d.page_source)
     puts "!有効な情報を入力するとトップページへ遷移し、商品名が表示されている。" 
   else
@@ -739,6 +793,14 @@ def login_user2_item_buy
   sleep 3
   puts "◯【目視で確認】エラーハンドリングができていること（適切では無い値が入力された場合、情報は保存されず、エラーメッセージを出力させる）"
   #アラートが出るとエラーがでる
+
+  # check_3のチェックを行う
+  if @item_name.match(@d.page_source)
+    puts "☒ログインしていないユーザーでも、商品の編集が行える" 
+    @wait.until {@d.find_element(:class,"item-red-btn").displayed?}
+  else
+    puts "◯ログインしていないユーザーは、商品の編集が行えない。" 
+  end
 
 
 
