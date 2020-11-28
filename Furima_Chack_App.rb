@@ -1,7 +1,11 @@
 require 'selenium-webdriver'
+require './main'
+require './check_list'
+
 @wait = Selenium::WebDriver::Wait.new(:timeout => 180000)
 @d = Selenium::WebDriver.for :chrome
 
+@d.manage.timeouts.implicit_wait = 3
 
 #basic認証のidとpass
 b_id = "admin"
@@ -18,7 +22,7 @@ b_password = "1111"
 
 
 @nickname = "kusunnjyun"
-@email = "divssd13s8@co.jp"
+@email = "divssd16s20@co.jp"
 @password = "aaa111"
 @first_name = "愛"
 @last_name= "不時着"
@@ -26,7 +30,7 @@ b_password = "1111"
 @last_name_kana = "フジチャク"
 
 @nickname2 = "class"
-@email2 = "dssaf06s8@co.jp"
+@email2 = "dssaf06s19@co.jp"
 @first_name2 = "梨泰"
 @user_last_name2 = "院"
 @first_name_kana2 = "イテウォン"
@@ -54,13 +58,32 @@ b_password = "1111"
 @card_cvc = 123
 @postal_code = "965-0873"
 @prefecture = "福島県"
-@city = "会津若松市" 
+@city = "会津若松市"
 @addresses = "追手町１−１"
 @phone_number = "02089001111"
 
 @blank = "1"
 
-require './main'
+# チェック項目の結果や詳細を保存しておく配列
+# チェック項目の内容はハッシュ 
+# {チェック番号： 3 , チェック合否： "〇" , チェック内容： "〇〇をチェック" , チェック詳細： "○○×"}
+@check_log = []
 
-main()
+
+begin
+    main()
+ensure
+    if @check_log.length > 0
+        @check_log.each { |check|
+            puts "■チェック番号：" + check["チェック番号"].to_s + "\n"
+            print "■チェック合否：#{check["チェック合否"]}\n"
+            print "■チェック内容：\n#{check["チェック内容"]}\n"
+            print "■チェック詳細：\n#{check["チェック詳細"]}\n"
+        }
+    end
+
+    puts $!
+    puts $@
+end
+
 

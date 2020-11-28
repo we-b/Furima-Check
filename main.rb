@@ -1,3 +1,6 @@
+# チェック項目のメソッドをまとめているファイル
+require './check_list'
+
 def main
 
   @d.get(@url)
@@ -12,8 +15,6 @@ def main
 
   # ログアウト状態では、ヘッダーに新規登録/ログインボタンが表示されること
   check_1
-  puts @d.page_source
-return
   # ユーザー状態：user1
   # 出品：コート = なし,サングラス = なし
   # 購入：コート = なし,サングラス = なし
@@ -35,14 +36,13 @@ return
   # 購入：コート = なし,サングラス = なし
 
   # 出品
-  # 画像なしで出品
+  # 画像なしで出品トライ
   item_new_no_image
-  # 価格未入力で出品
+  # 価格未入力で出品トライ
   item_new_price_uninput
   # 入力必須項目を全て入力した状態で出品
   item_new_require_input
 
-  check_3
   # 自分で出品した商品の商品編集(エラーハンドリング)
   item_edit
 
@@ -86,34 +86,9 @@ return
   no_user_item_buy
 end
 
-def check_flags
-  @@check_1_flag = ""
-  @@check_2_flag = ""
-  @@check_3_flag = ""
-  @@check_4_flag = ""
-
-end
-
 
 # ログアウト状態
 # ログアウト状態では、ヘッダーに新規登録/ログインボタンが表示されること
-def check_1
-  @wait.until {@d.find_element(:class,"login").displayed?}
-  @d.find_element(:class,"login").displayed? rescue puts "×：ログアウト状態では、ヘッダーにログインボタンが表示されない"
-  @d.find_element(:class,"sign-up").displayed? rescue puts "×：ログアウト状態では、ヘッダーに新規登録ボタンが表示されない"
-end
-
-# ログイン状態
-# ログイン状態では、ヘッダーにユーザーのニックネーム/ログアウトボタンが表示されること
-def check_2
-  @d.find_element(:class,"user-nickname").displayed? rescue puts "×：ログアウト状態では、ヘッダーにユーザーのニックネームが表示されない"
-  @d.find_element(:class,"logout").displayed? rescue puts "×：ログアウト状態では、ヘッダーにログアウトボタンが表示されない"
-end
-
-# 商品購入ページでは、一覧や詳細ページで選択した商品の情報が出力されること
-def check_3
-
-end
 
 # 新規登録
 # ニックネームは未入力
@@ -430,9 +405,7 @@ end
 # エラーハンドリングのチェック
 def item_new_require_input
 
-  # ここはなぜ目視確認？何を確認する？
-  # 適切ではない値とはどう言った情報か？
-  puts "◯【目視で確認】エラーハンドリングができていること（適切では無い値が入力された場合、情報は保存されず、エラーメッセージを出力させる）"
+  puts '◯【目視で確認】エラーハンドリングができていること（適切では無い値が入力された場合、情報は保存されず、エラーメッセージを出力させる）'
   @d.find_element(:id,"item-image").clear
   @d.find_element(:id,"item-name").clear
   @d.find_element(:id,"item-info").clear
@@ -499,7 +472,6 @@ def item_new_require_input
 
   @d.find_element(:class,"sell-btn").click
 
-  # check_3のチェック項目を実施している
   if /#{@item_name}/ .match(@d.page_source)
     puts "!有効な情報を入力するとトップページへ遷移し、商品名が表示されている。" 
   else
@@ -574,9 +546,7 @@ def item_edit
   @d.find_element(:id,"item-info").send_keys(@item_info_re)
   @d.find_element(:class,"sell-btn").click
 
-  # トップ画面に戻ってきたこと or 商品説明文章が遷移先にあることでチェックしている？？
-  # ？「すでに登録されている商品情報は編集画面を開いた時点で表示される」を裏付けるチェックをしている処理になっているか疑問
-  # 少なくともカテゴリーのチェックはしていないため
+  # 稀に編集画面に遷移した際に値を保持していない実装をしている受講生がいるため、商品詳細画面に遷移できているかあぶり出すチェック項目
   if /#{@item_info_re}/.match(@d.page_source)
     puts "◯商品名やカテゴリーの情報など、すでに登録されている商品情報は編集画面を開いた時点で表示される"
   elsif /FURIMAが選ばれる3つの理由/ .match(@d.page_source)
@@ -585,10 +555,11 @@ def item_edit
     puts "◯商品名やカテゴリーの情報など、すでに登録されている商品情報は編集画面を開いた時点で表示される"
   else
     puts "☒商品説明が表示されないまたは、商品名やカテゴリーの情報など、すでに登録されている商品情報は編集画面を開いた時点で表示されない" 
+    # 必要な情報が入力された状態で編集確定されると商品詳細画面に戻ってくるため、detail-itemが表示されるが正解
     @wait.until {@d.find_element(:class,"detail-item").displayed?}
   end
 
-  # ここも以下の要件チェックしていない？のに○がついている？
+
   # ◯商品情報（商品画像・商品名・商品の状態など）を変更できる
   puts "◯何も編集せずに更新をしても画像無しの商品にならない"
   puts "◯商品情報（商品画像・商品名・商品の状態など）を変更できる"
@@ -640,11 +611,14 @@ def logout_item_edit_and_buy
     @wait.until {@d.find_element(:class,"detail-item").displayed?}
   end
 
-  @item_name = @d.find_element(:class,'item-name')
-  puts "!商品名は" +@item_name.text
+  # trueかfalseかどちらにせよ商品詳細画面に遷移したい
+  # 例外処理で
 
-  @item_price = @d.find_element(:class,'item-price')
-  puts "!商品価格は" + @item_price.text
+  item_name = @d.find_element(:class,'item-name')
+  puts "!商品名は" + item_name.text
+
+  item_price = @d.find_element(:class,'item-price')
+  puts "!商品価格は" + item_price.text
 
   # 商品詳細画面へ遷移
   @d.find_element(:class,"item-img-content").click
@@ -662,13 +636,7 @@ def logout_item_edit_and_buy
     puts "◯ログインしていないユーザーは、商品の削除が行えない。" 
   end
 
-  # 重複記述？？
-  if /編集/ .match(@d.page_source)
-    puts "☒ログインしていないユーザーでも、商品の編集が行える" 
-    @wait.until {@d.find_element(:class,"item-red-btn").displayed?}
-  else
-    puts "◯ログインしていないユーザーは、商品の編集が行えない。" 
-  end
+
 
   if /購入画面に進む/.match(@d.page_source)
     puts "!購入ボタンがあるのでクリック"
@@ -708,12 +676,10 @@ def login_user2
 
   # 「商品出品」ボタンが存在するかチェック
   # トップページかどうか
-  @wait.until {@d.find_element(:class,"purchase-btn").displayed?}
-  
-  # このputs文章の内容がよくわからない
-  puts "【説明】商品出品ページに遷移してしまうためトップページに遷移後、商品購入画面に遷移する。"
+  @wait.until {@d.find_element(:class,"purchase-btn").displayed?} rescue puts "Error: class:purchase-btnが見つかりません"
 
-
+  # 商品購入ページでは、一覧や詳細ページで選択した商品の情報が出力されること
+  check_3
 
   # #ログイン2
   # @d.find_element(:class,"login").click
@@ -749,10 +715,10 @@ def login_user2_item_buy
   @wait.until {@d.find_element(:class, "item-red-btn").displayed?}
   @d.find_element(:class,"item-red-btn").click
 
-  # 購入画面のURLをputsする理由とは？
+  # 購入画面のURLをputsする理由とは？ = 途中でエラーが起こった場合に踏むURL保持しておくため
   #チェック機能追加
   order_url_coat = @d.current_url
-  puts "コート購入画面の@URL→  "+ order_url_coat
+  puts "コート購入画面のURL→  "+ order_url_coat
   #クレジットカード情報入力画面に遷移
   @wait.until {@d.find_element(:id, 'card-exp-month').displayed?}
   @d.find_element(:id, 'card-exp-month').send_keys(@card_exp_month)
@@ -794,7 +760,6 @@ def login_user2_item_buy
   puts "◯【目視で確認】エラーハンドリングができていること（適切では無い値が入力された場合、情報は保存されず、エラーメッセージを出力させる）"
   #アラートが出るとエラーがでる
 
-  # check_3のチェックを行う
   if @item_name.match(@d.page_source)
     puts "☒ログインしていないユーザーでも、商品の編集が行える" 
     @wait.until {@d.find_element(:class,"item-red-btn").displayed?}
@@ -845,6 +810,7 @@ def login_user2_item_buy
   puts "◯電話番号にはハイフンは不要で、11桁以内である"
   puts "◯購入が完了したら、トップページまたは購入完了ページに遷移する"
   # もし購入完了後に購入完了ページへ遷移するのであればトップページへ遷移させる処理が必要では？
+  # A：後々トップページへ遷移する処理を挟みたい
 end
 
 # 購入後の商品状態や表示方法をチェック
@@ -864,9 +830,8 @@ def login_user2_after_purchase_check1
     puts "◯@URLを直接入力して購入済みの商品ページへ遷移しようとすると、トップページに遷移する"
   else
     puts "☒@URLを直接入力して購入済みの商品ページへ遷移しようとすると、トップページに遷移しない"
-    # putsの「１」とは？？
-    puts 1
     # 手動でトップページに遷移させる理由は？？
+    # A:ここも出品ボタンの有無を確認して自動でトップに遷移する処理を実行させたい
     puts "!手動でトップページに遷移するとプログラムが動きます。"
     @wait.until {@d.find_element(:class,"purchase-btn").displayed?}
   end
@@ -881,7 +846,8 @@ def login_user2_after_purchase_check1
     @d.find_element(:class,"item-red-btn").click
     @wait.until {@d.find_element(:class,"furima-icon").displayed?}
 
-    # 「購入画面に進む」ボタン自体が表示されている時点でNGなのでは？？
+    # 84期まではログアウトユーザーが詳細画面を見ても「購入画面に進む」ボタンが表示されていてもOK(クリックするとトップに戻ること)
+    # 85期からは「購入画面に進む」ボタンの表示自体がNG
     puts "◯しかし、押してもトップページに遷移するので購入した商品は、再度購入できない状態になっている"
     @d.find_element(:class,"furima-icon").click 
   else
@@ -892,6 +858,7 @@ def login_user2_after_purchase_check1
   sleep 3
   # @wait.until {@d.find_element(:id,"FURIMAが選ばれる3つの理由").displayed?}
   # 今更だが、「出品する」という固定ワード検索だけではエラーが頻発しそう = 「出品」だけの表記の人もいそう
+  # 一定数の受講生のみなので問題なし = エラーが起こったら手動で確認してもらう
   if /出品する/ .match(@d.page_source)
     @d.find_element(:class,"purchase-btn").click
     puts "!出品ページに遷移1"
@@ -944,7 +911,6 @@ def login_user1_item_buy
   @d.find_element(:id, 'email').send_keys(@email)
   @d.find_element(:id, 'password').send_keys(@password)
   @d.find_element(:class,"login-red-btn").click
-  # 複数同一のクラスが存在する場合は一番最初の要素が取得できる？
   @wait.until {@d.find_element(:class,"item-img-content").displayed?}
   @d.find_element(:class,"item-img-content").click 
 
@@ -1000,7 +966,6 @@ def no_user_item_buy
 
   @wait.until {@d.find_element(:class,"item-destroy").displayed?}
   @d.find_element(:class,"item-destroy").click
-  @item_name2 = "サングラス"
   if /#{@item_name2}/ .match(@d.page_source)
     puts "☒出品者だけが商品情報を削除できない" 
     @wait.until {@d.find_element(:class,"purchase-btn").displayed?}
@@ -1010,7 +975,6 @@ def no_user_item_buy
 
 
 
-  @item_name = "コート"
   @wait.until {@d.find_element(:class,"purchase-btn").displayed?}
   @d.find_element(:link_text,"ログアウト").click
   @wait.until {@d.find_element(:class,"purchase-btn").displayed?}
