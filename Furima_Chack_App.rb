@@ -13,8 +13,8 @@ b_password = "1111"
 @http ="http://#{b_id}:#{b_password}@"
 # 受講生の@URLをhttp://以降から記入
 
-# @url = "#{@http}furima-11111.herokuapp.com/"
-@url = "http://localhost:3000/"
+@url = "#{@http}furima-11111.herokuapp.com/"
+# @url = "http://localhost:3000/"
 
 
 @item_image = "/Users/tech-camp/projects/furima_checkApp/photo/coat.jpg"
