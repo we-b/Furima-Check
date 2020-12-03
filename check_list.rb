@@ -200,7 +200,7 @@ def check_4
         check_detail["チェック詳細"] << "×：ログアウト状態で、トップ画面で出品順に商品が並んでいない\n"
       end
     else
-      check_detail["チェック詳細"] << "×：ログアウト状態で、トップ画面で出品順に商品が並んでいない\n"
+      check_detail["チェック詳細"] << "×：ログアウト状態で、トップ画面にclass「item-name」が存在しない\n"
     end
     
     check_detail["チェック合否"] = check_flag == 1 ? "◯" : "×"
