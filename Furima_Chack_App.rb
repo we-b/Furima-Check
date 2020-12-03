@@ -4,8 +4,17 @@ require './check_list'
 
 @wait = Selenium::WebDriver::Wait.new(:timeout => 180000)
 @d = Selenium::WebDriver.for :chrome
+# チェック用のドライバー
 
 @d.manage.timeouts.implicit_wait = 3
+
+# 1つ目のウィンドウのID
+@window1_id = @d.window_handle
+# 2つ目のウィンドウを開く
+@d.execute_script( "window.open()" )
+# 2つ目のウィンドウのIDを取得
+@window2_id = @d.window_handles.last
+
 
 #basic認証のidとpass
 b_id = "admin"
@@ -36,6 +45,14 @@ b_password = "1111"
 @first_name_kana2 = "イテウォン"
 @last_name_kana2 = "クラス"
 
+@nickname3 = "player"
+@email3 = "aaaabbbb1111@co.jp"
+@first_name3 = "ランバ"
+@user_last_name3 = "ラル"
+@first_name_kana3 = "ランバ"
+@last_name_kana3 = "ラル"
+
+
 
 
 @item_image_name = "coat.jpg"
@@ -43,14 +60,15 @@ b_password = "1111"
 @item_info = "今年イチオシのトレンチコート"
 @item_info_re = "昨年イチオシのトレンチコート"
 @value = '2'
-
 @item_price = 40000
+# 購入ページのURLを直接入力でリダイレクトされるかのチェック用
+@order_url_coat = ""
 
 
 @item_name2 = "サングラス"
 @item_info2 = "限定5品のサングラス"
-
 @item_price2 = 30000
+@order_url_glasses = ""
 
 @card_number = 4242424242424242
 @card_exp_month = 10

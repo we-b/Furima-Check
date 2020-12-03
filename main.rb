@@ -5,6 +5,7 @@ def main
 
   @d.get(@url)
 
+  test_method
   # ユーザー状態：ログアウト
   # 出品：コート = ,サングラス =
   # 購入：コート = ,サングラス =
@@ -31,6 +32,10 @@ def main
   # ログイン
   login_user1
 
+  # ログイン状態では、ヘッダーにユーザーのニックネーム/ログアウトボタンが表示されること
+  check_2
+
+
   # ユーザー状態：user1
   # 出品：コート = user1,サングラス = なし
   # 購入：コート = なし,サングラス = なし
@@ -53,10 +58,13 @@ def main
   # 出品：コート = user1,サングラス = なし
   # 購入：コート = user2,サングラス = なし
 
-  # 別名義のユーザーで登録 & ログイン
+  # user2で登録 & ログイン
   login_user2
-  # user2で商品購入
+  # user2が商品購入
   login_user2_item_buy
+
+  check_6
+  
   # 購入後の商品状態や表示方法をチェック
   login_user2_after_purchase_check1
 
@@ -77,6 +85,7 @@ def main
   # サングラス購入
   login_user1_item_buy
 
+  # check_5
 
   # ユーザー状態：ログアウト
   # 出品：コート = user1,サングラス = user2
@@ -227,8 +236,6 @@ def login_user1
   @wait.until {@d.find_element(:class,"login-red-btn").displayed?}
   @d.find_element(:class,"login-red-btn").click
 
-  # puts "アカウント1でログイン"
-
   # トップ画面に戻れているか
   if /FURIMAが選ばれる3つの理由/ .match(@d.page_source)
   puts "◯ログイン/ログアウトができる" 
@@ -236,9 +243,13 @@ def login_user1
   puts "☒ログイン/ログアウトができない" 
   @wait.until {@d.find_element(:class,"purchase-btn").displayed?}
   end
+end
 
-  # ログイン状態では、ヘッダーにユーザーのニックネーム/ログアウトボタンが表示されること
-  check_2
+# 出品
+# 画像添付なし
+def item_new_no_image
+
+  @wait.until {@d.find_element(:class,"purchase-btn").displayed?}
 
   # 出品ボタンを押して画面遷移できるかどうか
   if /出品する/ .match(@d.page_source)
@@ -257,11 +268,7 @@ def login_user1
     puts "!出品ページに遷移できない"
     @wait.until {@d.find_element(:id,"item-name").displayed?}
   end
-end
 
-# 出品
-# 画像添付なし
-def item_new_no_image
   @wait.until {@d.find_element(:id,"item-name").displayed?}
   @d.find_element(:id,"item-name").send_keys(@item_name)
 
@@ -717,8 +724,12 @@ def login_user2_item_buy
 
   # 購入画面のURLをputsする理由とは？ = 途中でエラーが起こった場合に踏むURL保持しておくため
   #チェック機能追加
-  order_url_coat = @d.current_url
-  puts "コート購入画面のURL→  "+ order_url_coat
+  @order_url_coat = @d.current_url
+  puts "コート購入画面のURL→  " + @order_url_coat
+
+  # コート購入前にチェック
+  check_5
+
   #クレジットカード情報入力画面に遷移
   @wait.until {@d.find_element(:id, 'card-exp-month').displayed?}
   @d.find_element(:id, 'card-exp-month').send_keys(@card_exp_month)
@@ -824,8 +835,8 @@ def login_user2_after_purchase_check1
     @wait.until {@d.find_element(:class,"sold-out").displayed?}
   end
 
-  # order_url_coatは購入画面のURLでは？商品ページではないハズ
-  @d.get(order_url_coat)
+  # @order_url_coatは購入画面のURLでは？商品ページではないハズ
+  @d.get(@order_url_coat)
   if /FURIMAが選ばれる3つの理由/ .match(@d.page_source)
     puts "◯@URLを直接入力して購入済みの商品ページへ遷移しようとすると、トップページに遷移する"
   else
@@ -918,8 +929,8 @@ def login_user1_item_buy
   @wait.until {@d.find_element(:class,"item-red-btn").displayed?}
   @d.find_element(:class,"item-red-btn").click
   # 購入は確定させずにURLのみ取得
-  order_url_glasses = @d.current_url
-  puts "サングラス購入画面の@URL→  "+ order_url_glasses
+  @order_url_glasses = @d.current_url
+  puts "サングラス購入画面の@URL→  "+ @order_url_glasses
   @d.get(@url)
 end
 
@@ -928,7 +939,7 @@ def no_user_item_buy
   @wait.until {@d.find_element(:class,"purchase-btn").displayed?}
   @d.find_element(:link_text,"ログアウト").click
 
-  @d.get(order_url_glasses)
+  @d.get(@order_url_glasses)
   if /会員情報入力/ .match(@d.page_source)
     puts "！ログインしていない状態で@URLを直接入力し購入ページに遷移しようとするとログインページに遷移する"
     puts "◯ログインしていないユーザーは購入ページに遷移しようとすると、ログインページに遷移する"
@@ -945,7 +956,7 @@ def no_user_item_buy
   @d.find_element(:id, 'password').send_keys(@password)
   @d.find_element(:class,"login-red-btn").click
 
-  @d.get(order_url_glasses)
+  @d.get(@order_url_glasses)
   if /FURIMAが選ばれる3つの理由/ .match(@d.page_source)
     puts "◯出品者は@URLを直接入力して購入ページに遷移しようとすると、トップページに遷移する"
   else
@@ -997,10 +1008,24 @@ def no_user_item_buy
 
 
   puts "プログラム終了"
+  puts "ログイン情報1 user1_email #{@email} password #{@password}"
+  puts "ログイン情報2 user2_email #{@email2} password #{@password}"
   puts "【目視で確認】商品出品時に登録した情報が見られるようになっている"
   puts "【目視で確認】新規登録、商品出品、商品購入の際にエラーハンドリングができていること（適切では無い値が入力された場合、情報は保存されず、エラーメッセージを出力させる）"
-  puts "【目視で確認】basic認証が実装されている" 
+  puts "【目視で確認】basic認証が実装されている"
   puts "【目視で確認】ログイン/ログアウトによって、ヘッダーにてユーザーへ表示する情報が変わる"
   puts "【目視で確認】画像が表示されており、画像がリンク切れなどになっていない"
+  puts "【目視で確認】ログアウト状態のユーザーは、商品出品ページへ遷移しようとすると、ログインページへ遷移すること"
+  puts "【目視で確認】パスワードは半角英数字混合であること"
+  puts "【目視で確認】パスワードは6文字以上であること"
+  puts "【目視で確認】価格の範囲が、¥300~¥9,999,999の間であること"
+  puts "【目視で確認】商品出品時とほぼ同じ見た目で商品情報編集機能が実装されていること"
+  puts "【目視で確認】商品購入ページでは、一覧や詳細ページで選択した商品の情報が出力されること"
+  puts "【目視で確認】ログイン状態の出品者でも、売却済みの商品に対しては「編集・削除ボタン」が表示されないこと"
+  puts "【目視で確認】出品者・出品者以外にかかわらず、ログイン状態のユーザーが、URLを直接入力して売却済み商品の商品情報編集ページへ遷移しようとすると、トップページに遷移すること"
+  puts "【目視で確認】ログアウト状態のユーザーが、URLを直接入力して売却済み商品の商品情報編集ページへ遷移しようとすると、ログインページに遷移すること"
+  puts "【目視で確認】ログアウト状態のユーザーは、URLを直接入力して商品情報編集ページへ遷移しようとすると、ログインページに遷移すること"
+  puts "【目視で確認】商品購入画面で出品時に登録した情報が見られるようになっていること"
+  puts "【目視で確認】商品詳細ページでログアウト状態のユーザーには、「編集・削除・購入画面に進むボタン」が表示されないこと"
   sleep 300000000000000
 end

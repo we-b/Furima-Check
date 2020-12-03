@@ -209,3 +209,126 @@ def check_4
     @check_log.push(check_detail)
   end
 end
+
+# ログイン状態の出品者が、URLを直接入力して自身の出品した商品購入ページに遷移しようとすると、トップページに遷移すること
+def check_5
+  check_detail = {"チェック番号"=> 5 , "チェック合否"=> "" , "チェック内容"=> "ログイン状態の出品者が、URLを直接入力して自身の出品した商品購入ページに遷移しようとすると、トップページに遷移すること" , "チェック詳細"=> ""}
+  check_flag = 0
+
+  begin
+    # 2つ目のウィンドウに切り替え
+    @d.switch_to.window( @window2_id )
+    @d.get(@url)
+
+    # トップページ画面からスタート
+    @wait.until {@d.find_element(:class,"purchase-btn").displayed?}
+
+    # user_1でログイン
+    login_user1
+
+    # user_1がログイン状態で自分が出品したコートの購入画面に遷移(直接URL入力)
+    @d.get(@order_url_coat)
+    # アイコンが表示されるまで待機
+    @wait.until {@d.find_element(:class,"furima-icon").displayed? || @d.find_element(:class,"second-logo").displayed? }
+
+    # 出品ボタンの有無でトップページに遷移したかを判断
+    if @d.find_element(:class,"purchase-btn").displayed?
+      check_detail["チェック詳細"] << "○：ログイン状態の出品者が、URLを直接入力して自身の出品した商品購入ページに遷移しようとすると、トップページに遷移する\n"
+      check_flag += 1
+    else
+      check_detail["チェック詳細"] << "×：ログイン状態の出品者が、URLを直接入力して自身の出品した商品購入ページに遷移しようとすると、トップページ以外に遷移する\n"
+      @d.get(@url)
+    end
+
+    check_detail["チェック合否"] = check_flag == 1 ? "◯" : "×"
+
+  ensure
+    # ログアウトしておく
+    @d.find_element(:class,"logout").click
+    @d.get(@url)
+    @check_log.push(check_detail)
+    # エラー発生有無に関係なく操作ウィンドウを元に戻す
+    @d.switch_to.window( @window1_id )
+  end
+end
+
+# check_6で活用する
+def sign_up_user3
+
+  @wait.until {@d.find_element(:class,"furima-icon").displayed? || @d.find_element(:class,"second-logo").displayed? }
+
+  @d.find_element(:class,"sign-up").click
+  @wait.until {@d.find_element(:id, 'nickname').displayed?}
+  @d.find_element(:id, 'nickname').send_keys(@nickname3)
+  @wait.until {@d.find_element(:id, 'email').displayed?}
+  @d.find_element(:id, 'email').send_keys(@email3)
+  @wait.until {@d.find_element(:id, 'password').displayed?}
+  @d.find_element(:id, 'password').send_keys(@password3)
+  @wait.until {@d.find_element(:id, 'password-confirmation').displayed?}
+  @d.find_element(:id, 'password-confirmation').send_keys(@password3)
+  @wait.until {@d.find_element(:id, 'first-name').displayed?}
+  @d.find_element(:id, 'first-name').send_keys(@first_name3)
+  @wait.until {@d.find_element(:id, 'last-name').displayed?}
+  @d.find_element(:id, 'last-name').send_keys(@last_name3)
+  @wait.until {@d.find_element(:id, 'first-name-kana').displayed?}
+  @d.find_element(:id, 'first-name-kana').send_keys(@first_name_kana3)
+  @wait.until {@d.find_element(:id, 'last-name-kana').displayed?}
+  @d.find_element(:id, 'last-name-kana').send_keys(@last_name_kana3)
+
+  @d.find_element(:class,"register-red-btn").click
+end
+
+
+# ログイン状態の出品者以外のユーザーが、URLを直接入力して売却済み商品の商品購入ページへ遷移しようとすると、トップページに遷移すること
+def check_6
+  check_detail = {"チェック番号"=> 6 , "チェック合否"=> "" , "チェック内容"=> "ログイン状態のユーザーが、URLを直接入力して売却済み商品の商品購入ページへ遷移しようとすると、トップページに遷移すること" , "チェック詳細"=> ""}
+  check_flag = 0
+
+  begin
+    # 2つ目のウィンドウに切り替え
+    @d.switch_to.window( @window2_id )
+    @d.get(@url)
+
+
+    # トップページ画面からスタート
+    @wait.until {@d.find_element(:class,"purchase-btn").displayed?}
+
+    #user3でサインアップ
+    sign_up_user3
+
+    # user3がログイン状態で他人が出品したコートの購入画面に遷移(直接URL入力)
+    @d.get(@order_url_coat)
+    # アイコンが表示されるまで待機
+    @wait.until {@d.find_element(:class,"furima-icon").displayed? || @d.find_element(:class,"second-logo").displayed? }
+
+    # 出品ボタンの有無でトップページに遷移したかを判断
+    if @d.find_element(:class,"purchase-btn").displayed?
+      check_detail["チェック詳細"] << "○：ログイン状態の出品者以外のユーザーが、URLを直接入力して自身の出品した商品購入ページに遷移しようとすると、トップページに遷移する\n"
+      check_flag += 1
+    else
+      check_detail["チェック詳細"] << "×：ログイン状態の出品者以外のユーザーが、URLを直接入力して自身の出品した商品購入ページに遷移しようとすると、トップページ以外に遷移する\n"
+      @d.get(@url)
+    end
+
+    check_detail["チェック合否"] = check_flag == 1 ? "◯" : "×"
+
+  ensure
+    # ログアウトしておく
+    @d.find_element(:class,"logout").click
+    @d.get(@url)
+    @check_log.push(check_detail)
+    # エラー発生有無に関係なく操作ウィンドウを元に戻す
+    @d.switch_to.window( @window1_id )
+  end
+end
+
+
+def test_method
+  @d.switch_to.window( @window2_id )
+  @d.get "http://yahoo.com"
+  sleep 10
+  @d.get "https://www.google.com/?hl=ja"
+  sleep 10
+  @d.switch_to.window( @window1_id )
+  @d.get "https://www.google.com/?hl=ja"
+end
