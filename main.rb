@@ -1,7 +1,7 @@
 # チェック項目のメソッドをまとめているファイル
 require './check_list'
 # ruby_jardはデバッグの際にのみ使用する。普段はコメントアウトする
-# require 'ruby_jard'
+require 'ruby_jard'
 
 def main
 
@@ -93,6 +93,11 @@ def main
 
   # ログアウトしたユーザーで購入できるかチェック
   no_user_item_buy
+end
+
+# メソッド化
+def select_new(element)
+  return Selenium::WebDriver::Support::Select.new(element )
 end
 
 
@@ -192,8 +197,17 @@ def sign_up_retry
   puts "◯ユーザー本名のフリガナは全角（カタカナ）で入力させる"
 
 
-  puts "生年月日を入力してください。入力後、登録ボタンを押してください"
-  # 登録ボタンはPC操作者にクリックさせる
+  # 生年月日入力inputタグの親クラス
+  parent_birth_element = @d.find_element(:class, 'input-birth-wrap')
+  # 3つの子クラスを取得
+  birth_elements = parent_birth_element.find_elements(:tag_name, 'select')
+  birth_elements.each{|ele|
+    # 年・月・日のそれぞれに値を入力
+    select_ele = select_new(ele)
+    select_ele.select_by(:index, @select_index)
+  }
+  
+  @d.find_element(:class,"register-red-btn").click
 end
 
 
@@ -679,14 +693,25 @@ def login_user2
   @d.find_element(:id, 'last-name').send_keys(@user_last_name2)
   @d.find_element(:id, 'first-name-kana').send_keys(@first_name_kana2)
   @d.find_element(:id, 'last-name-kana').send_keys(@last_name_kana2)
-  puts "生年月日を入力した後、登録ボタンを押してください"
+  
+  # 生年月日入力inputタグの親クラス
+  parent_birth_element = @d.find_element(:class, 'input-birth-wrap')
+  # 3つの子クラスを取得
+  birth_elements = parent_birth_element.find_elements(:tag_name, 'select')
+  birth_elements.each{|ele|
+    # 年・月・日のそれぞれに値を入力
+    select_ele = select_new(ele)
+    select_ele.select_by(:index, @select_index)
+  }
+  
+  @d.find_element(:class,"register-red-btn").click
 
   # 「商品出品」ボタンが存在するかチェック
   # トップページかどうか
   @wait.until {@d.find_element(:class,"purchase-btn").displayed?} rescue puts "Error: class:purchase-btnが見つかりません"
 
   # 商品購入ページでは、一覧や詳細ページで選択した商品の情報が出力されること
-  check_3
+  # check_3
 
   # #ログイン2
   # @d.find_element(:class,"login").click
@@ -728,7 +753,7 @@ def login_user2_item_buy
   puts "コート購入画面のURL→  " + @order_url_coat
 
   # コート購入前にチェック
-  check_5
+  # check_5
 
   #クレジットカード情報入力画面に遷移
   @wait.until {@d.find_element(:id, 'card-exp-month').displayed?}

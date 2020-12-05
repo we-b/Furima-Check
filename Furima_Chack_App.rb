@@ -1,5 +1,5 @@
 # ruby_jardはデバッグの際にのみ使用する。普段はコメントアウトする
-# require 'ruby_jard'
+require 'ruby_jard'
 require 'selenium-webdriver'
 require './main'
 require './check_list'
@@ -26,8 +26,8 @@ b_password = "1111"
 @http ="http://#{b_id}:#{b_password}@"
 # 受講生の@URLをhttp://以降から記入
 
-@url = "#{@http}furima-11111.herokuapp.com/"
-# @url = "http://localhost:3000/"
+# @url = "#{@http}afternoon-bayou-26262.herokuapp.com/"
+@url = "http://localhost:3000/"
 
 
 @item_image = "/Users/tech-camp/projects/furima_checkApp/photo/coat.jpg"
@@ -85,6 +85,8 @@ b_password = "1111"
 @phone_number = "02089001111"
 
 @blank = "1"
+
+@select_index = 1
 
 # チェック項目の結果や詳細を保存しておく配列
 # チェック項目の内容はハッシュ 
