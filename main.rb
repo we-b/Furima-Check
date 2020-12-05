@@ -1,7 +1,13 @@
 # チェック項目のメソッドをまとめているファイル
 require './check_list'
 # ruby_jardはデバッグの際にのみ使用する。普段はコメントアウトする
-require 'ruby_jard'
+# require 'ruby_jard'
+
+# メモ
+# 購入時に起こっていたエラー詳細
+# item-red-btn = 商品詳細画面での商品の編集 or 購入のボタン
+# buy-red-btn  = 購入画面での購入ボタン
+
 
 def main
 
@@ -796,9 +802,9 @@ def login_user2_item_buy
   puts "◯【目視で確認】エラーハンドリングができていること（適切では無い値が入力された場合、情報は保存されず、エラーメッセージを出力させる）"
   #アラートが出るとエラーがでる
 
-  if @item_name.match(@d.page_source)
+  if /#{@item_name}/.match(@d.page_source)
     puts "☒ログインしていないユーザーでも、商品の編集が行える" 
-    @wait.until {@d.find_element(:class,"item-red-btn").displayed?}
+    @wait.until {@d.find_element(:class,"buy-red-btn").displayed?}
   else
     puts "◯ログインしていないユーザーは、商品の編集が行えない。" 
   end

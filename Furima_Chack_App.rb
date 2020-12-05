@@ -1,5 +1,5 @@
 # ruby_jardはデバッグの際にのみ使用する。普段はコメントアウトする
-require 'ruby_jard'
+# require 'ruby_jard'
 require 'selenium-webdriver'
 require './main'
 require './check_list'
@@ -27,7 +27,7 @@ b_password = "1111"
 # 受講生の@URLをhttp://以降から記入
 
 # @url = "#{@http}afternoon-bayou-26262.herokuapp.com/"
-@url = "http://localhost:3000/"
+@url = "http://#{b_id}:#{b_password}@localhost:3000/"
 
 
 @item_image = "/Users/tech-camp/projects/furima_checkApp/photo/coat.jpg"
@@ -35,7 +35,7 @@ b_password = "1111"
 
 
 @nickname = "kusunnjyun"
-@email = "divssd16s27@co.jp"
+@email = "divssd16s3@co.jp"
 @password = "aaa111"
 @first_name = "愛"
 @last_name= "不時着"
@@ -43,7 +43,7 @@ b_password = "1111"
 @last_name_kana = "フジチャク"
 
 @nickname2 = "class"
-@email2 = "dssaf06s27@co.jp"
+@email2 = "dssaf06s3@co.jp"
 @first_name2 = "梨泰"
 @user_last_name2 = "院"
 @first_name_kana2 = "イテウォン"
