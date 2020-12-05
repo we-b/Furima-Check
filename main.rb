@@ -1,11 +1,12 @@
 # チェック項目のメソッドをまとめているファイル
 require './check_list'
+# ruby_jardはデバッグの際にのみ使用する。普段はコメントアウトする
+# require 'ruby_jard'
 
 def main
 
   @d.get(@url)
 
-  test_method
   # ユーザー状態：ログアウト
   # 出品：コート = ,サングラス =
   # 購入：コート = ,サングラス =
@@ -35,6 +36,7 @@ def main
   # ログイン状態では、ヘッダーにユーザーのニックネーム/ログアウトボタンが表示されること
   check_2
 
+  # jard
 
   # ユーザー状態：user1
   # 出品：コート = user1,サングラス = なし
@@ -64,7 +66,7 @@ def main
   login_user2_item_buy
 
   check_6
-  
+
   # 購入後の商品状態や表示方法をチェック
   login_user2_after_purchase_check1
 
@@ -84,8 +86,6 @@ def main
   # ログアウト → user1でログイン
   # サングラス購入
   login_user1_item_buy
-
-  # check_5
 
   # ユーザー状態：ログアウト
   # 出品：コート = user1,サングラス = user2

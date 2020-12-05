@@ -1,6 +1,9 @@
+# ruby_jardはデバッグの際にのみ使用する。普段はコメントアウトする
+# require 'ruby_jard'
 require 'selenium-webdriver'
 require './main'
 require './check_list'
+
 
 @wait = Selenium::WebDriver::Wait.new(:timeout => 180000)
 @d = Selenium::WebDriver.for :chrome
@@ -14,6 +17,7 @@ require './check_list'
 @d.execute_script( "window.open()" )
 # 2つ目のウィンドウのIDを取得
 @window2_id = @d.window_handles.last
+@d.switch_to.window(@window1_id)
 
 
 #basic認証のidとpass
@@ -31,7 +35,7 @@ b_password = "1111"
 
 
 @nickname = "kusunnjyun"
-@email = "divssd16s20@co.jp"
+@email = "divssd16s27@co.jp"
 @password = "aaa111"
 @first_name = "愛"
 @last_name= "不時着"
@@ -39,14 +43,14 @@ b_password = "1111"
 @last_name_kana = "フジチャク"
 
 @nickname2 = "class"
-@email2 = "dssaf06s19@co.jp"
+@email2 = "dssaf06s27@co.jp"
 @first_name2 = "梨泰"
 @user_last_name2 = "院"
 @first_name_kana2 = "イテウォン"
 @last_name_kana2 = "クラス"
 
 @nickname3 = "player"
-@email3 = "aaaabbbb1111@co.jp"
+@email3 = "aaaabbbb1112@co.jp"
 @first_name3 = "ランバ"
 @user_last_name3 = "ラル"
 @first_name_kana3 = "ランバ"
