@@ -244,7 +244,7 @@ def check_5
 
   ensure
     # ログアウトしておく
-    @d.find_element(:class,"logout").click
+    @d.find_element(:link_text,"ログアウト").click
     @d.get(@url)
     @check_log.push(check_detail)
     # エラー発生有無に関係なく操作ウィンドウを元に戻す

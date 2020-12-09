@@ -1,11 +1,18 @@
 # チェック項目のメソッドをまとめているファイル。
 require './check_list'
+# ruby_jardはデバッグの際にのみ使用する。普段はコメントアウトする
+# require 'ruby_jard'
+
+# メモ
+# 購入時に起こっていたエラー詳細
+# item-red-btn = 商品詳細画面での商品の編集 or 購入のボタン
+# buy-red-btn  = 購入画面での購入ボタン
+
 
 def main
 
   @d.get(@url)
 
-  test_method
   # ユーザー状態：ログアウト
   # 出品：コート = ,サングラス =
   # 購入：コート = ,サングラス =
@@ -35,6 +42,7 @@ def main
   # ログイン状態では、ヘッダーにユーザーのニックネーム/ログアウトボタンが表示されること
   check_2
 
+  # jard
 
   # ユーザー状態：user1
   # 出品：コート = user1,サングラス = なし
@@ -64,7 +72,7 @@ def main
   login_user2_item_buy
 
   check_6
-  
+
   # 購入後の商品状態や表示方法をチェック
   login_user2_after_purchase_check1
 
@@ -85,14 +93,17 @@ def main
   # サングラス購入
   login_user1_item_buy
 
-  # check_5
-
   # ユーザー状態：ログアウト
   # 出品：コート = user1,サングラス = user2
   # 購入：コート = user2,サングラス = user1
 
   # ログアウトしたユーザーで購入できるかチェック
   no_user_item_buy
+end
+
+# メソッド化
+def select_new(element)
+  return Selenium::WebDriver::Support::Select.new(element )
 end
 
 
@@ -192,8 +203,17 @@ def sign_up_retry
   puts "◯ユーザー本名のフリガナは全角（カタカナ）で入力させる"
 
 
-  puts "生年月日を入力してください。入力後、登録ボタンを押してください"
-  # 登録ボタンはPC操作者にクリックさせる
+  # 生年月日入力inputタグの親クラス
+  parent_birth_element = @d.find_element(:class, 'input-birth-wrap')
+  # 3つの子クラスを取得
+  birth_elements = parent_birth_element.find_elements(:tag_name, 'select')
+  birth_elements.each{|ele|
+    # 年・月・日のそれぞれに値を入力
+    select_ele = select_new(ele)
+    select_ele.select_by(:index, @select_index)
+  }
+  
+  @d.find_element(:class,"register-red-btn").click
 end
 
 
@@ -679,14 +699,25 @@ def login_user2
   @d.find_element(:id, 'last-name').send_keys(@user_last_name2)
   @d.find_element(:id, 'first-name-kana').send_keys(@first_name_kana2)
   @d.find_element(:id, 'last-name-kana').send_keys(@last_name_kana2)
-  puts "生年月日を入力した後、登録ボタンを押してください"
+  
+  # 生年月日入力inputタグの親クラス
+  parent_birth_element = @d.find_element(:class, 'input-birth-wrap')
+  # 3つの子クラスを取得
+  birth_elements = parent_birth_element.find_elements(:tag_name, 'select')
+  birth_elements.each{|ele|
+    # 年・月・日のそれぞれに値を入力
+    select_ele = select_new(ele)
+    select_ele.select_by(:index, @select_index)
+  }
+  
+  @d.find_element(:class,"register-red-btn").click
 
   # 「商品出品」ボタンが存在するかチェック
   # トップページかどうか
   @wait.until {@d.find_element(:class,"purchase-btn").displayed?} rescue puts "Error: class:purchase-btnが見つかりません"
 
   # 商品購入ページでは、一覧や詳細ページで選択した商品の情報が出力されること
-  check_3
+  # check_3
 
   # #ログイン2
   # @d.find_element(:class,"login").click
@@ -728,7 +759,7 @@ def login_user2_item_buy
   puts "コート購入画面のURL→  " + @order_url_coat
 
   # コート購入前にチェック
-  check_5
+  # check_5
 
   #クレジットカード情報入力画面に遷移
   @wait.until {@d.find_element(:id, 'card-exp-month').displayed?}
@@ -771,9 +802,9 @@ def login_user2_item_buy
   puts "◯【目視で確認】エラーハンドリングができていること（適切では無い値が入力された場合、情報は保存されず、エラーメッセージを出力させる）"
   #アラートが出るとエラーがでる
 
-  if @item_name.match(@d.page_source)
+  if /#{@item_name}/.match(@d.page_source)
     puts "☒ログインしていないユーザーでも、商品の編集が行える" 
-    @wait.until {@d.find_element(:class,"item-red-btn").displayed?}
+    @wait.until {@d.find_element(:class,"buy-red-btn").displayed?}
   else
     puts "◯ログインしていないユーザーは、商品の編集が行えない。" 
   end

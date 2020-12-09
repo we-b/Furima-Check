@@ -1,6 +1,9 @@
+# ruby_jardはデバッグの際にのみ使用する。普段はコメントアウトする
+# require 'ruby_jard'
 require 'selenium-webdriver'
 require './main'
 require './check_list'
+
 
 @wait = Selenium::WebDriver::Wait.new(:timeout => 180000)
 @d = Selenium::WebDriver.for :chrome
@@ -14,6 +17,7 @@ require './check_list'
 @d.execute_script( "window.open()" )
 # 2つ目のウィンドウのIDを取得
 @window2_id = @d.window_handles.last
+@d.switch_to.window(@window1_id)
 
 
 #basic認証のidとpass
@@ -22,8 +26,8 @@ b_password = "1111"
 @http ="http://#{b_id}:#{b_password}@"
 # 受講生の@URLをhttp://以降から記入
 
-@url = "#{@http}furima-11111.herokuapp.com/"
-# @url = "http://localhost:3000/"
+# @url = "#{@http}afternoon-bayou-26262.herokuapp.com/"
+@url = "http://#{b_id}:#{b_password}@localhost:3000/"
 
 
 @item_image = "/Users/tech-camp/projects/furima_checkApp/photo/coat.jpg"
@@ -31,7 +35,7 @@ b_password = "1111"
 
 
 @nickname = "kusunnjyun"
-@email = "divssd16s20@co.jp"
+@email = "divssd16s3@co.jp"
 @password = "aaa111"
 @first_name = "愛"
 @last_name= "不時着"
@@ -39,14 +43,14 @@ b_password = "1111"
 @last_name_kana = "フジチャク"
 
 @nickname2 = "class"
-@email2 = "dssaf06s19@co.jp"
+@email2 = "dssaf06s3@co.jp"
 @first_name2 = "梨泰"
 @user_last_name2 = "院"
 @first_name_kana2 = "イテウォン"
 @last_name_kana2 = "クラス"
 
 @nickname3 = "player"
-@email3 = "aaaabbbb1111@co.jp"
+@email3 = "aaaabbbb1112@co.jp"
 @first_name3 = "ランバ"
 @user_last_name3 = "ラル"
 @first_name_kana3 = "ランバ"
@@ -81,6 +85,8 @@ b_password = "1111"
 @phone_number = "02089001111"
 
 @blank = "1"
+
+@select_index = 1
 
 # チェック項目の結果や詳細を保存しておく配列
 # チェック項目の内容はハッシュ 
