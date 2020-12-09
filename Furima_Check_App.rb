@@ -1,9 +1,10 @@
 # ruby_jardはデバッグの際にのみ使用する。普段はコメントアウトする
-# require 'ruby_jard'
+require 'ruby_jard'
 require 'selenium-webdriver'
 require './main'
 require './check_list'
-
+# ランダム文字列の生成ライブラリ
+require 'securerandom'
 
 @wait = Selenium::WebDriver::Wait.new(:timeout => 180000)
 @d = Selenium::WebDriver.for :chrome
@@ -26,33 +27,35 @@ b_password = "1111"
 @http ="http://#{b_id}:#{b_password}@"
 # 受講生の@URLをhttp://以降から記入
 
-# @url = "#{@http}afternoon-bayou-26262.herokuapp.com/"
-@url = "http://#{b_id}:#{b_password}@localhost:3000/"
+@url = "#{@http}afternoon-bayou-26262.herokuapp.com/"
+# @url = "http://#{b_id}:#{b_password}@localhost:3000/"
+
+# テスト登録用emailのランダム文字列
+randm_word = SecureRandom.hex(10) #=> "4a01bbd139f5e94bd249"
 
 
 @item_image = "/Users/tech-camp/projects/furima_checkApp/photo/coat.jpg"
 @item_image2 = "/Users/tech-camp/projects/furima_checkApp/photo/sunglass.jpg"
+@password = "aaa111" #パスワードは共通
 
-
-@nickname = "kusunnjyun"
-@email = "divssd16s3@co.jp"
-@password = "aaa111"
+@nickname = "lifecoach_test_user1"
+@email = "user1_#{randm_word}@co.jp"
 @first_name = "愛"
 @last_name= "不時着"
 @first_name_kana = "アイ"
 @last_name_kana = "フジチャク"
 
-@nickname2 = "class"
-@email2 = "dssaf06s3@co.jp"
+@nickname2 = "lifeoach_test_user2"
+@email2 = "user2_#{randm_word}@co.jp"
 @first_name2 = "梨泰"
-@user_last_name2 = "院"
+@last_name2 = "院"
 @first_name_kana2 = "イテウォン"
 @last_name_kana2 = "クラス"
 
-@nickname3 = "player"
-@email3 = "aaaabbbb1112@co.jp"
+@nickname3 = "lifecoach_test_user3"
+@email3 = "user3_#{randm_word}@co.jp"
 @first_name3 = "ランバ"
-@user_last_name3 = "ラル"
+@last_name3 = "ラル"
 @first_name_kana3 = "ランバ"
 @last_name_kana3 = "ラル"
 

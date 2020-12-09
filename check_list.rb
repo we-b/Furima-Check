@@ -229,7 +229,7 @@ def check_5
     # user_1がログイン状態で自分が出品したコートの購入画面に遷移(直接URL入力)
     @d.get(@order_url_coat)
     # アイコンが表示されるまで待機
-    @wait.until {@d.find_element(:class,"furima-icon").displayed? || @d.find_element(:class,"second-logo").displayed? }
+    @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
 
     # 出品ボタンの有無でトップページに遷移したかを判断
     if @d.find_element(:class,"purchase-btn").displayed?
@@ -255,7 +255,10 @@ end
 # check_6で活用する
 def sign_up_user3
 
-  @wait.until {@d.find_element(:class,"furima-icon").displayed? || @d.find_element(:class,"second-logo").displayed? }
+  # もしまだログイン状態であればログアウトしておく
+  if @d.find_element(:class,"logout").displayed? then @d.find_element(:class,"logout").click end
+
+  @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
 
   @d.find_element(:class,"sign-up").click
   @wait.until {@d.find_element(:id, 'nickname').displayed?}
@@ -263,9 +266,9 @@ def sign_up_user3
   @wait.until {@d.find_element(:id, 'email').displayed?}
   @d.find_element(:id, 'email').send_keys(@email3)
   @wait.until {@d.find_element(:id, 'password').displayed?}
-  @d.find_element(:id, 'password').send_keys(@password3)
+  @d.find_element(:id, 'password').send_keys(@password)
   @wait.until {@d.find_element(:id, 'password-confirmation').displayed?}
-  @d.find_element(:id, 'password-confirmation').send_keys(@password3)
+  @d.find_element(:id, 'password-confirmation').send_keys(@password)
   @wait.until {@d.find_element(:id, 'first-name').displayed?}
   @d.find_element(:id, 'first-name').send_keys(@first_name3)
   @wait.until {@d.find_element(:id, 'last-name').displayed?}
@@ -274,6 +277,16 @@ def sign_up_user3
   @d.find_element(:id, 'first-name-kana').send_keys(@first_name_kana3)
   @wait.until {@d.find_element(:id, 'last-name-kana').displayed?}
   @d.find_element(:id, 'last-name-kana').send_keys(@last_name_kana3)
+
+  # 生年月日入力inputタグの親クラス
+  parent_birth_element = @d.find_element(:class, 'input-birth-wrap')
+  # 3つの子クラスを取得
+  birth_elements = parent_birth_element.find_elements(:tag_name, 'select')
+  birth_elements.each{|ele|
+    # 年・月・日のそれぞれに値を入力
+    select_ele = select_new(ele)
+    select_ele.select_by(:index, @select_index)
+  }
 
   @d.find_element(:class,"register-red-btn").click
 end
@@ -299,7 +312,7 @@ def check_6
     # user3がログイン状態で他人が出品したコートの購入画面に遷移(直接URL入力)
     @d.get(@order_url_coat)
     # アイコンが表示されるまで待機
-    @wait.until {@d.find_element(:class,"furima-icon").displayed? || @d.find_element(:class,"second-logo").displayed? }
+    @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
 
     # 出品ボタンの有無でトップページに遷移したかを判断
     if @d.find_element(:class,"purchase-btn").displayed?

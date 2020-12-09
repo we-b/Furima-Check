@@ -1,7 +1,7 @@
 # チェック項目のメソッドをまとめているファイル。
 require './check_list'
 # ruby_jardはデバッグの際にのみ使用する。普段はコメントアウトする
-# require 'ruby_jard'
+require 'ruby_jard'
 
 # メモ
 # 購入時に起こっていたエラー詳細
@@ -42,7 +42,6 @@ def main
   # ログイン状態では、ヘッダーにユーザーのニックネーム/ログアウトボタンが表示されること
   check_2
 
-  # jard
 
   # ユーザー状態：user1
   # 出品：コート = user1,サングラス = なし
@@ -106,6 +105,12 @@ def select_new(element)
   return Selenium::WebDriver::Support::Select.new(element )
 end
 
+def two_class_displayed_check(first_ele, second_ele)
+  f_flag = @d.find_element(:class,second_ele).displayed? rescue false
+  s_flag = @d.find_element(:class,first_ele).displayed? rescue false
+  if f_flag || s_flag then return true end
+  return false
+end
 
 # ログアウト状態
 # ログアウト状態では、ヘッダーに新規登録/ログインボタンが表示されること
@@ -114,6 +119,7 @@ end
 # ニックネームは未入力
 def sign_up_nickname_input
   @d.find_element(:class,"sign-up").click
+
   @wait.until {@d.find_element(:id, 'nickname').displayed?}
   # ニックネーム項目には未入力で処理を行う
   @wait.until {@d.find_element(:id, 'email').displayed?}
@@ -298,23 +304,23 @@ def item_new_no_image
   @wait.until {@d.find_element(:id,"item-category").displayed?}
   # 「カテゴリー」のセレクトタグから値を選択
   item_category_element = @d.find_element(:id,"item-category")
-  item_category = Selenium::WebDriver::Support::Select.new(item_category_element)
+  item_category = select_new(item_category_element)
   item_category.select_by(:value, @value)
   # 「商品の状態」のセレクトタグから値を選択
   @wait.until {@d.find_element(:id,"item-sales-status").displayed?}
   item_sales_status_element = @d.find_element(:id,"item-sales-status")
-  item_sales_status = Selenium::WebDriver::Support::Select.new(item_sales_status_element)
+  item_sales_status = select_new(item_sales_status_element)
   item_sales_status.select_by(:value, @value)
 
 
   @wait.until {@d.find_element(:id,"item-shipping-fee-status").displayed?}
   item_shipping_fee_status_element = @d.find_element(:id,"item-shipping-fee-status")
-  item_shipping_fee_status = Selenium::WebDriver::Support::Select.new(item_shipping_fee_status_element)
+  item_shipping_fee_status = select_new(item_shipping_fee_status_element)
   item_shipping_fee_status.select_by(:value, @value)
 
   @wait.until {@d.find_element(:id,"item-prefecture").displayed?}
   item_prefecture_element = @d.find_element(:id,"item-prefecture")
-  item_prefecture = Selenium::WebDriver::Support::Select.new(item_prefecture_element)
+  item_prefecture = select_new(item_prefecture_element)
   item_prefecture.select_by(:value, @value)
 
 
@@ -332,7 +338,7 @@ def item_new_no_image
 
   @wait.until {@d.find_element(:id,"item-scheduled-delivery").displayed?}
   item_scheduled_delivery_element = @d.find_element(:id,"item-scheduled-delivery")
-  item_scheduled_delivery = Selenium::WebDriver::Support::Select.new(item_scheduled_delivery_element)
+  item_scheduled_delivery = select_new(item_scheduled_delivery_element)
   item_scheduled_delivery.select_by(:value, @value)
 
   #表記をに,を入れているかどうかで又はを追記
@@ -364,23 +370,23 @@ def item_new_price_uninput
   @d.find_element(:id,"item-name").clear
   @d.find_element(:id,"item-info").clear
   item_category_blank = @d.find_element(:id,"item-category")
-  item_category_blank = Selenium::WebDriver::Support::Select.new(item_category_blank)
+  item_category_blank = select_new(item_category_blank)
   item_category_blank.select_by(:value, @blank)
 
   item_sales_status_blank = @d.find_element(:id,"item-sales-status")
-  item_sales_status_blank = Selenium::WebDriver::Support::Select.new(item_sales_status_blank )
+  item_sales_status_blank = select_new(item_sales_status_blank )
   item_sales_status_blank.select_by(:value, @blank)
 
   item_shipping_fee_status_blank = @d.find_element(:id,"item-shipping-fee-status")
-  item_shipping_fee_status_blank = Selenium::WebDriver::Support::Select.new(item_shipping_fee_status_blank )
+  item_shipping_fee_status_blank = select_new(item_shipping_fee_status_blank )
   item_shipping_fee_status_blank.select_by(:value, @blank)
 
   item_prefecture_blank = @d.find_element(:id,"item-prefecture")
-  item_prefecture_blank = Selenium::WebDriver::Support::Select.new(item_prefecture_blank )
+  item_prefecture_blank = select_new(item_prefecture_blank )
   item_prefecture_blank.select_by(:value, @blank)
 
   item_scheduled_delivery_blank = @d.find_element(:id,"item-scheduled-delivery")
-  item_scheduled_delivery_blank = Selenium::WebDriver::Support::Select.new(item_scheduled_delivery_blank )
+  item_scheduled_delivery_blank = select_new(item_scheduled_delivery_blank )
   item_scheduled_delivery_blank.select_by(:value, @blank)
 
   @d.find_element(:id,"item-price").clear
@@ -391,24 +397,24 @@ def item_new_price_uninput
   @d.find_element(:id,"item-info").send_keys(@item_info)
 
   item_category_element = @d.find_element(:id,"item-category")
-  item_category = Selenium::WebDriver::Support::Select.new(item_category_element)
+  item_category = select_new(item_category_element)
   item_category.select_by(:value, @value)
 
   item_sales_status_element = @d.find_element(:id,"item-sales-status")
-  item_sales_status = Selenium::WebDriver::Support::Select.new(item_sales_status_element)
+  item_sales_status = select_new(item_sales_status_element)
   item_sales_status.select_by(:value, @value)
 
   item_shipping_fee_status_element = @d.find_element(:id,"item-shipping-fee-status")
-  item_shipping_fee_status = Selenium::WebDriver::Support::Select.new(item_shipping_fee_status_element)
+  item_shipping_fee_status = select_new(item_shipping_fee_status_element)
   item_shipping_fee_status.select_by(:value, @value)
 
   item_prefecture_element = @d.find_element(:id,"item-prefecture")
-  item_prefecture = Selenium::WebDriver::Support::Select.new(item_prefecture_element)
+  item_prefecture = select_new(item_prefecture_element)
   item_prefecture.select_by(:value, @value)
 
 
   item_scheduled_delivery_element = @d.find_element(:id,"item-scheduled-delivery")
-  item_scheduled_delivery = Selenium::WebDriver::Support::Select.new(item_scheduled_delivery_element)
+  item_scheduled_delivery = select_new(item_scheduled_delivery_element)
   item_scheduled_delivery.select_by(:value, @value)
 
   # @wait.until {@d.find_element(:id,"item-price").displayed?}
@@ -437,23 +443,23 @@ def item_new_require_input
   @d.find_element(:id,"item-name").clear
   @d.find_element(:id,"item-info").clear
   item_category_blank = @d.find_element(:id,"item-category")
-  item_category_blank = Selenium::WebDriver::Support::Select.new(item_category_blank)
+  item_category_blank = select_new(item_category_blank)
   item_category_blank.select_by(:value, @blank)
 
   item_sales_status_blank = @d.find_element(:id,"item-sales-status")
-  item_sales_status_blank = Selenium::WebDriver::Support::Select.new(item_sales_status_blank )
+  item_sales_status_blank = select_new(item_sales_status_blank )
   item_sales_status_blank.select_by(:value, @blank)
 
   item_shipping_fee_status_blank = @d.find_element(:id,"item-shipping-fee-status")
-  item_shipping_fee_status_blank = Selenium::WebDriver::Support::Select.new(item_shipping_fee_status_blank )
+  item_shipping_fee_status_blank = select_new(item_shipping_fee_status_blank )
   item_shipping_fee_status_blank.select_by(:value, @blank)
 
   item_prefecture_blank = @d.find_element(:id,"item-prefecture")
-  item_prefecture_blank = Selenium::WebDriver::Support::Select.new(item_prefecture_blank )
+  item_prefecture_blank = select_new(item_prefecture_blank )
   item_prefecture_blank.select_by(:value, @blank)
 
   item_scheduled_delivery_blank = @d.find_element(:id,"item-scheduled-delivery")
-  item_scheduled_delivery_blank = Selenium::WebDriver::Support::Select.new(item_scheduled_delivery_blank )
+  item_scheduled_delivery_blank = select_new(item_scheduled_delivery_blank )
   item_scheduled_delivery_blank.select_by(:value, @blank)
 
 
@@ -469,27 +475,27 @@ def item_new_require_input
   puts "◯商品の説明が必須である"
 
   item_category_element = @d.find_element(:id,"item-category")
-  item_category = Selenium::WebDriver::Support::Select.new(item_category_element)
+  item_category = select_new(item_category_element)
   item_category.select_by(:value, @value)
   puts "◯カテゴリーの情報が必須である"
 
   item_sales_status_element = @d.find_element(:id,"item-sales-status")
-  item_sales_status = Selenium::WebDriver::Support::Select.new(item_sales_status_element)
+  item_sales_status = select_new(item_sales_status_element)
   item_sales_status.select_by(:value, @value)
   puts "◯商品の状態についての情報が必須である"
 
   item_shipping_fee_status_element = @d.find_element(:id,"item-shipping-fee-status")
-  item_shipping_fee_status = Selenium::WebDriver::Support::Select.new(item_shipping_fee_status_element)
+  item_shipping_fee_status = select_new(item_shipping_fee_status_element)
   item_shipping_fee_status.select_by(:value, @value)
   puts "◯配送料の負担についての情報が必須である"
 
   item_prefecture_element = @d.find_element(:id,"item-prefecture")
-  item_prefecture = Selenium::WebDriver::Support::Select.new(item_prefecture_element)
+  item_prefecture = select_new(item_prefecture_element)
   item_prefecture.select_by(:value, @value)
   puts "◯発送元の地域についての情報が必須である"
 
   item_scheduled_delivery_element = @d.find_element(:id,"item-scheduled-delivery")
-  item_scheduled_delivery = Selenium::WebDriver::Support::Select.new(item_scheduled_delivery_element)
+  item_scheduled_delivery = select_new(item_scheduled_delivery_element)
   item_scheduled_delivery.select_by(:value, @value)
   puts "◯発送までの日数についての情報が必須である"
 
@@ -696,7 +702,7 @@ def login_user2
   @d.find_element(:id, 'password').send_keys(@password)
   @d.find_element(:id, 'password-confirmation').send_keys(@password)
   @d.find_element(:id, 'first-name').send_keys(@first_name2)
-  @d.find_element(:id, 'last-name').send_keys(@user_last_name2)
+  @d.find_element(:id, 'last-name').send_keys(@last_name2)
   @d.find_element(:id, 'first-name-kana').send_keys(@first_name_kana2)
   @d.find_element(:id, 'last-name-kana').send_keys(@last_name_kana2)
   
@@ -866,41 +872,51 @@ def login_user2_after_purchase_check1
     @wait.until {@d.find_element(:class,"sold-out").displayed?}
   end
 
-  # @order_url_coatは購入画面のURLでは？商品ページではないハズ
+  jard
+
   @d.get(@order_url_coat)
+  # アイコンが表示されるまで待機
+  @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
+
   if /FURIMAが選ばれる3つの理由/ .match(@d.page_source)
     puts "◯@URLを直接入力して購入済みの商品ページへ遷移しようとすると、トップページに遷移する"
   else
     puts "☒@URLを直接入力して購入済みの商品ページへ遷移しようとすると、トップページに遷移しない"
-    # 手動でトップページに遷移させる理由は？？
-    # A:ここも出品ボタンの有無を確認して自動でトップに遷移する処理を実行させたい
-    puts "!手動でトップページに遷移するとプログラムが動きます。"
-    @wait.until {@d.find_element(:class,"purchase-btn").displayed?}
   end
+
+  # トップページへ遷移
+  @d.get(@url)
+  @wait.until {@d.find_element(:class,"purchase-btn").displayed?}
 
   @wait.until {@d.find_element(:class,"item-img-content").displayed?}
 
   # 一度購入した商品の商品詳細画面へすすむ
-  @d.find_element(:class,"item-img-content").click 
-  sleep 3
+  @d.find_element(:class,"item-img-content").click
+  
+  @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
+
   if /購入画面に進む/ .match(@d.page_source)
     puts "!購入した商品だが、再度購入ボタンが表示されている"
     @d.find_element(:class,"item-red-btn").click
-    @wait.until {@d.find_element(:class,"furima-icon").displayed?}
+    @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
 
+    # 遷移先の画面に出品ボタンの有無でトップページに遷移したかを判断
+    if @d.find_element(:class,"purchase-btn").displayed?
+      puts "◯しかし、押してもトップページに遷移するので購入した商品は、再度購入できない状態になっている"
+    else
+      puts "×「購入ボタン」を押すとトップページ以外の画面に遷移する状態になっている"
+      @d.get(@url)
+    end
     # 84期まではログアウトユーザーが詳細画面を見ても「購入画面に進む」ボタンが表示されていてもOK(クリックするとトップに戻ること)
     # 85期からは「購入画面に進む」ボタンの表示自体がNG
-    puts "◯しかし、押してもトップページに遷移するので購入した商品は、再度購入できない状態になっている"
-    @d.find_element(:class,"furima-icon").click 
+
   else
-    puts "!手動でトップページに遷移するとプログラムが動きます。"
-    @d.find_element(:class,"furima-icon").click 
+    puts "!一度購入した商品には再度購入ボタンが表示されない"
+    @d.get(@url)
   end
 
-  sleep 3
-  # @wait.until {@d.find_element(:id,"FURIMAが選ばれる3つの理由").displayed?}
-  # 今更だが、「出品する」という固定ワード検索だけではエラーが頻発しそう = 「出品」だけの表記の人もいそう
-  # 一定数の受講生のみなので問題なし = エラーが起こったら手動で確認してもらう
+  @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
+
   if /出品する/ .match(@d.page_source)
     @d.find_element(:class,"purchase-btn").click
     puts "!出品ページに遷移1"
@@ -913,36 +929,35 @@ def login_user2_after_purchase_check1
   else
     puts "!出品ページに遷移できない"
   end
-  sleep 3
+  @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
 end
 
-
+# user2によるサングラス出品
 def login_user2_item_new
-  # user2による出品
   @wait.until {@d.find_element(:id,"item-image").displayed?}
   @d.find_element(:id,"item-image").send_keys(@item_image2)
-  @d.find_element(:id,"item-name").send_keys(@item_name2) 
+  @d.find_element(:id,"item-name").send_keys(@item_name2)
   @d.find_element(:id,"item-info").send_keys(@item_info2)
   item_category_element = @d.find_element(:id,"item-category")
-  item_category = Selenium::WebDriver::Support::Select.new(item_category_element)
+  item_category = select_new(item_category_element)
   item_category.select_by(:value, @value)
   item_sales_status_element = @d.find_element(:id,"item-sales-status")
-  item_sales_status = Selenium::WebDriver::Support::Select.new(item_sales_status_element)
+  item_sales_status = select_new(item_sales_status_element)
   item_sales_status.select_by(:value, @value)
   item_shipping_fee_status_element = @d.find_element(:id,"item-shipping-fee-status")
-  item_shipping_fee_status = Selenium::WebDriver::Support::Select.new(item_shipping_fee_status_element)
+  item_shipping_fee_status = select_new(item_shipping_fee_status_element)
   item_shipping_fee_status.select_by(:value, @value)
   item_prefecture_element = @d.find_element(:id,"item-prefecture")
-  item_prefecture = Selenium::WebDriver::Support::Select.new(item_prefecture_element)
+  item_prefecture = select_new(item_prefecture_element)
   item_prefecture.select_by(:value, @value)
   item_scheduled_delivery_element = @d.find_element(:id,"item-scheduled-delivery")
-  item_scheduled_delivery = Selenium::WebDriver::Support::Select.new(item_scheduled_delivery_element)
+  item_scheduled_delivery = select_new(item_scheduled_delivery_element)
   item_scheduled_delivery.select_by(:value, @value)
   @d.find_element(:id,"item-price").send_keys(@item_price2)
   @d.find_element(:class,"sell-btn").click
 end
 
-# user2が出品したサングラスを購入する
+# user2が出品したサングラスをuser1が購入する
 def login_user1_item_buy
   # 出品完了後、トップページからログアウト
   @wait.until {@d.find_element(:class,"purchase-btn").displayed?}
@@ -971,71 +986,107 @@ def no_user_item_buy
   @d.find_element(:link_text,"ログアウト").click
 
   @d.get(@order_url_glasses)
+  @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
+
   if /会員情報入力/ .match(@d.page_source)
+    # ログインページへ遷移するのが正解
     puts "！ログインしていない状態で@URLを直接入力し購入ページに遷移しようとするとログインページに遷移する"
     puts "◯ログインしていないユーザーは購入ページに遷移しようとすると、ログインページに遷移する"
   else
+    # ログインページに遷移しなかったらログインページへ遷移させる
     puts "☒ログインしていないユーザーは購入ページに遷移しようとしても、ログインページに遷移しない"
-    puts  "!手動でログインページに遷移するとプログラムが動きます。"
-    @wait.until {@d.find_element(:id,"email").displayed?}
+    @d.get(@url)
+    @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
+
+    @d.find_element(:class,"sign-up").click
   end
 
 
-  #ログイン2
+  #user2(サングラスの出品者)でログイン
   @wait.until {@d.find_element(:id,"email").displayed?}
   @d.find_element(:id, 'email').send_keys(@email2)
   @d.find_element(:id, 'password').send_keys(@password)
   @d.find_element(:class,"login-red-btn").click
 
+  @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
+
   @d.get(@order_url_glasses)
+  @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
+
   if /FURIMAが選ばれる3つの理由/ .match(@d.page_source)
     puts "◯出品者は@URLを直接入力して購入ページに遷移しようとすると、トップページに遷移する"
   else
     puts "☒出品者が@URLを直接入力して購入ページに遷移しようとすると、トップページに遷移しない"
-    puts  "!手動でトップページに遷移するとプログラムが動きます。"
-    @wait.until {@d.find_element(:class,"purchase-btn").displayed?}
+    @d.get(@url)
   end
 
 
   @wait.until {@d.find_element(:class,"item-img-content").displayed?}
-  @d.find_element(:class,"item-img-content").click 
+  @d.find_element(:class,"item-img-content").click
+
+  @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
+
   if /購入画面に進む/ .match(@d.page_source)
     puts "☒出品者でも、商品購入のリンクが踏めるようになっている"
   else
     puts "◯出品者以外にしか、商品購入のリンクが踏めないようになっている" 
   end
 
-
+  # 商品削除ボタン
   @wait.until {@d.find_element(:class,"item-destroy").displayed?}
   @d.find_element(:class,"item-destroy").click
-  if /#{@item_name2}/ .match(@d.page_source)
-    puts "☒出品者だけが商品情報を削除できない" 
-    @wait.until {@d.find_element(:class,"purchase-btn").displayed?}
+
+  @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
+
+  # 最新出品商品名 = 「サングラス」以外の商品名
+  latest_item_name = @d.find_element(:class,"item-name").text
+  if latest_item_name == @item_name2
+    puts "☒出品者が商品詳細ページで削除ボタンを押しても削除できない"
   else
-    puts "◯出品者だけが商品情報を削除できる" 
-  end 
+    puts "◯出品者だけが商品情報を削除できる"
+  end
 
 
 
   @wait.until {@d.find_element(:class,"purchase-btn").displayed?}
   @d.find_element(:link_text,"ログアウト").click
   @wait.until {@d.find_element(:class,"purchase-btn").displayed?}
-  if /#{@item_name}/ .match(@d.page_source)
-    puts "◯ログアウトした状態でも、商品一覧を閲覧できる"
+
+  # 要素が取得できなければeach処理を行わないためのfalse
+  all_items = @d.find_elements(:class,"item-name") rescue false
+
+  if all_items
+    # トップページにコートが存在するかのフラグ
+    item1_flag = false
+    all_items.each{|ele|
+      # 商品名があればフラグをtrueにする
+      if ele.text == @item_name then item1_flag = true end
+    }
+
+    if item1_flag == true
+      puts "◯ログアウトした状態でも、商品一覧を閲覧できる"
+    else
+      puts "☒ログアウトすると、商品一覧を閲覧できない"
+      puts "☒伴ってログアウトした際の商品詳細画面での商品説明の有無は確認できない"
+    end
   else
     puts "☒ログアウトすると、商品一覧を閲覧できない"
+    puts "☒伴ってログアウトした際の商品詳細画面での商品説明の有無は確認できない"
   end
 
-  @d.find_element(:class,"item-img-content").click
+  # トップページに商品画像が存在していたら商品説明のチェックを行う
+  if @d.find_element(:class,"item-img-content").displayed?
+    @d.find_element(:class,"item-img-content").click
 
-  @wait.until{@d.find_element(:class,"item-explain-box")}
-  if @d.find_element(:class,"item-explain-box").text == @item_info_re
-    puts  "!【商品説明は表示できている】" + @d.find_element(:class,"item-explain-box").text
-  else
-    puts "☒商品説明が表示されない"
-
+    # 商品説明の情報の有無チェック
+    @wait.until{@d.find_element(:class,"item-explain-box")}
+    if @d.find_element(:class,"item-explain-box").text == @item_info_re
+      puts  "!【商品説明は表示できている】" + @d.find_element(:class,"item-explain-box").text
+    else
+      puts "☒商品説明が表示されない"
+    end
+    puts "◯ログアウトした状態でも、商品詳細ページを閲覧できる"
   end
-  puts "◯ログアウトした状態でも、商品詳細ページを閲覧できる"
 
 
   puts "プログラム終了"
