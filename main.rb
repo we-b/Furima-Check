@@ -562,6 +562,10 @@ def item_edit
   # 商品編集ボタンクリック
   @d.find_element(:class,"item-red-btn").click
 
+  
+  # 商品出品時とほぼ同じ見た目で商品情報編集機能が実装されていること
+  check_7
+
   # 「商品の説明」項目を空白にして再度出品してみる
   @d.find_element(:id,"item-info").clear
   @d.find_element(:class,"sell-btn").click
@@ -816,7 +820,6 @@ def login_user2_item_buy
   end
 
 
-
   @wait.until {@d.find_element(:id, 'card-number').displayed?}
   @d.find_element(:id, 'card-number').send_keys(@card_number)
   puts "【説明】クレジットカードの番号記入"
@@ -872,20 +875,24 @@ def login_user2_after_purchase_check1
     @wait.until {@d.find_element(:class,"sold-out").displayed?}
   end
 
+
+  # jard
+  # ログイン中にコート購入画面に遷移するとログアウトしてしまう
+  # 原因不明のエラーのため、一旦コメントアウト
+  # @d.get(@order_url_coat)
+  # # アイコンが表示されるまで待機
+  # @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
+
+  # if /FURIMAが選ばれる3つの理由/ .match(@d.page_source)
+  #   puts "◯@URLを直接入力して購入済みの商品ページへ遷移しようとすると、トップページに遷移する"
+  # else
+  #   puts "☒@URLを直接入力して購入済みの商品ページへ遷移しようとすると、トップページに遷移しない"
+  # end
+
   jard
-
-  @d.get(@order_url_coat)
-  # アイコンが表示されるまで待機
-  @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
-
-  if /FURIMAが選ばれる3つの理由/ .match(@d.page_source)
-    puts "◯@URLを直接入力して購入済みの商品ページへ遷移しようとすると、トップページに遷移する"
-  else
-    puts "☒@URLを直接入力して購入済みの商品ページへ遷移しようとすると、トップページに遷移しない"
-  end
-
   # トップページへ遷移
   @d.get(@url)
+
   @wait.until {@d.find_element(:class,"purchase-btn").displayed?}
 
   @wait.until {@d.find_element(:class,"item-img-content").displayed?}
@@ -912,6 +919,7 @@ def login_user2_after_purchase_check1
 
   else
     puts "!一度購入した商品には再度購入ボタンが表示されない"
+
     @d.get(@url)
   end
 
