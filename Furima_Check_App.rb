@@ -70,6 +70,8 @@ randm_word = SecureRandom.hex(10) #=> "4a01bbd139f5e94bd249"
 @item_price = 40000
 # 購入ページのURLを直接入力でリダイレクトされるかのチェック用
 @order_url_coat = ""
+# user1によるコート出品画面のURL
+@edit_url_coat = ""
 
 
 @item_name2 = "サングラス"

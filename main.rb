@@ -83,6 +83,9 @@ def main
   # user2による出品(サングラス)
   login_user2_item_new
 
+  # ログアウト状態で、トップ画面の上から、出品された日時が新しい順に表示されること
+  # サングラス　→　コートの順に出品されているかチェック
+  check_4
 
   # ユーザー状態：user1
   # 出品：コート = user1,サングラス = user2
@@ -112,8 +115,22 @@ def two_class_displayed_check(first_ele, second_ele)
   return false
 end
 
-# ログアウト状態
-# ログアウト状態では、ヘッダーに新規登録/ログインボタンが表示されること
+# ユーザーのログイン
+def login_any_user(email, pass)
+  @d.get(@url)
+  @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
+
+  @d.find_element(:class,"login").click
+  @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
+
+  @d.find_element(:id, 'email').send_keys(email)
+  @d.find_element(:id, 'password').send_keys(pass)
+  @d.find_element(:class,"login-red-btn").click
+  @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
+  @d.get(@url)
+  @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
+
+end
 
 # 新規登録
 # ニックネームは未入力
@@ -222,12 +239,6 @@ def sign_up_retry
   @d.find_element(:class,"register-red-btn").click
 end
 
-
-# #ログイン
-# @d.find_element(:class,"login").click 
-# @d.find_element(:id, 'email').send_keys(@email)
-# @d.find_element(:id, 'password').send_keys(@password)
-# @d.find_element(:class,"login-red-btn").click
 
 # トップメニューに戻ってきた後にログアウトする
 def logout_from_the_topMenu
@@ -562,9 +573,21 @@ def item_edit
   # 商品編集ボタンクリック
   @d.find_element(:class,"item-red-btn").click
 
-  
   # 商品出品時とほぼ同じ見た目で商品情報編集機能が実装されていること
   check_7
+
+  # ログアウト状態のユーザーは、URLを直接入力して商品情報編集ページへ遷移しようとすると、ログインページに遷移すること
+  check_8
+
+  # 別ウィンドウにて異なるユーザーでログインした際はウィンドウを元に戻す時は再度ログインし直す
+  @d.get(@url)
+  # 元のuser1でログイン
+  login_any_user(@email, @password)
+
+  @d.find_element(:class,"item-img-content").click
+  @wait.until {@d.find_element(:class,"item-red-btn").displayed?}
+  # 商品編集ボタンクリック
+  @d.find_element(:class,"item-red-btn").click
 
   # 「商品の説明」項目を空白にして再度出品してみる
   @d.find_element(:id,"item-info").clear
@@ -727,13 +750,7 @@ def login_user2
   @wait.until {@d.find_element(:class,"purchase-btn").displayed?} rescue puts "Error: class:purchase-btnが見つかりません"
 
   # 商品購入ページでは、一覧や詳細ページで選択した商品の情報が出力されること
-  # check_3
-
-  # #ログイン2
-  # @d.find_element(:class,"login").click
-  # @d.find_element(:id, 'email').send_keys(@email2)
-  # @d.find_element(:id, 'password').send_keys(@password)
-  # @d.find_element(:class,"login-red-btn").click
+  check_3
 
   puts "【説明】nickname2でログイン"
 end
@@ -764,12 +781,16 @@ def login_user2_item_buy
   @d.find_element(:class,"item-red-btn").click
 
   # 購入画面のURLをputsする理由とは？ = 途中でエラーが起こった場合に踏むURL保持しておくため
-  #チェック機能追加
   @order_url_coat = @d.current_url
   puts "コート購入画面のURL→  " + @order_url_coat
 
   # コート購入前にチェック
-  # check_5
+  check_5
+
+  login_any_user(@email2, @password)
+  @d.find_element(:class,"item-img-content").click
+  @wait.until {@d.find_element(:class, "item-red-btn").displayed?}
+  @d.find_element(:class,"item-red-btn").click
 
   #クレジットカード情報入力画面に遷移
   @wait.until {@d.find_element(:id, 'card-exp-month').displayed?}
@@ -867,6 +888,8 @@ end
 # 購入後の商品状態や表示方法をチェック
 def login_user2_after_purchase_check1
 
+  login_any_user(@email2, @password)
+
   # トップページでの表記をチェック
   if /Sold Out/ .match(@d.page_source)
     puts "◯売却済みの商品は、「sould out」の文字が表示されるようになっている" 
@@ -876,21 +899,16 @@ def login_user2_after_purchase_check1
   end
 
 
-  # jard
-  # ログイン中にコート購入画面に遷移するとログアウトしてしまう
-  # 原因不明のエラーのため、一旦コメントアウト
-  # @d.get(@order_url_coat)
-  # # アイコンが表示されるまで待機
-  # @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
+  @d.get(@order_url_coat)
+  # アイコンが表示されるまで待機
+  @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
 
-  # if /FURIMAが選ばれる3つの理由/ .match(@d.page_source)
-  #   puts "◯@URLを直接入力して購入済みの商品ページへ遷移しようとすると、トップページに遷移する"
-  # else
-  #   puts "☒@URLを直接入力して購入済みの商品ページへ遷移しようとすると、トップページに遷移しない"
-  # end
+  if /FURIMAが選ばれる3つの理由/ .match(@d.page_source)
+    puts "◯@URLを直接入力して購入済みの商品ページへ遷移しようとすると、トップページに遷移する"
+  else
+    puts "☒@URLを直接入力して購入済みの商品ページへ遷移しようとすると、トップページに遷移しない"
+  end
 
-  jard
-  # トップページへ遷移
   @d.get(@url)
 
   @wait.until {@d.find_element(:class,"purchase-btn").displayed?}

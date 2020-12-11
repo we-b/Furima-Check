@@ -180,6 +180,7 @@ def check_3
 end
 
 # ログアウト状態で、トップ画面の上から、出品された日時が新しい順に表示されること
+# サングラス　→　コートの順に出品されているかチェック
 def check_4
   check_detail = {"チェック番号"=> 4 , "チェック合否"=> "" , "チェック内容"=> "ログアウト状態で、トップ画面の上から、出品された日時が新しい順に表示されること" , "チェック詳細"=> ""}
   check_flag = 0
@@ -224,7 +225,7 @@ def check_5
     @wait.until {@d.find_element(:class,"purchase-btn").displayed?}
 
     # user_1でログイン
-    login_user1
+    login_any_user(@email, @password)
 
     # user_1がログイン状態で自分が出品したコートの購入画面に遷移(直接URL入力)
     @d.get(@order_url_coat)
@@ -246,6 +247,8 @@ def check_5
     # ログアウトしておく
     @d.find_element(:link_text,"ログアウト").click
     @d.get(@url)
+    @wait.until {@d.find_element(:class,"purchase-btn").displayed?}
+
     @check_log.push(check_detail)
     # エラー発生有無に関係なく操作ウィンドウを元に戻す
     @d.switch_to.window( @window1_id )
@@ -346,50 +349,125 @@ def check_7
 
     # 商品の入力項目のチェック用配列
     item_input_data = {}
-    item_input_data["商品画像"] = unshift(@d.find_element(:id,"item-image") rescue "商品画像(class名：item-image)が存在しませんでした")
-    item_input_data["商品名"] = unshift(@d.find_element(:id,"item-name") rescue "商品名(class名：item-name)が存在しませんでした")
-    item_input_data["商品の説明"] = unshift(@d.find_element(:id,"item-info") rescue "商品の説明(class名：item-info)が存在しませんでした")
-    item_input_data["商品カテゴリー"] = unshift(@d.find_element(:id,"item-category") rescue "商品カテゴリー(class名：item-category)が存在しませんでした")
-    item_input_data["商品の状態"] = unshift(@d.find_element(:id,"item-sales-status") rescue "商品の状態(class名：item-sales-status)が存在しませんでした")
-    item_input_data["配送料の負担"] = unshift(@d.find_element(:id,"item-shipping-fee-status") rescue "配送料の負担(class名：item-shipping-fee-status)が存在しませんでした")
-    item_input_data["発送元の地域"] = unshift(@d.find_element(:id,"item-prefecture") rescue "発送元の地域(class名：item-prefecture)が存在しませんでした")
-    item_input_data["発送までの日数"] = unshift(@d.find_element(:id,"item-scheduled-delivery") rescue "発送までの日数(class名：item-scheduled-delivery)が存在しませんでした")
-    item_input_data["商品価格"] = unshift(@d.find_element(:id,"item-price") rescue "商品価格(class名：item-name)が存在しませんでした")
+    item_input_data["商品画像"] = @d.find_element(:id,"item-image") rescue "×：商品画像(class名：item-image)が存在しませんでした\n"
+    item_input_data["商品名"] = @d.find_element(:id,"item-name") rescue "×：商品名(class名：item-name)が存在しませんでした\n"
+    item_input_data["商品の説明"] = @d.find_element(:id,"item-info") rescue "×：商品の説明(class名：item-info)が存在しませんでした\n"
+    item_input_data["商品カテゴリー"] = @d.find_element(:id,"item-category") rescue "×：商品カテゴリー(class名：item-category)が存在しませんでした\n"
+    item_input_data["商品の状態"] = @d.find_element(:id,"item-sales-status") rescue "×：商品の状態(class名：item-sales-status)が存在しませんでした\n"
+    item_input_data["配送料の負担"] = @d.find_element(:id,"item-shipping-fee-status") rescue "×：配送料の負担(class名：item-shipping-fee-status)が存在しませんでした\n"
+    item_input_data["発送元の地域"] = @d.find_element(:id,"item-prefecture") rescue "×：発送元の地域(class名：item-prefecture)が存在しませんでした\n"
+    item_input_data["発送までの日数"] = @d.find_element(:id,"item-scheduled-delivery") rescue "×：発送までの日数(class名：item-scheduled-delivery)が存在しませんでした\n"
+    item_input_data["商品価格"] = @d.find_element(:id,"item-price") rescue "×：商品価格(class名：item-name)が存在しませんでした\n"
 
+    # 適切なタグではなかった場合のエラー文言作成メソッド
+    def create_NG_result_status(check_name, tag, answer_tag)
+      return "×：【#{check_name}】は存在するが、タグが<#{tag}>によって作成されているためNG 正解は<#{answer_tag}>タグでの作成が必要\n"
+    end
 
-    item_input_data.each{|data|
+    item_input_data.each{|key, value|
       # 内容が文字列かどうかチェック = 文字列だったらエラー判定
-      if data.kind_of?(String)
-        check_detail["チェック詳細"] << item_input_data
+      if value.kind_of?(String)
+        # エラー文言をそのまま詳細に追加
+        check_detail["チェック詳細"] << value
       else
-        check_detail["チェック詳細"] << "#{data.key}"
+        # チェック項目に応じてチェック詳細文章を作成する
+        case key
+        when "商品画像"
+          result = value.tag_name == "input" ? "◯：【#{key}】は正常に表示されている\n" : create_NG_result_status(key, value.tag_name, "input") ;
+          check_detail["チェック詳細"] << result
+          check_flag += 1
+        when "商品名"
+          result = value.tag_name == "textarea" ? "◯：【#{key}】は正常に表示されている\n" : create_NG_result_status(key, value.tag_name, "textarea") ;
+          check_detail["チェック詳細"] << result
+          check_flag += 1
+        when "商品の説明"
+          result = value.tag_name == "textarea" ? "◯：【#{key}】は正常に表示されている\n" : create_NG_result_status(key, value.tag_name, "textarea") ;
+          check_detail["チェック詳細"] << result
+          check_flag += 1
+        when "商品カテゴリー"
+          result = value.tag_name == "select" ? "◯：【#{key}】は正常に表示されている\n" : create_NG_result_status(key, value.tag_name, "select") ;
+          check_detail["チェック詳細"] << result
+          check_flag += 1
+        when "商品の状態"
+          result = value.tag_name == "select" ? "◯：【#{key}】は正常に表示されている\n" : create_NG_result_status(key, value.tag_name, "select") ;
+          check_detail["チェック詳細"] << result
+          check_flag += 1
+        when "配送料の負担"
+          result = value.tag_name == "select" ? "◯：【#{key}】は正常に表示されている\n" : create_NG_result_status(key, value.tag_name, "select") ;
+          check_detail["チェック詳細"] << result
+          check_flag += 1
+        when "発送元の地域"
+          result = value.tag_name == "select" ? "◯：【#{key}】は正常に表示されている\n" : create_NG_result_status(key, value.tag_name, "select") ;
+          check_detail["チェック詳細"] << result
+          check_flag += 1
+        when "発送までの日数"
+          result = value.tag_name == "select" ? "◯：【#{key}】は正常に表示されている\n" : create_NG_result_status(key, value.tag_name, "select") ;
+          check_detail["チェック詳細"] << result
+          check_flag += 1
+        when "商品価格"
+          result = value.tag_name == "input" ? "◯：【#{key}】は正常に表示されている\n" : create_NG_result_status(key, value.tag_name, "input") ;
+          check_detail["チェック詳細"] << result
+          check_flag += 1
+        end
       end
-
     }
 
-    # ログアウト状態でトップ画面にログインボタンとサインアップボタンが表示されているかチェック
-    # 直前で出品している商品は「サングラス」
-    if @d.find_element(:class,"item-name").displayed?
-      # 最新の商品名を取得
-      latest_ele_name = @d.find_element(:class,"item-name").text
-      # 最新の商品名が「サングラス」と同じか比較
-      if latest_ele_name == @item_name2
-        check_detail["チェック詳細"] << "○：ログアウト状態で、トップ画面で出品順に商品が並んでいる\n"
-        check_flag += 1
-      else
-        check_detail["チェック詳細"] << "×：ログアウト状態で、トップ画面で出品順に商品が並んでいない\n"
-      end
-    else
-      check_detail["チェック詳細"] << "×：ログアウト状態で、トップ画面にclass「item-name」が存在しない\n"
-    end
-    
-    check_detail["チェック合否"] = check_flag == 1 ? "◯" : "×"
-  
+    check_detail["チェック合否"] = check_flag == 9 ? "◯" : "×"
+
   ensure
     @check_log.push(check_detail)
   end
+end
+
+# ログアウト状態のユーザーは、URLを直接入力して商品情報編集ページへ遷移しようとすると、ログインページに遷移すること
+def check_8
+  check_detail = {"チェック番号"=> 8 , "チェック合否"=> "" , "チェック内容"=> "ログアウト状態のユーザーは、URLを直接入力して商品情報編集ページへ遷移しようとすると、ログインページに遷移すること" , "チェック詳細"=> ""}
+  check_flag = 0
+  begin
+    @wait.until {@d.find_element(:class,"sell-btn").displayed?}
+
+    # 商品編集画面のURLを取得
+    @edit_url_coat = @d.current_url
+
+    # ウィンドウ切り替え
+    @d.switch_to.window( @window2_id )
+    sleep 5
+    @d.get(@url)
+    # 他ユーザーでログイン中のためログアウト
+    @d.find_element(:class,"logout").click
+    @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false}
+
+    # ログアウト状態でコート編集画面に直接遷移する
+    @d.get(@edit_url_coat)
+
+    # 編集画面に遷移した時も想定した判定基準を追加
+    # 編集画面のロゴ画像にはクラス名が振られていないため
+    @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
+
+    if /会員情報入力/ .match(@d.page_source)
+      check_detail["チェック詳細"] << "◯：ログアウト状態のユーザーが、URLを直接入力して商品編集ページに遷移しようとすると、ログインページに遷移する\n"
+      check_flag += 1
+    elsif /FURIMAが選ばれる3つの理由/ .match(@d.page_source)
+      check_detail["チェック詳細"] << "×：ログアウト状態のユーザーが、URLを直接入力して商品編集ページに遷移しようとすると、トップページに遷移してしまう\n"
+    else
+      check_detail["チェック詳細"] << "×：ログアウト状態のユーザーが、URLを直接入力して商品編集ページに遷移しようとすると、ログインページでもトップページでもないページに遷移してしまう\n"
+    end
+
+    @d.get(@url)
+    @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
+
+    check_detail["チェック合否"] = check_flag == 1 ? "◯" : "×"
+
+  ensure
+    @d.get(@url)
+    @check_log.push(check_detail)
+    # エラー発生有無に関係なく操作ウィンドウを元に戻す
+    @d.switch_to.window( @window1_id )
+    sleep 5
+  end
 
 end
+
 
 def test_method
   @d.switch_to.window( @window2_id )
