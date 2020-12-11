@@ -70,7 +70,7 @@ def main
   # user2が商品購入
   login_user2_item_buy
 
-  check_6
+  # check_6
 
   # 購入後の商品状態や表示方法をチェック
   login_user2_after_purchase_check1
@@ -564,7 +564,7 @@ def item_edit
 
   
   # 商品出品時とほぼ同じ見た目で商品情報編集機能が実装されていること
-  check_7
+  # check_7
 
   # 「商品の説明」項目を空白にして再度出品してみる
   @d.find_element(:id,"item-info").clear
@@ -889,7 +889,7 @@ def login_user2_after_purchase_check1
   #   puts "☒@URLを直接入力して購入済みの商品ページへ遷移しようとすると、トップページに遷移しない"
   # end
 
-  jard
+  # jard
   # トップページへ遷移
   @d.get(@url)
 
@@ -937,7 +937,8 @@ def login_user2_after_purchase_check1
   else
     puts "!出品ページに遷移できない"
   end
-  @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
+  ##kodama 商品ページ遷移後止まってしまうのでコメントアウト
+  # @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
 end
 
 # user2によるサングラス出品
@@ -1106,7 +1107,7 @@ def no_user_item_buy
   puts "【目視で確認】ログイン/ログアウトによって、ヘッダーにてユーザーへ表示する情報が変わる"
   puts "【目視で確認】画像が表示されており、画像がリンク切れなどになっていない"
   puts "【目視で確認】ログアウト状態のユーザーは、商品出品ページへ遷移しようとすると、ログインページへ遷移すること"
-  puts "【目視で確認】パスワードは半角英数字混合であること"
+  # puts "【目視で確認】パスワードは半角英数字混合であること"
   puts "【目視で確認】パスワードは6文字以上であること"
   puts "【目視で確認】価格の範囲が、¥300~¥9,999,999の間であること"
   puts "【目視で確認】商品出品時とほぼ同じ見た目で商品情報編集機能が実装されていること"
