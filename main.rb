@@ -30,7 +30,8 @@ def main
   # ユーザー新規登録
   # ニックネーム,誕生日未入力
   sign_up_nickname_input
-
+  #パスワード6文字以下で登録できないか確認
+  sign_up_shortpassword_input
   # 必須項目を入力して再登録
   sign_up_retry
   # トップメニュー → ログアウトする
@@ -136,11 +137,66 @@ def sign_up_nickname_input
   @d.find_element(:id, 'first-name-kana').send_keys(@first_name_kana)
   @wait.until {@d.find_element(:id, 'last-name-kana').displayed?}
   @d.find_element(:id, 'last-name-kana').send_keys(@last_name_kana)
-
   @d.find_element(:class,"register-red-btn").click
+  @d.find_element(:id, 'nickname').displayed? ? "○：必須項目が一つでも欠けている場合は、ユーザー登録ができない\n" : "×：必須項目が一つでも欠けている場合は、ユーザー登録ができる\n"
+
 end
 
-# まだ登録が完了していない場合、再度登録
+
+def sign_up_shortpassword_input
+  @d.find_element(:id, 'nickname').clear
+  @wait.until {@d.find_element(:id, 'email').displayed?}
+  @d.find_element(:id, 'email').clear
+  @wait.until {@d.find_element(:id, 'password').displayed?}
+  @d.find_element(:id, 'password').clear
+  @wait.until {@d.find_element(:id, 'password-confirmation').displayed?}
+  @d.find_element(:id, 'password-confirmation').clear
+  @wait.until {@d.find_element(:id, 'first-name').displayed?}
+  @d.find_element(:id, 'first-name').clear
+  @wait.until {@d.find_element(:id, 'last-name').displayed?}
+  @d.find_element(:id, 'last-name').clear
+  @wait.until {@d.find_element(:id, 'first-name-kana').displayed?}
+  @d.find_element(:id, 'first-name-kana').clear
+  @wait.until {@d.find_element(:id, 'last-name-kana').displayed?}
+  @d.find_element(:id, 'last-name-kana').clear
+  # パスワードは6文字以下であること
+  @wait.until {@d.find_element(:id, 'nickname').displayed?}
+  @d.find_element(:id, 'nickname').send_keys(@nickname)
+  @wait.until {@d.find_element(:id, 'email').displayed?}
+  @d.find_element(:id, 'email').send_keys(@email)
+  @wait.until {@d.find_element(:id, 'password').displayed?}
+  @d.find_element(:id, 'password').send_keys(@password_short)
+  @wait.until {@d.find_element(:id, 'password-confirmation').displayed?}
+  @d.find_element(:id, 'password-confirmation').send_keys(@password_short)
+  @wait.until {@d.find_element(:id, 'first-name').displayed?}
+  @d.find_element(:id, 'first-name').send_keys(@first_name)
+  @wait.until {@d.find_element(:id, 'last-name').displayed?}
+  @d.find_element(:id, 'last-name').send_keys(@last_name)
+  @wait.until {@d.find_element(:id, 'first-name-kana').displayed?}
+  @d.find_element(:id, 'first-name-kana').send_keys(@first_name_kana)
+  @wait.until {@d.find_element(:id, 'last-name-kana').displayed?}
+  @d.find_element(:id, 'last-name-kana').send_keys(@last_name_kana)
+
+
+  parent_birth_element = @d.find_element(:class, 'input-birth-wrap')
+  
+  birth_elements = parent_birth_element.find_elements(:tag_name, 'select')
+  birth_elements.each{|ele|
+    select_ele = select_new(ele)
+    select_ele.select_by(:index, @select_index)
+  }
+
+  @d.find_element(:class,"register-red-btn").click
+  if @d.find_element(:id,"nickname").displayed?
+    puts"○：パスワードは6文字以上である\n"
+  else
+    @d.find_element(:class,"sign-up").click 
+    "×：パスワードは6文字以上でない\n"
+  end
+end
+
+
+#まだ登録が完了していない場合、再度登録
 def sign_up_retry
 
   if /会員情報入力/ .match(@d.page_source)
@@ -150,7 +206,7 @@ def sign_up_retry
   @wait.until {@d.find_element(:id,"nickname").displayed?}
   end
 
-  puts "◯必須項目が一つでも欠けている場合は、ユーザー登録ができない"
+  
   sleep 3
   puts "◯【目視で確認】エラーハンドリングができていること（適切では無い値が入力された場合、情報は保存されず、エラーメッセージを出力させる）"
 
@@ -175,7 +231,7 @@ def sign_up_retry
   # ここで再度.displayed?メソッド使う意味はあるのか？？ = 高速処理によって処理がエラーを起こさないように記述している
   @wait.until {@d.find_element(:id, 'nickname').displayed?}
   @d.find_element(:id, 'nickname').send_keys(@nickname)
-  puts "◯ニックネームが@必須である"
+  puts "◯ニックネームが必須である"
 
   @wait.until {@d.find_element(:id, 'email').displayed?}
   @d.find_element(:id, 'email').send_keys(@email)
@@ -1107,8 +1163,8 @@ def no_user_item_buy
   puts "【目視で確認】ログイン/ログアウトによって、ヘッダーにてユーザーへ表示する情報が変わる"
   puts "【目視で確認】画像が表示されており、画像がリンク切れなどになっていない"
   puts "【目視で確認】ログアウト状態のユーザーは、商品出品ページへ遷移しようとすると、ログインページへ遷移すること"
-  # puts "【目視で確認】パスワードは半角英数字混合であること"
-  puts "【目視で確認】パスワードは6文字以上であること"
+  puts "【目視で確認】パスワードは半角英数字混合であること"
+  # puts "【目視で確認】パスワードは6文字以上であること"
   puts "【目視で確認】価格の範囲が、¥300~¥9,999,999の間であること"
   puts "【目視で確認】商品出品時とほぼ同じ見た目で商品情報編集機能が実装されていること"
   puts "【目視で確認】商品購入ページでは、一覧や詳細ページで選択した商品の情報が出力されること"

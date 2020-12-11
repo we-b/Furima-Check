@@ -90,6 +90,7 @@ randm_word = SecureRandom.hex(10) #=> "4a01bbd139f5e94bd249"
 @blank = "1"
 
 @select_index = 1
+@password_short = "aa11"
 
 # チェック項目の結果や詳細を保存しておく配列
 # チェック項目の内容はハッシュ 
