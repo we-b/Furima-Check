@@ -138,6 +138,7 @@ def check_1
 end
 
 
+
 # ログイン状態
 # ログイン状態では、ヘッダーにユーザーのニックネーム/ログアウトボタンが表示されること
 def check_2
@@ -575,8 +576,7 @@ def check_8
     @d.switch_to.window( @window1_id )
     sleep 5
   end
-
-end
+# end
 
 
 def test_method

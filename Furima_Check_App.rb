@@ -34,8 +34,8 @@ b_password = "1111"
 randm_word = SecureRandom.hex(10) #=> "4a01bbd139f5e94bd249"
 
 
-@item_image = "/Users/tech-camp/projects/furima_checkApp/photo/coat.jpg"
-@item_image2 = "/Users/tech-camp/projects/furima_checkApp/photo/sunglass.jpg"
+@item_image = "/Users/tech-camp/projects2/Furima-Check/photo/coat.jpg"
+@item_image2 = "/Users/tech-camp/projects2/Furima-Check/photo/sunglass.jpg"
 @password = "aaa111" #パスワードは共通
 
 @nickname = "lifecoach_test_user1"

@@ -10,3 +10,4 @@ gem 'pry'
 gem 'pry-byebug'
 gem 'pry-rails'
 gem "pry-rescue", "~> 1.5"
+gem 'ruby_jard'
