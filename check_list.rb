@@ -296,104 +296,6 @@ def sign_up_user3
 end
 
 
-<<<<<<< HEAD
-# # ログイン状態の出品者以外のユーザーが、URLを直接入力して売却済み商品の商品購入ページへ遷移しようとすると、トップページに遷移すること
-# def check_6
-#   check_detail = {"チェック番号"=> 6 , "チェック合否"=> "" , "チェック内容"=> "ログイン状態のユーザーが、URLを直接入力して売却済み商品の商品購入ページへ遷移しようとすると、トップページに遷移すること" , "チェック詳細"=> ""}
-#   check_flag = 0
-
-#   begin
-#     # 2つ目のウィンドウに切り替え
-#     @d.switch_to.window( @window2_id )
-#     sleep 5
-#     @d.get(@url)
-
-
-#     # トップページ画面からスタート
-#     @wait.until {@d.find_element(:class,"purchase-btn").displayed?}
-
-#     #user3でサインアップ
-#     sign_up_user3
-
-#     # user3がログイン状態で他人が出品したコートの購入画面に遷移(直接URL入力)
-#     @d.get(@order_url_coat)
-#     # アイコンが表示されるまで待機
-#     @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
-
-#     # 出品ボタンの有無でトップページに遷移したかを判断
-#     if @d.find_element(:class,"purchase-btn").displayed?
-#       check_detail["チェック詳細"] << "○：ログイン状態の出品者以外のユーザーが、URLを直接入力して自身の出品した商品購入ページに遷移しようとすると、トップページに遷移する\n"
-#       check_flag += 1
-#     else
-#       check_detail["チェック詳細"] << "×：ログイン状態の出品者以外のユーザーが、URLを直接入力して自身の出品した商品購入ページに遷移しようとすると、トップページ以外に遷移する\n"
-#       @d.get(@url)
-#     end
-
-#     check_detail["チェック合否"] = check_flag == 1 ? "◯" : "×"
-
-#   ensure
-#     # ログアウトしておく
-#     @d.find_element(:class,"logout").click
-#     @d.get(@url)
-#     @check_log.push(check_detail)
-#     # エラー発生有無に関係なく操作ウィンドウを元に戻す
-#     @d.switch_to.window( @window1_id )
-#     sleep 5
-#   end
-# end
-
-# # 商品出品時とほぼ同じ見た目で商品情報編集機能が実装されていること
-# def check_7
-#   check_detail = {"チェック番号"=> 7 , "チェック合否"=> "" , "チェック内容"=> "商品出品時とほぼ同じ見た目で商品情報編集機能が実装されていること" , "チェック詳細"=> ""}
-#   check_flag = 0
-#   begin
-#     @wait.until {@d.find_element(:class,"sell-btn").displayed?}
-
-#     # 商品の入力項目のチェック用配列
-#     item_input_data = {}
-#     item_input_data["商品画像"] = unshift(@d.find_element(:id,"item-image") rescue "商品画像(class名：item-image)が存在しませんでした")
-#     item_input_data["商品名"] = unshift(@d.find_element(:id,"item-name") rescue "商品名(class名：item-name)が存在しませんでした")
-#     item_input_data["商品の説明"] = unshift(@d.find_element(:id,"item-info") rescue "商品の説明(class名：item-info)が存在しませんでした")
-#     item_input_data["商品カテゴリー"] = unshift(@d.find_element(:id,"item-category") rescue "商品カテゴリー(class名：item-category)が存在しませんでした")
-#     item_input_data["商品の状態"] = unshift(@d.find_element(:id,"item-sales-status") rescue "商品の状態(class名：item-sales-status)が存在しませんでした")
-#     item_input_data["配送料の負担"] = unshift(@d.find_element(:id,"item-shipping-fee-status") rescue "配送料の負担(class名：item-shipping-fee-status)が存在しませんでした")
-#     item_input_data["発送元の地域"] = unshift(@d.find_element(:id,"item-prefecture") rescue "発送元の地域(class名：item-prefecture)が存在しませんでした")
-#     item_input_data["発送までの日数"] = unshift(@d.find_element(:id,"item-scheduled-delivery") rescue "発送までの日数(class名：item-scheduled-delivery)が存在しませんでした")
-#     item_input_data["商品価格"] = unshift(@d.find_element(:id,"item-price") rescue "商品価格(class名：item-name)が存在しませんでした")
-
-
-#     item_input_data.each{|data|
-#       # 内容が文字列かどうかチェック = 文字列だったらエラー判定
-#       if data.kind_of?(String)
-#         check_detail["チェック詳細"] << item_input_data
-#       else
-#         check_detail["チェック詳細"] << "#{data.key}"
-#       end
-
-#     }
-
-#     # ログアウト状態でトップ画面にログインボタンとサインアップボタンが表示されているかチェック
-#     # 直前で出品している商品は「サングラス」
-#     if @d.find_element(:class,"item-name").displayed?
-#       # 最新の商品名を取得
-#       latest_ele_name = @d.find_element(:class,"item-name").text
-#       # 最新の商品名が「サングラス」と同じか比較
-#       if latest_ele_name == @item_name2
-#         check_detail["チェック詳細"] << "○：ログアウト状態で、トップ画面で出品順に商品が並んでいる\n"
-#         check_flag += 1
-#       else
-#         check_detail["チェック詳細"] << "×：ログアウト状態で、トップ画面で出品順に商品が並んでいない\n"
-#       end
-#     else
-#       check_detail["チェック詳細"] << "×：ログアウト状態で、トップ画面にclass「item-name」が存在しない\n"
-#     end
-    
-#     check_detail["チェック合否"] = check_flag == 1 ? "◯" : "×"
-  
-#   ensure
-#     @check_log.push(check_detail)
-#   end
-=======
 # ログイン状態の出品者以外のユーザーが、URLを直接入力して売却済み商品の商品購入ページへ遷移しようとすると、トップページに遷移すること
 def check_6
   check_detail = {"チェック番号"=> 6 , "チェック合否"=> "" , "チェック内容"=> "ログイン状態のユーザーが、URLを直接入力して売却済み商品の商品購入ページへ遷移しようとすると、トップページに遷移すること" , "チェック詳細"=> ""}
@@ -564,8 +466,6 @@ def check_8
     @d.switch_to.window( @window1_id )
     sleep 5
   end
->>>>>>> f6f72892dd99a821762dad693b435e1f3733698d
-
 # end
 
 
