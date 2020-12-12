@@ -120,6 +120,14 @@ def login_any_user(email, pass)
   @d.get(@url)
   @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
 
+  # ログイン状態であればログアウトしておく
+  if (@d.find_element(:class,"logout").displayed? rescue false)
+    @d.find_element(:class,"logout").click
+    @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
+    @d.get(@url)
+    @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }  
+  end
+
   @d.find_element(:class,"login").click
   @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
 
@@ -256,7 +264,7 @@ def logout_from_the_topMenu
   end
 
   # if /ログアウト/.match(@d.page_source)
-  @d.find_element(:link_text,"ログアウト").click
+  @d.find_element(:class,"logout").click
   # else
 
   # end
@@ -625,12 +633,13 @@ def item_edit
   puts "◯商品情報（商品画像・商品名・商品の状態など）を変更できる"
 end
 
+# ログアウトしてから商品の編集や購入ができるかチェック
 def logout_item_edit_and_buy
   # ヘッダーのトップへ遷移するアイコンをクリック
   @d.find_element(:class,"furima-icon").click
 
   # ログアウトをクリック
-  @d.find_element(:link_text,"ログアウト").click
+  @d.find_element(:class,"logout").click
   # ログアウト後のトップページで「出品する」ボタンをクリック
   if /出品する/ .match(@d.page_source)
     @d.find_element(:class,"purchase-btn").click
@@ -645,28 +654,16 @@ def logout_item_edit_and_buy
     puts "!出品ページに遷移できない"
   end
 
-  if /会員情報入力/ .match(@d.page_source)
-    puts "!ログインしていない状態で商品出品ページへアクセスすると、ログインページへ遷移しました"
-    @wait.until {@d.find_element(:class,"second-logo").displayed?}
-    # second-logo = トップページ以外でのヘッダーに表示されるトップへ遷移するアイコンをクリック
-    @d.find_element(:class,"second-logo").click
+  # ログアウト状態のユーザーは、商品出品ページへ遷移しようとすると、ログインページへ遷移すること
+  check_9
 
-  elsif /FURIMAが選ばれる3つの理由/ .match(@d.page_source)
-    puts "!ログインしていない状態で商品出品ページへアクセスすると、トップページへ遷移しました"
-
-  else
-    puts "!ログインしていない状態で商品出品ページへアクセスすると、ログインページへ遷移できませんでした"
-    @d.find_element(:class,"second-logo").click
-  end
-
-  puts "◯ログインしているユーザーだけが、出品ページへ遷移できる"
 
   # トップページにて出品された商品一覧(商品画像)が表示されているかどうか
   @wait.until {@d.find_element(:class, "item-img-content").displayed?}
   if /#{@item_image_name}/ .match(@d.page_source)
-    puts "!ログインしていないユーザーでも、商品の一覧表示を確認でき、出品画像が表示されている" 
+    puts "!ログアウト状態で、トップ画面にて商品の一覧表示を確認でき、出品画像が表示されている" 
   else
-    puts "!ログインしていないユーザーだと出品画像が表示されない" 
+    puts "!ログアウト状態だとトップ画面にて出品画像が表示されない"
     # ？現在トップページ画面なのに「detail-item」クラスは商品詳細画面にしか存在しないクラスを指定している
     @wait.until {@d.find_element(:class,"detail-item").displayed?}
   end
@@ -683,34 +680,35 @@ def logout_item_edit_and_buy
   # 商品詳細画面へ遷移
   @d.find_element(:class,"item-img-content").click
   if /編集/ .match(@d.page_source)
-    puts "☒ログインしていないユーザーでも、商品の編集が行える" 
+    puts "☒ログアウト状態で商品詳細画面にて商品の編集が行えてしまう"
+    # ログアウト状態では「item-red-btn」クラスは存在しないため不要？
     @wait.until {@d.find_element(:class,"item-red-btn").displayed?}
   else
-    puts "◯ログインしていないユーザーは、商品の編集が行えない。" 
+    puts "◯ログアウト状態では商品詳細画面にて商品の編集が行えない。"
   end
 
   if /削除/ .match(@d.page_source)
-    puts "☒ログインしていないユーザーでも、商品の削除が行える"
+    puts "☒ログアウト状態で商品詳細画面にて商品の削除が行えてしまう"
     @wait.until {@d.find_element(:class,"item-red-btn").displayed?}
   else
-    puts "◯ログインしていないユーザーは、商品の削除が行えない。" 
+    puts "◯ログアウト状態では商品詳細画面にて商品の削除が行えない。"
   end
-
-
 
   if /購入画面に進む/.match(@d.page_source)
-    puts "!購入ボタンがあるのでクリック"
+    puts "!商品詳細画面に「購入ボタン」があるのでクリック"
     @d.find_element(:class,"item-red-btn").click
     if /会員情報入力/.match(@d.page_source)
+      puts "◯ログアウト状態では購入ページに遷移しようとすると、ログインページに遷移する"
       @d.find_element(:class,"second-logo").click
     else
-      "☒ログインしていないユーザーは購入ページに遷移しようとすると、ログインページに遷移しない"
+      "☒ログアウト状態では購入ページに遷移しようとすると、ログインページに遷移しない"
     end
   else
-    puts "!購入ボタンがない"
+    puts "!商品詳細画面に購入ボタンがない"
   end
 
-  puts "◯ログインしていないユーザーは購入ページに遷移しようとすると、ログインページに遷移する"
+  @d.get(@url)
+  @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
 
   puts "【説明】購入ボタン自体を消しているてる場合があるので一度、サインアップする"
 
@@ -943,6 +941,8 @@ def login_user2_after_purchase_check1
 
   @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
 
+  jard
+  
   if /出品する/ .match(@d.page_source)
     @d.find_element(:class,"purchase-btn").click
     puts "!出品ページに遷移1"
@@ -955,7 +955,7 @@ def login_user2_after_purchase_check1
   else
     puts "!出品ページに遷移できない"
   end
-  @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
+  @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
 end
 
 # user2によるサングラス出品
@@ -987,7 +987,7 @@ end
 def login_user1_item_buy
   # 出品完了後、トップページからログアウト
   @wait.until {@d.find_element(:class,"purchase-btn").displayed?}
-  @d.find_element(:link_text,"ログアウト").click
+  @d.find_element(:class,"logout").click
 
   #user1で再度ログイン
   @d.find_element(:class,"login").click 
@@ -1009,10 +1009,10 @@ end
 # ログイン状態で商品購入
 def no_user_item_buy
   @wait.until {@d.find_element(:class,"purchase-btn").displayed?}
-  @d.find_element(:link_text,"ログアウト").click
+  @d.find_element(:class,"logout").click
 
   @d.get(@order_url_glasses)
-  @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
+  @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
 
   if /会員情報入力/ .match(@d.page_source)
     # ログインページへ遷移するのが正解
@@ -1022,7 +1022,7 @@ def no_user_item_buy
     # ログインページに遷移しなかったらログインページへ遷移させる
     puts "☒ログインしていないユーザーは購入ページに遷移しようとしても、ログインページに遷移しない"
     @d.get(@url)
-    @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
+    @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
 
     @d.find_element(:class,"sign-up").click
   end
@@ -1034,10 +1034,10 @@ def no_user_item_buy
   @d.find_element(:id, 'password').send_keys(@password)
   @d.find_element(:class,"login-red-btn").click
 
-  @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
+  @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
 
   @d.get(@order_url_glasses)
-  @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
+  @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
 
   if /FURIMAが選ばれる3つの理由/ .match(@d.page_source)
     puts "◯出品者は@URLを直接入力して購入ページに遷移しようとすると、トップページに遷移する"
@@ -1050,7 +1050,7 @@ def no_user_item_buy
   @wait.until {@d.find_element(:class,"item-img-content").displayed?}
   @d.find_element(:class,"item-img-content").click
 
-  @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
+  @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
 
   if /購入画面に進む/ .match(@d.page_source)
     puts "☒出品者でも、商品購入のリンクが踏めるようになっている"
@@ -1062,7 +1062,7 @@ def no_user_item_buy
   @wait.until {@d.find_element(:class,"item-destroy").displayed?}
   @d.find_element(:class,"item-destroy").click
 
-  @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
+  @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
 
   # 最新出品商品名 = 「サングラス」以外の商品名
   latest_item_name = @d.find_element(:class,"item-name").text
@@ -1075,7 +1075,7 @@ def no_user_item_buy
 
 
   @wait.until {@d.find_element(:class,"purchase-btn").displayed?}
-  @d.find_element(:link_text,"ログアウト").click
+  @d.find_element(:class,"logout").click
   @wait.until {@d.find_element(:class,"purchase-btn").displayed?}
 
   # 要素が取得できなければeach処理を行わないためのfalse

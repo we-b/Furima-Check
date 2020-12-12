@@ -45,7 +45,7 @@ randm_word = SecureRandom.hex(10) #=> "4a01bbd139f5e94bd249"
 @first_name_kana = "アイ"
 @last_name_kana = "フジチャク"
 
-@nickname2 = "lifeoach_test_user2"
+@nickname2 = "lifecoach_test_user2"
 @email2 = "user2_#{randm_word}@co.jp"
 @first_name2 = "梨泰"
 @last_name2 = "院"

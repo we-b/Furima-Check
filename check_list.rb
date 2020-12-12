@@ -1,13 +1,12 @@
 require "./main"
 
-
+# ログアウト状態でトップ画面にログインボタンとサインアップボタンが表示されているかチェック
 def check_1
   check_detail = {"チェック番号"=> 1 , "チェック合否"=> "" , "チェック内容"=> "ログアウト状態で、ヘッダーにログイン/新規登録ボタンが表示されること" , "チェック詳細"=> ""}
   check_flag = 0
 
   begin
     @wait.until {@d.find_element(:class,"purchase-btn").displayed?}
-    # ログアウト状態でトップ画面にログインボタンとサインアップボタンが表示されているかチェック
     if @d.find_element(:class,"login").displayed?
       check_ele1 = @d.find_element(:class,"login").displayed? ? "○：ログアウト状態で、ヘッダーにログインボタンが表示されている\n" : "×：ログアウト状態では、ヘッダーにログインボタンが表示されない\n"
       check_detail["チェック詳細"] << check_ele1
@@ -102,9 +101,9 @@ def check_3
     @d.find_element(:class,"item-img-content").click
   
     # 商品詳細画面での情報を取得
-    @wait.until {@d.find_element(:class, "item-image").displayed?}
+    @wait.until {@d.find_element(:class, "item-box-img").displayed?}
     show_item_name = @d.find_element(:class,"name").text rescue "Error：class：nameが見つかりません\n"
-    show_item_img = @d.find_element(:class,"item-image").attribute("src") rescue "Error：class：item-imageが見つかりません\n"
+    show_item_img = @d.find_element(:class,"item-box-img").attribute("src") rescue "Error：class：item-box-imgが見つかりません\n"
     show_item_price = @d.find_element(:class,"item-price").text rescue "Error：class：item-priceが見つかりません\n"
   
     # 詳細画面の表示内容をチェック
@@ -245,7 +244,7 @@ def check_5
 
   ensure
     # ログアウトしておく
-    @d.find_element(:link_text,"ログアウト").click
+    @d.find_element(:class,"logout").click
     @d.get(@url)
     @wait.until {@d.find_element(:class,"purchase-btn").displayed?}
 
@@ -467,6 +466,33 @@ def check_8
   end
 
 end
+
+# ログアウト状態のユーザーは、商品出品ページへ遷移しようとすると、ログインページへ遷移すること
+def check_9
+  check_detail = {"チェック番号"=> 9 , "チェック合否"=> "" , "チェック内容"=> "ログアウト状態のユーザーは、商品出品ページへ遷移しようとすると、ログインページへ遷移すること" , "チェック詳細"=> ""}
+  check_flag = 0
+  begin
+    @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
+
+    if /会員情報入力/ .match(@d.page_source)
+      check_detail["チェック詳細"] << "◯：!ログアウト状態で商品出品ページへアクセスすると、ログインページへ遷移しました\n"
+      check_flag += 1
+    elsif /FURIMAが選ばれる3つの理由/ .match(@d.page_source)
+      check_detail["チェック詳細"] << "×：!ログアウト状態で商品出品ページへアクセスすると、トップページへ遷移しました\n"
+    else
+      check_detail["チェック詳細"] << "×：!ログアウト状態で商品出品ページへアクセスすると、ログインページ、トップページ以外の画面へ遷移しました\n"
+    end
+
+    check_detail["チェック合否"] = check_flag == 1 ? "◯" : "×"
+
+  ensure
+    @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
+    @d.get(@url)
+
+    @check_log.push(check_detail)
+  end
+end
+
 
 
 def test_method
