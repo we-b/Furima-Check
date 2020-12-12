@@ -31,6 +31,9 @@ def main
   # ニックネーム,誕生日未入力
   sign_up_nickname_input
 
+  # 半角英数字
+  kodama_1
+  
   # 必須項目を入力して再登録
   sign_up_retry
   # トップメニュー → ログアウトする

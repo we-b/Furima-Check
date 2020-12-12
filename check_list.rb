@@ -1,5 +1,115 @@
 require "./main"
 
+def kodama_1
+  check_detail = {"チェック番号"=> 111 , "チェック合否"=> "" , "チェック内容"=> "パスワードは半角英数字混合であること" , "チェック詳細"=> ""}
+  check_flag = 0
+
+  begin
+    @wait.until {@d.find_element(:id,"nickname").displayed?}
+    # ログアウト状態でトップ画面にログインボタンとサインアップボタンが表示されているかチェック
+    if @d.find_element(:id,"nickname").displayed?
+      # 入力欄をクリア
+      @d.find_element(:id, 'nickname').clear
+      @wait.until {@d.find_element(:id, 'email').displayed?}
+      @d.find_element(:id, 'email').clear
+      @wait.until {@d.find_element(:id, 'password').displayed?}
+      @d.find_element(:id, 'password').clear
+      @wait.until {@d.find_element(:id, 'password-confirmation').displayed?}
+      @d.find_element(:id, 'password-confirmation').clear
+      @wait.until {@d.find_element(:id, 'first-name').displayed?}
+      @d.find_element(:id, 'first-name').clear
+      @wait.until {@d.find_element(:id, 'last-name').displayed?}
+      @d.find_element(:id, 'last-name').clear
+      @wait.until {@d.find_element(:id, 'first-name-kana').displayed?}
+      @d.find_element(:id, 'first-name-kana').clear
+      @wait.until {@d.find_element(:id, 'last-name-kana').displayed?}
+      @d.find_element(:id, 'last-name-kana').clear
+
+      #パスワードを文字のみ入力
+      @wait.until {@d.find_element(:id, 'nickname').displayed?}
+      @d.find_element(:id, 'nickname').send_keys(@nickname)
+      @wait.until {@d.find_element(:id, 'email').displayed?}
+      @d.find_element(:id, 'email').send_keys(@email)
+      @wait.until {@d.find_element(:id, 'password').displayed?}
+      @d.find_element(:id, 'password').send_keys(@password_string)
+      @wait.until {@d.find_element(:id, 'password-confirmation').displayed?}
+      @d.find_element(:id, 'password-confirmation').send_keys(@password_string)
+      @wait.until {@d.find_element(:id, 'first-name').displayed?}
+      @d.find_element(:id, 'first-name').send_keys(@first_name)
+      @wait.until {@d.find_element(:id, 'last-name').displayed?}
+      @d.find_element(:id, 'last-name').send_keys(@last_name)
+      @wait.until {@d.find_element(:id, 'first-name-kana').displayed?}
+      @d.find_element(:id, 'first-name-kana').send_keys(@first_name_kana)
+      @wait.until {@d.find_element(:id, 'last-name-kana').displayed?}
+      @d.find_element(:id, 'last-name-kana').send_keys(@last_name_kana)
+
+      parent_birth_element = @d.find_element(:class, 'input-birth-wrap')
+      birth_elements = parent_birth_element.find_elements(:tag_name, 'select')
+      birth_elements.each{|ele|
+      select_ele = select_new(ele)
+      select_ele.select_by(:index, @select_index)}
+  
+      @d.find_element(:class,"register-red-btn").click
+
+      check_ele1 = @d.find_element(:id, 'nickname').displayed? ? "○：パスワードは文字のみだと登録できない\n" : "×：パスワードは文字のみでも登録できる\n"
+      check_detail["チェック詳細"] << check_ele1
+      check_flag += 1
+    end
+    jard
+    if @d.find_element(:id,"nickname").displayed?
+      # 入力欄をクリア
+      @d.find_element(:id, 'nickname').clear
+      @wait.until {@d.find_element(:id, 'email').displayed?}
+      @d.find_element(:id, 'email').clear
+      @wait.until {@d.find_element(:id, 'password').displayed?}
+      @d.find_element(:id, 'password').clear
+      @wait.until {@d.find_element(:id, 'password-confirmation').displayed?}
+      @d.find_element(:id, 'password-confirmation').clear
+      @wait.until {@d.find_element(:id, 'first-name').displayed?}
+      @d.find_element(:id, 'first-name').clear
+      @wait.until {@d.find_element(:id, 'last-name').displayed?}
+      @d.find_element(:id, 'last-name').clear
+      @wait.until {@d.find_element(:id, 'first-name-kana').displayed?}
+      @d.find_element(:id, 'first-name-kana').clear
+      @wait.until {@d.find_element(:id, 'last-name-kana').displayed?}
+      @d.find_element(:id, 'last-name-kana').clear
+
+      #パスワードを数字のみ入力
+      @wait.until {@d.find_element(:id, 'nickname').displayed?}
+      @d.find_element(:id, 'nickname').send_keys(@nickname)
+      @wait.until {@d.find_element(:id, 'email').displayed?}
+      @d.find_element(:id, 'email').send_keys(@email)
+      @wait.until {@d.find_element(:id, 'password').displayed?}
+      @d.find_element(:id, 'password').send_keys(@password_int)
+      @wait.until {@d.find_element(:id, 'password-confirmation').displayed?}
+      @d.find_element(:id, 'password-confirmation').send_keys(@password_int)
+      @wait.until {@d.find_element(:id, 'first-name').displayed?}
+      @d.find_element(:id, 'first-name').send_keys(@first_name)
+      @wait.until {@d.find_element(:id, 'last-name').displayed?}
+      @d.find_element(:id, 'last-name').send_keys(@last_name)
+      @wait.until {@d.find_element(:id, 'first-name-kana').displayed?}
+      @d.find_element(:id, 'first-name-kana').send_keys(@first_name_kana)
+      @wait.until {@d.find_element(:id, 'last-name-kana').displayed?}
+      @d.find_element(:id, 'last-name-kana').send_keys(@last_name_kana)
+
+      parent_birth_element = @d.find_element(:class, 'input-birth-wrap')
+      birth_elements = parent_birth_element.find_elements(:tag_name, 'select')
+      birth_elements.each{|ele|
+      select_ele = select_new(ele)
+      select_ele.select_by(:index, @select_index)}
+  
+      @d.find_element(:class,"register-red-btn").click
+      check_ele1 = @d.find_element(:id, 'nickname').displayed? ? "○：パスワードは数字のみだと登録できない\n" : "×：パスワードは数字のみでも登録できる\n"
+      check_detail["チェック詳細"] << check_ele1
+      check_flag += 1
+    end
+    jard
+    check_detail["チェック合否"] = check_flag == 2 ? "◯" : "×"
+
+  ensure
+    @check_log.push(check_detail)
+  end
+end
 
 def check_1
   check_detail = {"チェック番号"=> 1 , "チェック合否"=> "" , "チェック内容"=> "ログアウト状態で、ヘッダーにログイン/新規登録ボタンが表示されること" , "チェック詳細"=> ""}
