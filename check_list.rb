@@ -491,6 +491,62 @@ def check_9
   end
 end
 
+# 出品者でも、売却済みの商品に対しては「編集・削除ボタン」が表示されないこと
+def check_10
+  check_detail = {"チェック番号"=> 10 , "チェック合否"=> "" , "チェック内容"=> "出品者でも、売却済みの商品に対しては「編集・削除ボタン」が表示されないこと" , "チェック詳細"=> ""}
+  check_flag = 0
+  begin
+    # 2つ目のウィンドウに切り替え
+    @d.switch_to.window( @window2_id )
+    sleep 5
+    @d.get(@url)
+
+
+    # トップページ画面からスタート
+    @wait.until {@d.find_element(:class,"purchase-btn").displayed?}
+
+    # コートを出品したuser1でログイン
+    login_any_user(@email, @password)
+    # 最新商品 =
+    items = @d.find_elements(:class,"item-name")
+    items.each{|item|
+      #直前で購入した「コート」の詳細画面へ遷移
+      if item.text == @item_name then item.click end
+      @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
+      break
+    }
+
+    # 編集ボタンの有無
+    if /編集/.match(@d.page_source)
+      check_detail["チェック詳細"] << "×：出品者が売却済みの商品の商品詳細画面へいくと、「編集」のリンクが表示されている\n"
+    else
+      check_detail["チェック詳細"] << "◯：出品者が売却済みの商品の商品詳細画面へいくと、「編集」のリンクが表示されていない\n"
+      check_flag += 1
+    end
+
+    # 削除ボタンの有無
+    if /削除/.match(@d.page_source)
+      check_detail["チェック詳細"] << "×：出品者が売却済みの商品の商品詳細画面へいくと、「削除」のリンクが表示されている\n"
+    else
+      check_detail["チェック詳細"] << "◯：出品者が売却済みの商品の商品詳細画面へいくと、「削除」のリンクが表示されていない\n"
+      check_flag += 1
+    end
+
+    @d.get(@url)
+    @wait.until {@d.find_element(:class,"purchase-btn").displayed?}
+
+    check_detail["チェック合否"] = check_flag == 2 ? "◯" : "×"
+
+  ensure
+    # ログアウトしておく
+    @d.find_element(:class,"logout").click
+    @d.get(@url)
+    @check_log.push(check_detail)
+    # エラー発生有無に関係なく操作ウィンドウを元に戻す
+    @d.switch_to.window( @window1_id )
+    sleep 5
+  end
+end
 
 
 def test_method

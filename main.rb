@@ -11,7 +11,7 @@ require 'ruby_jard'
 
 def main
 
-  start
+  # start
 
   @url = @http + @url_ele
   # @url = "http://#{b_id}:#{b_password}@localhost:3000/"
@@ -75,7 +75,12 @@ def main
   # user2が商品購入
   login_user2_item_buy
 
+  # ログイン状態の出品者以外のユーザーが、URLを直接入力して売却済み商品の商品購入ページへ遷移しようとすると、トップページに遷移すること
   check_6
+
+  jard
+  # 出品者でも、売却済みの商品に対しては「編集・削除ボタン」が表示されないこと
+  check_10
 
   # 購入後の商品状態や表示方法をチェック
   login_user2_after_purchase_check1
@@ -154,7 +159,7 @@ def login_any_user(email, pass)
     @d.find_element(:class,"logout").click
     @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
     @d.get(@url)
-    @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }  
+    @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
   end
 
   @d.find_element(:class,"login").click
@@ -164,6 +169,7 @@ def login_any_user(email, pass)
   @d.find_element(:id, 'password').send_keys(pass)
   @d.find_element(:class,"login-red-btn").click
   @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
+  # トップページ画面
   @d.get(@url)
   @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
 
