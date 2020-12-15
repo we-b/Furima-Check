@@ -22,13 +22,12 @@ require 'securerandom'
 
 
 #basic認証のidとpass
-b_id = "admin"
-b_password = "1111"
-@http ="http://#{b_id}:#{b_password}@"
+@b_id = "admin"
+@b_password = "2222"
+@http ="http://#{@b_id}:#{@b_password}@"
 # 受講生の@URLをhttp://以降から記入
 
-@url = "#{@http}afternoon-bayou-26262.herokuapp.com/"
-# @url = "http://#{b_id}:#{b_password}@localhost:3000/"
+@url_ele = "afternoon-bayou-26262.herokuapp.com/"
 
 # テスト登録用emailのランダム文字列
 randm_word = SecureRandom.hex(10) #=> "4a01bbd139f5e94bd249"
@@ -110,6 +109,8 @@ ensure
             print "■チェック詳細：\n#{check["チェック詳細"]}\n"
         }
     end
+    
+    sleep 300000000000000
 
     puts $!
     puts $@

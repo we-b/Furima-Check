@@ -168,8 +168,6 @@ def check_3
   
     check_detail["チェック合否"] = check_flag == 9 ? "◯" : "×"
   
-    @check_log.push(check_detail)
-
     # トップ画面へ戻っておく
     @d.get(@url)
     # エラー発生有無にかかわらず実行
