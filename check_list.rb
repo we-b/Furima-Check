@@ -552,35 +552,35 @@ end
 def check_11
   check_detail = {"チェック番号"=> 11 , "チェック合否"=> "" , "チェック内容"=> "商品詳細ページでログアウト状態のユーザーには、「編集・削除・購入画面に進むボタン」が表示されないこと" , "チェック詳細"=> ""}
   check_flag = 0
-  
+
   begin
     if /編集/ .match(@d.page_source)
-      check_detail["チェック詳細"] << "×：ログアウト状態のユーザーでは商品詳細画面にて商品の編集ボタンが表示されてしまう"
+      check_detail["チェック詳細"] << "×：ログアウト状態のユーザーでは商品詳細画面にて商品の編集ボタンが表示されてしまう\n"
     else
-      check_detail["チェック詳細"] << "◯：ログアウト状態のユーザーでは商品詳細画面にて商品の編集ボタンが表示されない"
+      check_detail["チェック詳細"] << "◯：ログアウト状態のユーザーでは商品詳細画面にて商品の編集ボタンが表示されない\n"
       check_flag += 1
     end
 
     if /削除/ .match(@d.page_source)
-      check_detail["チェック詳細"] << "×：ログアウト状態のユーザーでは商品詳細画面にて商品の削除ボタンが表示されてしまう"
+      check_detail["チェック詳細"] << "×：ログアウト状態のユーザーでは商品詳細画面にて商品の削除ボタンが表示されてしまう\n"
     else
-      check_detail["チェック詳細"] << "◯：ログアウト状態のユーザーでは商品詳細画面にて商品の削除ボタンが表示されない"
+      check_detail["チェック詳細"] << "◯：ログアウト状態のユーザーでは商品詳細画面にて商品の削除ボタンが表示されない\n"
       check_flag += 1
     end
 
     if /購入画面に進む/.match(@d.page_source)
-      check_detail["チェック詳細"] << "!：商品詳細画面に「購入ボタン」があるのでクリック"
+      check_detail["チェック詳細"] << "!：商品詳細画面に「購入ボタン」があるのでクリック\n"
       @d.find_element(:class,"item-red-btn").click
       @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
 
       if /会員情報入力/.match(@d.page_source)
-        check_detail["チェック詳細"] << "◯：ログアウト状態では購入ページに遷移しようとすると、ログインページに遷移する"
+        check_detail["チェック詳細"] << "◯：ログアウト状態では購入ページに遷移しようとすると、ログインページに遷移する\n"
         check_flag += 1
       else
-        check_detail["チェック詳細"] << "×：ログアウト状態では購入ページに遷移しようとすると、ログインページに遷移しない"
+        check_detail["チェック詳細"] << "×：ログアウト状態では購入ページに遷移しようとすると、ログインページに遷移しない\n"
       end
     else
-      check_detail["チェック詳細"] << "◯：ログアウト状態のユーザーでは商品詳細画面にて購入ボタンが表示されない"
+      check_detail["チェック詳細"] << "◯：ログアウト状態のユーザーでは商品詳細画面にて購入ボタンが表示されない\n"
       check_flag += 1
     end
 
@@ -596,6 +596,39 @@ def check_11
     @check_log.push(check_detail)
   end
 end
+
+# ログイン状態の出品者以外のユーザーのみ、「購入画面に進むボタン」が表示されること
+def check_12
+  check_detail = {"チェック番号"=> 12 , "チェック合否"=> "" , "チェック内容"=> "ログイン状態の出品者以外のユーザーのみ、「購入画面に進むボタン」が表示されること" , "チェック詳細"=> ""}
+  check_flag = 0
+
+  begin
+
+    # トップページ　→　商品(コート)詳細画面へ遷移
+    @wait.until {@d.find_element(:class,"item-img-content").displayed?}
+    @d.find_element(:class,"item-img-content").click
+    @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
+
+    if /購入画面に進む/.match(@d.page_source)
+      check_detail["チェック詳細"] << "◯：出品者以外のログインユーザーだと商品詳細画面に「購入ボタン」が表示される\n"
+      check_flag += 1
+    else
+      check_detail["チェック詳細"] << "×：出品者以外のログインユーザーだと商品詳細画面に「購入ボタン」が表示されない\n"
+    end
+
+    @d.get(@url)
+    @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
+
+    check_detail["チェック合否"] = check_flag == 1 ? "◯" : "×"
+
+  ensure
+    @d.get(@url)
+    @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
+
+    @check_log.push(check_detail)
+  end
+end
+
 
 
 

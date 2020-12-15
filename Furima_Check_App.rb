@@ -22,7 +22,7 @@ require 'securerandom'
 
 
 #basic認証のidとpass
-@b_id = "admin"
+@b_id = "admin_test"
 @b_password = "2222"
 @http ="http://#{@b_id}:#{@b_password}@"
 # 受講生の@URLをhttp://以降から記入

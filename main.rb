@@ -751,6 +751,8 @@ def login_user2
   # トップページかどうか
   @wait.until {@d.find_element(:class,"purchase-btn").displayed?} rescue puts "Error: class:purchase-btnが見つかりません"
 
+  # ログイン状態の出品者以外のユーザーのみ、「購入画面に進むボタン」が表示されること
+  check_12
   # 商品購入ページでは、一覧や詳細ページで選択した商品の情報が出力されること
   check_3
 
