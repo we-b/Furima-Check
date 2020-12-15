@@ -709,35 +709,10 @@ def logout_item_edit_and_buy
 
   # 商品詳細画面へ遷移
   @d.find_element(:class,"item-img-content").click
-  if /編集/ .match(@d.page_source)
-    puts "☒ログアウト状態で商品詳細画面にて商品の編集が行えてしまう"
-    @wait.until {@d.find_element(:class,"item-red-btn").displayed?}
-  else
-    puts "◯ログアウト状態では商品詳細画面にて商品の編集が行えない。"
-  end
-
-  if /削除/ .match(@d.page_source)
-    puts "☒ログアウト状態で商品詳細画面にて商品の削除が行えてしまう"
-    @wait.until {@d.find_element(:class,"item-red-btn").displayed?}
-  else
-    puts "◯ログアウト状態では商品詳細画面にて商品の削除が行えない。"
-  end
-
-  if /購入画面に進む/.match(@d.page_source)
-    puts "!商品詳細画面に「購入ボタン」があるのでクリック"
-    @d.find_element(:class,"item-red-btn").click
-    if /会員情報入力/.match(@d.page_source)
-      puts "◯ログアウト状態では購入ページに遷移しようとすると、ログインページに遷移する"
-      @d.find_element(:class,"second-logo").click
-    else
-      "☒ログアウト状態では購入ページに遷移しようとすると、ログインページに遷移しない"
-    end
-  else
-    puts "!商品詳細画面に購入ボタンがない"
-  end
-
-  @d.get(@url)
   @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
+
+  # 商品詳細ページでログアウト状態のユーザーには、「編集・削除・購入画面に進むボタン」が表示されないこと
+  check_11
 
   puts "【説明】購入ボタン自体を消しているてる場合があるので一度、サインアップする"
 
