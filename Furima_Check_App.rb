@@ -92,7 +92,7 @@ randm_word = SecureRandom.hex(10) #=> "4a01bbd139f5e94bd249"
 @blank = "1"
 
 @select_index = 1
-@password_string = "aaaaaa"
+@password_string = "aaaaa"
 @password_int = "111111"
 
 # チェック項目の結果や詳細を保存しておく配列

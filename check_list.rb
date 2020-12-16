@@ -58,13 +58,14 @@ def kodama_1
       @wait.until {@d.find_element(:id, 'password-confirmation').displayed?}
       @d.find_element(:id, 'password-confirmation').send_keys(@password_string)
       @d.find_element(:class,"register-red-btn").click
-      #疑問：大文字の場合はどうするか条件分岐するか？？
+      #疑問：大文字の場合はどうするか条件分岐するか？？      
       if @d.find_element(:id, 'nickname').displayed?
-        "○：パスワードは文字のみだと登録できない\n"
+        check_ele1 = "○：パスワードは文字のみだと登録できない\n"
         check_detail["チェック詳細"] << check_ele1
         check_flag += 1
       else
-        "×：パスワードは文字のみでも登録できる\n"
+        check_ele1 ="×：パスワードは文字のみでも登録できる\n"
+        check_detail["チェック詳細"] << check_ele1
       end
     end
     if @d.find_element(:id,"nickname").displayed?
