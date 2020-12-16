@@ -137,7 +137,7 @@ def check_3
     # 商品購入画面での情報を取得
     @wait.until {@d.find_element(:class, "buy-item-img").displayed?}
     #まだクラス名が確定していない
-    purchase_item_name = @d.find_element(:class,"item_name").text rescue "Error：class：item_nameが見つかりません\n"
+    purchase_item_name = @d.find_element(:class,"buy-item-text").text rescue "Error：class：buy-item-textが見つかりません\n"
     purchase_item_img = @d.find_element(:class,"buy-item-img").attribute("src") rescue "Error：class：buy-item-imgが見つかりません\n"
     purchase_item_price = @d.find_element(:class,"item-payment-price").text rescue "Error：class：item-payment-priceが見つかりません\n"
   
