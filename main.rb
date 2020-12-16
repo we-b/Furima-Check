@@ -12,8 +12,9 @@ require 'ruby_jard'
 def main
 
   # start
-
+  
   @url = @http + @url_ele
+  puts @url
   # @url = "http://#{b_id}:#{b_password}@localhost:3000/"
 
   @d.get(@url)
@@ -38,6 +39,7 @@ def main
 
   # 半角英数字
   kodama_1
+ 
   # 必須項目を入力して再登録
   sign_up_retry
   # トップメニュー → ログアウトする
@@ -82,7 +84,7 @@ def main
   check_6
 
 
-  jard
+  # jard
   # 出品者でも、売却済みの商品に対しては「編集・削除ボタン」が表示されないこと
   check_10
 
