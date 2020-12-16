@@ -33,8 +33,8 @@ require 'securerandom'
 randm_word = SecureRandom.hex(10) #=> "4a01bbd139f5e94bd249"
 
 
-@item_image = "/Users/tech-camp/projects/furima_checkApp/photo/coat.jpg"
-@item_image2 = "/Users/tech-camp/projects/furima_checkApp/photo/sunglass.jpg"
+@item_image = "/Users/tech-camp/projects2/Furima-Check/photo/coat.jpg"
+@item_image2 = "/Users/tech-camp/projects2/Furima-Check/photo/sunglass.jpg"
 @password = "aaa111" #パスワードは共通
 
 @nickname = "lifecoach_test_user1"
@@ -91,6 +91,8 @@ randm_word = SecureRandom.hex(10) #=> "4a01bbd139f5e94bd249"
 @blank = "1"
 
 @select_index = 1
+@password_string = "aaaaaa"
+@password_int = "111111"
 
 # チェック項目の結果や詳細を保存しておく配列
 # チェック項目の内容はハッシュ 
