@@ -77,12 +77,16 @@ def kodama_1
       @d.find_element(:id, 'password').send_keys(@password_int)
       @wait.until {@d.find_element(:id, 'password-confirmation').displayed?}
       @d.find_element(:id, 'password-confirmation').send_keys(@password_int)
-    
-  
       @d.find_element(:class,"register-red-btn").click
-      check_ele1 = @d.find_element(:id, 'nickname').displayed? ? "○：パスワードは数字のみだと登録できない\n" : "×：パスワードは数字のみでも登録できる\n"
-      check_detail["チェック詳細"] << check_ele1
-      check_flag += 1
+      
+      if @d.find_element(:id, 'nickname').displayed?
+        check_ele2 = "○：パスワードは数字のみだと登録できない\n"
+        check_detail["チェック詳細"] << check_ele2
+        check_flag += 1
+      else
+        check_ele2 ="×：パスワードは数字のみでも登録できる\n"
+        check_detail["チェック詳細"] << check_ele2
+      end
     end
     # jard
     check_detail["チェック合否"] = check_flag == 2 ? "◯" : "×"
