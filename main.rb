@@ -11,8 +11,14 @@ require 'ruby_jard'
 
 def main
 
-  # start
+  start
 
+  # basic認証が実装されている
+  check_14
+
+  jard
+  @http ="http://#{@b_id}:#{@b_password}@"
+# 受講生の@URLをhttp://以降から記入
   @url = @http + @url_ele
   # @url = "http://#{b_id}:#{b_password}@localhost:3000/"
 
@@ -127,11 +133,14 @@ def start
 
 「①動作チェックするアプリの本番環境URL」を入力しenterキーを押してください
 EOT
-  @url = gets.chomp
+
+  input_url = gets.chomp
+  # 「https://」を削除
+  @url_ele = input_url.gsub(/https:\/\//,"")
   puts "次に「②basic認証[ユーザー名]」を入力しenterキーを押してください"
   @b_id= gets.chomp
   puts "次に「③basic認証[パスワード]」を入力しenterキーを押してください"
-  @b_password= gets.chomp
+  @b_password = gets.chomp
 
   puts "自動チェックを開始します"
 

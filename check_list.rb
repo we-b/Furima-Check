@@ -630,6 +630,88 @@ def check_12
 end
 
 
+# 価格の範囲が、¥300~¥9,999,999の間であること
+def check_13
+  check_detail = {"チェック番号"=> 13 , "チェック合否"=> "" , "チェック内容"=> "価格の範囲が、¥300~¥9,999,999の間であること" , "チェック詳細"=> ""}
+  check_flag = 0
+
+  begin
+    @wait.until {@d.find_element(:class,"purchase-btn").displayed?}
+    # ログイン状態でトップ画面にユーザーのニックネームとログアウトボタンが表示されているか
+    if @d.find_element(:class,"user-nickname").displayed?
+      check_ele1 = @d.find_element(:class,"user-nickname").displayed? ? "○：ログイン状態で、ヘッダーにニックネームボタンが表示されている\n" : "×：ログアウト状態では、ヘッダーにユーザーのニックネームが表示されない\n"
+      check_detail["チェック詳細"] << check_ele1
+      check_flag += 1
+    end
+
+    if @d.find_element(:class,"logout").displayed?
+      check_ele2 = @d.find_element(:class,"logout").displayed? ? "○：ログイン状態で、ヘッダーにログアウトボタンが表示されている\n" : "×：ログアウト状態では、ヘッダーにログアウトボタンが表示されない\n"
+      check_detail["チェック詳細"] << check_ele1
+      check_flag += 1
+    end
+
+    check_detail["チェック合否"] = check_flag == 2 ? "◯" : "×"
+
+  ensure
+    @check_log.push(check_detail)
+  end
+end
+
+
+# basic認証が実装されている
+def check_14
+  check_detail = {"チェック番号"=> 14 , "チェック合否"=> "" , "チェック内容"=> "basic認証が実装されている" , "チェック詳細"=> ""}
+  check_flag = 0
+
+  begin
+
+    jard
+    # basic認証の情報を含まない本番環境のURLのみでアクセスしてみる
+    @d.get("https://" + @url_ele)
+    sleep 5
+
+    display_flag = @d.find_element(:class,"furima-icon").displayed? rescue false
+    # basic認証が実装されていたらトップ画面には遷移できないはず
+    if display_flag
+      check_detail["チェック詳細"] << "×：basic認証が実装されていない\n"
+    else
+      check_detail["チェック詳細"] << "◯：basic認証が実装されている\n"
+      check_flag += 1
+    end
+
+    check_detail["チェック合否"] = check_flag == 1 ? "◯" : "×";
+
+  ensure
+    @check_log.push(check_detail)
+  end
+end
+
+# # ログイン状態の出品者以外のユーザーは、URLを直接入力して出品していない商品の商品情報編集ページへ遷移しようとすると、トップページに遷移すること
+# def check_15
+#   check_detail = {"チェック番号"=> 15 , "チェック合否"=> "" , "チェック内容"=> "ログイン状態の出品者以外のユーザーは、URLを直接入力して出品していない商品の商品情報編集ページへ遷移しようとすると、トップページに遷移すること" , "チェック詳細"=> ""}
+#   check_flag = 0
+
+#   begin
+
+#     # basic認証の情報を含まない本番環境のURLのみでアクセスしてみる
+#     @d.get(@url_ele)
+#     sleep 5
+
+#     # basic認証が実装されていたらトップ画面には遷移できないはず
+#     if @d.find_element(:class,"furima-icon").displayed? rescue false
+#       check_detail["チェック詳細"] << "×：basic認証が実装されていない\n"
+#     else
+#       check_detail["チェック詳細"] << "◯：basic認証が実装されている\n"
+#       check_flag += 1
+#     end
+
+#     check_detail["チェック合否"] = check_flag == 1 ? "◯" : "×"
+
+#   ensure
+#     @check_log.push(check_detail)
+#   end
+# end
+
 
 
 def test_method
