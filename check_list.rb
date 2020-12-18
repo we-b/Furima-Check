@@ -665,7 +665,7 @@ def check_14
 
   begin
 
-    jard
+  
     # basic認証の情報を含まない本番環境のURLのみでアクセスしてみる
     @d.get("https://" + @url_ele)
     sleep 5
