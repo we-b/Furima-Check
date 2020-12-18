@@ -7,13 +7,15 @@ def check_1
 
   begin
     @wait.until {@d.find_element(:class,"purchase-btn").displayed?}
-    if @d.find_element(:class,"login").displayed?
+    display_flag = @d.find_element(:class,"login").displayed? rescue false
+    if display_flag
       check_ele1 = @d.find_element(:class,"login").displayed? ? "○：ログアウト状態で、ヘッダーにログインボタンが表示されている\n" : "×：ログアウト状態では、ヘッダーにログインボタンが表示されない\n"
       check_detail["チェック詳細"] << check_ele1
       check_flag += 1
     end
     
-    if @d.find_element(:class,"sign-up").displayed?
+    display_flag = @d.find_element(:class,"sign-up").displayed? rescue false
+    if display_flag
       check_ele2 = @d.find_element(:class,"sign-up").displayed? ? "◯：ログアウト状態で、ヘッダーに新規登録ボタンが表示されている\n" : "×：ログアウト状態では、ヘッダーに新規登録ボタンが表示されない\n"
       check_detail["チェック詳細"] << check_ele2
       check_flag += 1
@@ -35,14 +37,17 @@ def check_2
 
   begin
     @wait.until {@d.find_element(:class,"purchase-btn").displayed?}
+
+    display_flag = @d.find_element(:class,"user-nickname").displayed? rescue false
     # ログイン状態でトップ画面にユーザーのニックネームとログアウトボタンが表示されているか
-    if @d.find_element(:class,"user-nickname").displayed?
+    if display_flag
       check_ele1 = @d.find_element(:class,"user-nickname").displayed? ? "○：ログイン状態で、ヘッダーにニックネームボタンが表示されている\n" : "×：ログアウト状態では、ヘッダーにユーザーのニックネームが表示されない\n"
       check_detail["チェック詳細"] << check_ele1
       check_flag += 1
     end
 
-    if @d.find_element(:class,"logout").displayed?
+    display_flag = @d.find_element(:class,"logout").displayed? rescue false
+    if display_flag
       check_ele2 = @d.find_element(:class,"logout").displayed? ? "○：ログイン状態で、ヘッダーにログアウトボタンが表示されている\n" : "×：ログアウト状態では、ヘッダーにログアウトボタンが表示されない\n"
       check_detail["チェック詳細"] << check_ele1
       check_flag += 1
@@ -185,9 +190,10 @@ def check_4
   begin
     @wait.until {@d.find_element(:class,"purchase-btn").displayed?}
 
+    display_flag = @d.find_element(:class,"item-name").displayed? rescue false
     # ログアウト状態でトップ画面にログインボタンとサインアップボタンが表示されているかチェック
     # 直前で出品している商品は「サングラス」
-    if @d.find_element(:class,"item-name").displayed?
+    if display_flag
       # 最新の商品名を取得
       latest_ele_name = @d.find_element(:class,"item-name").text
       # 最新の商品名が「サングラス」と同じか比較
@@ -229,8 +235,9 @@ def check_5
     # アイコンが表示されるまで待機
     @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
 
+    display_flag = @d.find_element(:class,"purchase-btn").displayed? rescue false
     # 出品ボタンの有無でトップページに遷移したかを判断
-    if @d.find_element(:class,"purchase-btn").displayed?
+    if display_flag
       check_detail["チェック詳細"] << "○：ログイン状態の出品者が、URLを直接入力して自身の出品した商品購入ページに遷移しようとすると、トップページに遷移する\n"
       check_flag += 1
     else
@@ -300,7 +307,7 @@ def check_6
   begin
     # 2つ目のウィンドウに切り替え
     @d.switch_to.window( @window2_id )
-    sleep 5
+    
     @d.get(@url)
 
 
@@ -315,8 +322,9 @@ def check_6
     # アイコンが表示されるまで待機
     @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
 
+    display_flag = @d.find_element(:class,"purchase-btn").displayed? rescue false
     # 出品ボタンの有無でトップページに遷移したかを判断
-    if @d.find_element(:class,"purchase-btn").displayed?
+    if display_flag
       check_detail["チェック詳細"] << "○：ログイン状態の出品者以外のユーザーが、URLを直接入力して自身の出品した商品購入ページに遷移しようとすると、トップページに遷移する\n"
       check_flag += 1
     else
@@ -333,7 +341,7 @@ def check_6
     @check_log.push(check_detail)
     # エラー発生有無に関係なく操作ウィンドウを元に戻す
     @d.switch_to.window( @window1_id )
-    sleep 5
+    
   end
 end
 
@@ -428,7 +436,7 @@ def check_8
 
     # ウィンドウ切り替え
     @d.switch_to.window( @window2_id )
-    sleep 5
+    
     @d.get(@url)
     # 他ユーザーでログイン中のためログアウト
     @d.find_element(:class,"logout").click
@@ -460,7 +468,7 @@ def check_8
     @check_log.push(check_detail)
     # エラー発生有無に関係なく操作ウィンドウを元に戻す
     @d.switch_to.window( @window1_id )
-    sleep 5
+    
   end
 
 end
@@ -498,7 +506,7 @@ def check_10
   begin
     # 2つ目のウィンドウに切り替え
     @d.switch_to.window( @window2_id )
-    sleep 5
+    
     @d.get(@url)
 
 
@@ -544,7 +552,7 @@ def check_10
     @check_log.push(check_detail)
     # エラー発生有無に関係なく操作ウィンドウを元に戻す
     @d.switch_to.window( @window1_id )
-    sleep 5
+    
   end
 end
 
@@ -665,7 +673,6 @@ def check_14
 
   begin
 
-    jard
     # basic認証の情報を含まない本番環境のURLのみでアクセスしてみる
     @d.get("https://" + @url_ele)
     sleep 5
@@ -686,31 +693,89 @@ def check_14
   end
 end
 
-# # ログイン状態の出品者以外のユーザーは、URLを直接入力して出品していない商品の商品情報編集ページへ遷移しようとすると、トップページに遷移すること
-# def check_15
-#   check_detail = {"チェック番号"=> 15 , "チェック合否"=> "" , "チェック内容"=> "ログイン状態の出品者以外のユーザーは、URLを直接入力して出品していない商品の商品情報編集ページへ遷移しようとすると、トップページに遷移すること" , "チェック詳細"=> ""}
-#   check_flag = 0
+# ログイン状態の出品者以外のユーザーは、URLを直接入力して出品していない商品の商品情報編集ページへ遷移しようとすると、トップページに遷移すること
+def check_15
+  check_detail = {"チェック番号"=> 15 , "チェック合否"=> "" , "チェック内容"=> "ログイン状態の出品者以外のユーザーは、URLを直接入力して出品していない商品の商品情報編集ページへ遷移しようとすると、トップページに遷移すること" , "チェック詳細"=> ""}
+  check_flag = 0
 
-#   begin
+  begin
 
-#     # basic認証の情報を含まない本番環境のURLのみでアクセスしてみる
-#     @d.get(@url_ele)
-#     sleep 5
+    # user2ログイン状態でコート(user1出品)編集画面に直接遷移する
+    @d.get(@edit_url_coat)
 
-#     # basic認証が実装されていたらトップ画面には遷移できないはず
-#     if @d.find_element(:class,"furima-icon").displayed? rescue false
-#       check_detail["チェック詳細"] << "×：basic認証が実装されていない\n"
-#     else
-#       check_detail["チェック詳細"] << "◯：basic認証が実装されている\n"
-#       check_flag += 1
-#     end
+    # 編集画面のロゴ画像にはクラス名が振られていないため「/商品の情報を入力/」としている
+    @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
 
-#     check_detail["チェック合否"] = check_flag == 1 ? "◯" : "×"
+    # トップページに遷移であれば正解
+    if /FURIMAが選ばれる3つの理由/ .match(@d.page_source)
+      check_detail["チェック詳細"] << "◯：出品者以外のログインユーザーが、URLを直接入力して出品していない商品の商品編集ページに遷移しようとすると、トップページへ遷移する\n"
+      check_flag += 1
+    elsif /会員情報入力/ .match(@d.page_source)
+      check_detail["チェック詳細"] << "×：出品者以外のログインユーザーが、URLを直接入力して出品していない商品の商品編集ページに遷移しようとすると、ログインページへ遷移する\n"
+    else
+      check_detail["チェック詳細"] << "×：出品者以外のログインユーザーが、URLを直接入力して出品していない商品の商品編集ページに遷移しようとすると、トップページでもログインページでもないページへ遷移する\n"
+    end
 
-#   ensure
-#     @check_log.push(check_detail)
-#   end
-# end
+    @d.get(@url)
+    @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
+
+    check_detail["チェック合否"] = check_flag == 1 ? "◯" : "×"
+
+  ensure
+    @check_log.push(check_detail)
+  end
+end
+
+
+# 出品者・出品者以外にかかわらず、ログイン状態のユーザーが、URLを直接入力して売却済み商品の商品情報編集ページへ遷移しようとすると、トップページに遷移すること
+def check_16
+  check_detail = {"チェック番号"=> 16 , "チェック合否"=> "" , "チェック内容"=> "出品者・出品者以外にかかわらず、ログイン状態のユーザーが、URLを直接入力して売却済み商品の商品情報編集ページへ遷移しようとすると、トップページに遷移すること" , "チェック詳細"=> ""}
+  check_flag = 0
+
+  begin
+
+    # user2(出品者以外)がログイン状態で購入済みコートの商品編集画面に遷移(直接URL入力)
+    @d.get(@edit_url_coat)
+    # アイコンが表示されるまで待機
+    @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
+
+    display_flag = @d.find_element(:class,"purchase-btn").displayed? rescue false
+    # 出品ボタンの有無でトップページに遷移したかを判断
+    if display_flag
+      check_detail["チェック詳細"] << "○：出品者以外のユーザーが、売却済みの商品の商品情報編集ページにURLを直接入力して遷移しようとすると、トップページに遷移する\n"
+      check_flag += 1
+    else
+      check_detail["チェック詳細"] << "×：出品者以外のユーザーが、売却済みの商品の商品情報編集ページにURLを直接入力して遷移しようとすると、トップページに遷移しない\n"
+    end
+
+    # user1(出品者)にログイン
+    login_any_user(@email, @password)
+
+    # user1(出品者)がログイン状態で購入済みコートの商品編集画面に遷移(直接URL入力)
+    @d.get(@edit_url_coat)
+    # アイコンが表示されるまで待機
+    @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
+
+    display_flag = @d.find_element(:class,"purchase-btn").displayed? rescue false
+    if display_flag
+      check_detail["チェック詳細"] << "○：出品者が、自身の出品した売却済みの商品の商品情報編集ページにURLを直接入力して遷移しようとすると、トップページに遷移する\n"
+      check_flag += 1
+    else
+      check_detail["チェック詳細"] << "×：出品者が、自身の出品した売却済みの商品の商品情報編集ページにURLを直接入力して遷移しようとすると、トップページ以外に遷移する\n"
+    end
+
+    @d.get(@url)
+
+    check_detail["チェック合否"] = check_flag == 2 ? "◯" : "×"
+
+  ensure
+    # user2にログインして元に戻しておく
+    login_any_user(@email2, @password)
+
+    @check_log.push(check_detail)
+    # エラー発生有無に関係なく操作ウィンドウを元に戻す
+  end
+end
 
 
 

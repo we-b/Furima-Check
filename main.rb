@@ -11,12 +11,11 @@ require 'ruby_jard'
 
 def main
 
-  start
+  # start
 
   # basic認証が実装されている
   check_14
 
-  jard
   @http ="http://#{@b_id}:#{@b_password}@"
 # 受講生の@URLをhttp://以降から記入
   @url = @http + @url_ele
@@ -80,11 +79,13 @@ def main
   login_user2
   # user2が商品購入
   login_user2_item_buy
+  jard
+  # 出品者・出品者以外にかかわらず、ログイン状態のユーザーが、URLを直接入力して売却済み商品の商品情報編集ページへ遷移しようとすると、トップページに遷移すること
+  check_16
 
   # ログイン状態の出品者以外のユーザーが、URLを直接入力して売却済み商品の商品購入ページへ遷移しようとすると、トップページに遷移すること
   check_6
 
-  jard
   # 出品者でも、売却済みの商品に対しては「編集・削除ボタン」が表示されないこと
   check_10
 
@@ -184,47 +185,41 @@ def login_any_user(email, pass)
 
 end
 
-# 新規登録
-# ニックネームは未入力
-def sign_up_nickname_input
-  @d.find_element(:class,"sign-up").click
-
+# 新規登録に必要な項目入力を行うメソッド
+def input_sign_up_method(nickname, email, pass, first, last, first_kana, last_kana)
   @wait.until {@d.find_element(:id, 'nickname').displayed?}
-  # ニックネーム項目には未入力で処理を行う
+  @d.find_element(:id, 'email').send_keys(nickname)
   @wait.until {@d.find_element(:id, 'email').displayed?}
-  @d.find_element(:id, 'email').send_keys(@email)
+  @d.find_element(:id, 'email').send_keys(email)
   @wait.until {@d.find_element(:id, 'password').displayed?}
-  @d.find_element(:id, 'password').send_keys(@password)
+  @d.find_element(:id, 'password').send_keys(pass)
   @wait.until {@d.find_element(:id, 'password-confirmation').displayed?}
-  @d.find_element(:id, 'password-confirmation').send_keys(@password)
+  @d.find_element(:id, 'password-confirmation').send_keys(pass)
   @wait.until {@d.find_element(:id, 'first-name').displayed?}
-  @d.find_element(:id, 'first-name').send_keys(@first_name)
+  @d.find_element(:id, 'first-name').send_keys(first)
   @wait.until {@d.find_element(:id, 'last-name').displayed?}
-  @d.find_element(:id, 'last-name').send_keys(@last_name)
+  @d.find_element(:id, 'last-name').send_keys(last)
   @wait.until {@d.find_element(:id, 'first-name-kana').displayed?}
-  @d.find_element(:id, 'first-name-kana').send_keys(@first_name_kana)
+  @d.find_element(:id, 'first-name-kana').send_keys(first_kana)
   @wait.until {@d.find_element(:id, 'last-name-kana').displayed?}
-  @d.find_element(:id, 'last-name-kana').send_keys(@last_name_kana)
+  @d.find_element(:id, 'last-name-kana').send_keys(last_kana)
 
-  @d.find_element(:class,"register-red-btn").click
+  # 生年月日入力inputタグの親クラス
+  parent_birth_element = @d.find_element(:class, 'input-birth-wrap')
+  # 3つの子クラスを取得
+  birth_elements = parent_birth_element.find_elements(:tag_name, 'select')
+  birth_elements.each{|ele|
+    # 年・月・日のそれぞれに値を入力
+    select_ele = select_new(ele)
+    select_ele.select_by(:index, @select_index)
+  }
+
 end
 
-# まだ登録が完了していない場合、再度登録
-def sign_up_retry
-
-  if /会員情報入力/ .match(@d.page_source)
-  puts "!ニックネームを入力しないと、ユーザー登録ができない。" 
-  else
-  puts "!ニックネームを入力しなくても、ユーザー登録ができる" 
-  @wait.until {@d.find_element(:id,"nickname").displayed?}
-  end
-
-  puts "◯必須項目が一つでも欠けている場合は、ユーザー登録ができない"
-  sleep 3
-  puts "◯【目視で確認】エラーハンドリングができていること（適切では無い値が入力された場合、情報は保存されず、エラーメッセージを出力させる）"
-
-  # 再度登録
-  # まず入力の準備として項目情報をクリア
+# 新規登録に必要な入力項目を全てクリアにするメソッド
+def clear_sign_up_method
+  @wait.until {@d.find_element(:id, 'nickname').displayed?}
+  @d.find_element(:id, 'nickname').clear
   @wait.until {@d.find_element(:id, 'email').displayed?}
   @d.find_element(:id, 'email').clear
   @wait.until {@d.find_element(:id, 'password').displayed?}
@@ -240,54 +235,80 @@ def sign_up_retry
   @wait.until {@d.find_element(:id, 'last-name-kana').displayed?}
   @d.find_element(:id, 'last-name-kana').clear
 
+  # 将来的には生年月日のセレクトもクリアにしたい
+end
+
+
+# 新規登録
+# ニックネームは未入力
+def sign_up_nickname_input
+  @d.find_element(:class,"sign-up").click
+  @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
+
+
+  input_sign_up_method(@nickname, @email, @password, @first_name, @last_name, @first_name_kana, @last_name_kana)
+
+  @wait.until {@d.find_element(:id, 'nickname').displayed?}
+  @d.find_element(:id, 'nickname').clear
+
+  @d.find_element(:class,"register-red-btn").click
+end
+
+# まだ登録が完了していない場合、再度登録
+def sign_up_retry
+
+  @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
+
+  if /会員情報入力/ .match(@d.page_source)
+    puts "◯：ニックネームを入力しないと、ユーザー登録ができない。"
+    puts "◯：必須項目が一つでも欠けている場合は、ユーザー登録ができない"
+
+  else
+    puts "×：ニックネームを入力しなくても、ユーザー登録ができる"
+    # 登録できてしまった場合、ログアウトしておく
+    display_flag = @d.find_element(:class,"logout").displayed? rescue false
+    if display_flag
+      @d.find_element(:class,"logout").click
+      @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
+      @d.get(@url)
+      @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
+    end
+    @d.find_element(:class,"sign-up").click
+    @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
+
+    # 登録できてしまったアカウントと異なる情報に更新しておく = 再登録&再ログインできなくなってしまため
+    randm_word = SecureRandom.hex(5)
+    @email = "user1_#{randm_word}@co.jp"
+  end
+
+  sleep 3
+  puts "◯【目視で確認】エラーハンドリングができていること（適切では無い値が入力された場合、情報は保存されず、エラーメッセージを出力させる）"
+
+  # 再度登録
+  # まず入力の準備として項目情報をクリア
+  clear_sign_up_method
+
+  input_sign_up_method(@nickname, @email, @password, @first_name, @last_name, @first_name_kana, @last_name_kana)
+
+
   # 今度はニックネーム含めた全項目に情報を入力していく
   # ここで再度.displayed?メソッド使う意味はあるのか？？ = 高速処理によって処理がエラーを起こさないように記述している
-  @wait.until {@d.find_element(:id, 'nickname').displayed?}
-  @d.find_element(:id, 'nickname').send_keys(@nickname)
-  puts "◯ニックネームが@必須である"
-
-  @wait.until {@d.find_element(:id, 'email').displayed?}
-  @d.find_element(:id, 'email').send_keys(@email)
+  puts "◯ニックネームが必須である"
   puts "◯メールアドレスが必須である"
-  puts "◯メールアドレスは一意性である"
-  puts "◯メールアドレスは@を含む必要がある"
-
-  @wait.until {@d.find_element(:id, 'password').displayed?}
-  @d.find_element(:id, 'password').send_keys(@password)
+  puts "◯メールアドレスは一意性である"  #これはまだ立証できない
+  puts "◯メールアドレスは@を含む必要がある"  #これはまだ立証できない
   puts "◯パスワードが必須である"
-  puts "◯パスワードは6文字以上である"
-  puts "◯パスワードは半角英数字混合である"
+  puts "◯パスワードは6文字以上である"  #これはまだ立証できない
+  puts "◯パスワードは半角英数字混合である"  #これはまだ立証できない
+  puts "◯パスワードは確認用を含めて2回入力する"  #これはまだ立証できない
 
-  @wait.until {@d.find_element(:id, 'password-confirmation').displayed?}
-  @d.find_element(:id, 'password-confirmation').send_keys(@password)
-  puts "◯パスワードは確認用を含めて2回入力する"
+  puts "◯ユーザー本名が、名字と名前がそれぞれ必須である"  #これはまだ立証できない
+  puts "◯ユーザー本名は全角（漢字・ひらがな・カタカナ）で入力させる"  #これはまだ立証できない
 
-  @wait.until {@d.find_element(:id, 'first-name').displayed?}
-  @d.find_element(:id, 'first-name').send_keys(@first_name)
-  @wait.until {@d.find_element(:id, 'last-name').displayed?}
-  @d.find_element(:id, 'last-name').send_keys(@last_name)
-  puts "◯ユーザー本名が、名字と名前がそれぞれ必須である"
-  puts "◯ユーザー本名は全角（漢字・ひらがな・カタカナ）で入力させる"
-
-
-  @wait.until {@d.find_element(:id, 'first-name-kana').displayed?}
-  @d.find_element(:id, 'first-name-kana').send_keys(@first_name_kana)
-  @wait.until {@d.find_element(:id, 'last-name-kana').displayed?}
-  @d.find_element(:id, 'last-name-kana').send_keys(@last_name_kana)
   puts "◯ユーザー本名のフリガナが、名字と名前でそれぞれ必須である"
   puts "◯ユーザー本名のフリガナは全角（カタカナ）で入力させる"
 
 
-  # 生年月日入力inputタグの親クラス
-  parent_birth_element = @d.find_element(:class, 'input-birth-wrap')
-  # 3つの子クラスを取得
-  birth_elements = parent_birth_element.find_elements(:tag_name, 'select')
-  birth_elements.each{|ele|
-    # 年・月・日のそれぞれに値を入力
-    select_ele = select_new(ele)
-    select_ele.select_by(:index, @select_index)
-  }
-  
   @d.find_element(:class,"register-red-btn").click
 end
 
@@ -759,13 +780,14 @@ def login_user2
   # 「商品出品」ボタンが存在するかチェック
   # トップページかどうか
   @wait.until {@d.find_element(:class,"purchase-btn").displayed?} rescue puts "Error: class:purchase-btnが見つかりません"
-
+  
+  jard
+  # ログイン状態の出品者以外のユーザーは、URLを直接入力して出品していない商品の商品情報編集ページへ遷移しようとすると、トップページに遷移すること
+  check_15
   # ログイン状態の出品者以外のユーザーのみ、「購入画面に進むボタン」が表示されること
   check_12
   # 商品購入ページでは、一覧や詳細ページで選択した商品の情報が出力されること
   check_3
-
-  puts "【説明】nickname2でログイン"
 end
 
 def login_user2_item_buy
