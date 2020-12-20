@@ -76,6 +76,8 @@ randm_word = SecureRandom.hex(10) #=> "4a01bbd139f5e94bd249"
 @order_url_coat = ""
 # user1によるコート情報編集画面のURL
 @edit_url_coat = ""
+# ユーザー新規登録画面,出品画面,購入画面で表示されるエラーログを保存しておくハッシュ
+@error_log_hash = {}
 
 @item_name2 = "サングラス"
 @item_info2 = "限定5品のサングラス"
@@ -115,15 +117,15 @@ begin
 ensure
     if @check_log.length > 0
         @check_log.each { |check|
+            puts "--------------------------------------------------------------------------"
             puts "■チェック番号：" + check["チェック番号"].to_s + "\n"
             print "■チェック合否：#{check["チェック合否"]}\n"
             print "■チェック内容：\n#{check["チェック内容"]}\n"
             print "■チェック詳細：\n#{check["チェック詳細"]}\n"
+            puts "--------------------------------------------------------------------------"
+
         }
     end
-    
-    sleep 300000000000000
-
     puts $!
     puts $@
 end

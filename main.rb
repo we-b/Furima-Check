@@ -171,8 +171,9 @@ def login_any_user(email, pass)
   @d.get(@url)
   @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
 
+  display_flag = @d.find_element(:class,"logout").displayed? rescue false
   # ログイン状態であればログアウトしておく
-  if (@d.find_element(:class,"logout").displayed? rescue false)
+  if display_flag
     @d.find_element(:class,"logout").click
     @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
     @d.get(@url)
@@ -391,6 +392,9 @@ def sign_up_nickname_input
   @d.find_element(:class,"sign-up").click
   @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
 
+  # ユーザー新規登録画面でのエラーハンドリングログを取得
+  check_19_1
+
   # 新規登録に必要な項目入力を行うメソッド
   input_sign_up_method(@nickname, @email, @password, @first_name, @last_name, @first_name_kana, @last_name_kana)
 
@@ -531,8 +535,11 @@ end
 def item_new_no_image
 
   @wait.until {@d.find_element(:class,"purchase-btn").displayed?}
-  # 出品ボタンをクリック
+  # トップ画面で出品ボタンをクリック
   click_purchase_btn(true)
+
+  # 商品出品画面でのエラーハンドリングログを取得
+  check_19_2
 
   # 商品出品時の必須項目へ入力するメソッド
   input_item_new_method(@item_name, @item_info, @item_price, @item_image)
@@ -665,7 +672,6 @@ def item_edit
     @wait.until {@d.find_element(:class,"detail-item").displayed?}
   end
 
-  jard
   # 商品詳細ページで商品出品時に登録した情報が見られるようになっている
   check_18
 
@@ -840,14 +846,22 @@ def login_user2_item_buy
 
   @wait.until {@d.find_element(:class, "item-red-btn").displayed?}
   @d.find_element(:class,"item-red-btn").click
+  @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
 
   # 購入画面のURLをputsする理由とは？ = 途中でエラーが起こった場合に踏むURL保持しておくため
   @order_url_coat = @d.current_url
   puts "コート購入画面のURL→  " + @order_url_coat
 
+  # 商品購入画面でのエラーハンドリングログを取得
+  check_19_3
+  # 新規登録、商品出品、商品購入の際にエラーハンドリングができていること（適切では無い値が入力された場合、情報は保存されず、エラーメッセージを出力させる）
+  check_19
   # コート購入前にチェック
   check_5
 
+  raise "exit"
+
+  # check_5メソッドの中で別ウィンドウにてuser1に切り替えたためuser2で再ログイン
   login_any_user(@email2, @password)
   @d.find_element(:class,"item-img-content").click
   @wait.until {@d.find_element(:class, "item-red-btn").displayed?}
@@ -1004,20 +1018,8 @@ def login_user2_after_purchase_check1
 
   @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
 
-  
-  if /出品する/ .match(@d.page_source)
-    @d.find_element(:class,"purchase-btn").click
-    puts "!出品ページに遷移1"
-  elsif /出品する/ .match(@d.page_source)
-    @d.find_element(:class,"purchase-btn-text").click
-    puts "!出品ページに遷移2"
-  elsif /出品する/ .match(@d.page_source)
-      @d.find_element(:class,"purchase-btn-icon").click
-      puts "!出品ページに遷移3"
-  else
-    puts "!出品ページに遷移できない"
-  end
-  @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
+  # 出品画面へ遷移
+  click_purchase_btn(false)
 end
 
 # user2によるサングラス出品

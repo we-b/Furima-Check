@@ -509,8 +509,6 @@ def check_10
     @d.switch_to.window( @window2_id )
     
     @d.get(@url)
-
-
     # トップページ画面からスタート
     @wait.until {@d.find_element(:class,"purchase-btn").displayed?}
 
@@ -975,6 +973,210 @@ def check_18
     end
 
     check_detail["チェック合否"] = check_flag == 10 ? "◯" : "×"
+
+  ensure
+    @check_log.push(check_detail)
+  end
+end
+
+# ユーザー新規登録画面でのエラーハンドリングログを取得
+def check_19_1
+  # 全項目未入力でいきなり「登録する」ボタンをクリック
+  @d.find_element(:class,"register-red-btn").click
+  @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
+
+  # 念の為登録できてしまわないかチェック
+  if /会員情報入力/ .match(@d.page_source)
+    # 登録できなかった場合
+    # エラーログの表示有無
+    display_flag = @d.find_element(:class,"error-alert").displayed? rescue false
+    if display_flag
+      @error_log_hash["新規登録"] = "◯：【ユーザー新規登録画面】にて全項目未入力の状態で登録ボタンを押すと登録が完了せずエラーメッセージが出力される\n\n"
+      @error_log_hash["新規登録"] << "↓↓↓ エラーログ全文(出力された内容) ↓↓↓\n"
+      # エラーログの親要素
+      error_parent = @d.find_element(:class,"error-alert")
+      error_strings = error_parent.find_elements(:class,"error-message")
+      error_strings.each{|ele|
+        @error_log_hash["新規登録"] << "・" + ele.text + "\n"
+      }
+
+      # 出力されたエラーログに漏れがないか目視確認しやすいように比較文章をいれる
+      @error_log_hash["新規登録"] << "\n\n↓↓↓ エラーログ模範出力文章(英語表記ですが、出力文との比較にお使いください) ↓↓↓\n"
+      @error_log_hash["新規登録"] << <<-EOT
+      ----------------------------
+      ・Email can't be blank
+      ・Password can't be blank
+      ・Password is invalid
+      ・Nickname can't be blank
+      ・Last name can't be blank
+      ・Last name is invalid
+      ・First name can't be blank
+      ・First name is invalid
+      ・Last name kana can't be blank
+      ・Last name kana is invalid
+      ・First name kana can't be blank
+      ・First name kana is invalid
+      ・Birthday can't be blank
+      ----------------------------
+
+
+      EOT
+    else
+      # エラーログが出力されていなかったら
+      @error_log_hash["新規登録"] = "×：【ユーザー新規登録画面】にて全項目未入力の状態で登録ボタンを押すと登録は完了しないが、エラーメッセージは出力されない\n\n"
+    end
+  else
+    # 登録できてしまう場合
+    @error_log_hash["新規登録"] = "×：【ユーザー新規登録画面】にて全項目未入力の状態で登録ボタンを押すとリダイレクトせず登録画面以外のページへ遷移してしまう(登録できてしまっている可能性あり)\n"
+    # トップ画面へ
+    @d.get(@url)
+    @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
+
+    display_flag = @d.find_element(:class,"logout").displayed? rescue false
+    # ログイン状態であればログアウトしておく
+    if display_flag
+      @d.find_element(:class,"logout").click
+      @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
+      @d.get(@url)
+      @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
+    end
+
+    # 再度新規登録画面へ
+    @d.find_element(:class,"sign-up").click
+    @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
+
+  end
+end
+
+# 商品出品画面でのエラーハンドリングログを取得
+def check_19_2
+  # 全項目未入力でいきなり「出品する」ボタンをクリック
+  @d.find_element(:class,"sell-btn").click
+  @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
+
+  # 念の為出品できてしまわないかチェック
+  if /商品の情報を入力/ .match(@d.page_source)
+    # 出品できなかった場合
+    # エラーログの表示有無
+    display_flag = @d.find_element(:class,"error-alert").displayed? rescue false
+    if display_flag
+      @error_log_hash["商品出品"] = "◯：【商品出品画面】にて全項目未入力の状態で出品ボタンを押すと出品が完了せずエラーメッセージが出力される\n\n"
+      @error_log_hash["商品出品"] << "↓↓↓ エラーログ全文(出力された内容) ↓↓↓\n"
+      # エラーログの親要素
+      error_parent = @d.find_element(:class,"error-alert")
+      error_strings = error_parent.find_elements(:class,"error-message")
+      error_strings.each{|ele|
+        @error_log_hash["商品出品"] << "・" + ele.text + "\n"
+      }
+
+      # 出力されたエラーログに漏れがないか目視確認しやすいように比較文章をいれる
+      @error_log_hash["商品出品"] << "\n\n↓↓↓ エラーログ模範出力文章(英語表記ですが、出力文との比較にお使いください) ↓↓↓\n"
+      @error_log_hash["商品出品"] << <<-EOT
+      ----------------------------
+      ・Name can't be blank
+      ・Description can't be blank
+      ・Price can't be blank
+      ・Price is not included in the list
+      ・Image can't be blank
+      ・Category must be other than 0
+      ・Condition must be other than 0
+      ・Cost beaver must be other than 0
+      ・Shipment area must be other than 0
+      ・Preparation days must be other than 0
+      ----------------------------
+
+
+      EOT
+    else
+      # エラーログが出力されていなかったら
+      @error_log_hash["商品出品"] = "×：【商品出品画面】にて全項目未入力の状態で出品ボタンを押すと出品は完了しないが、エラーメッセージは出力されない\n\n"
+    end
+  else
+    # 出品できてしまう場合
+    @error_log_hash["商品出品"] = "×：【商品出品画面】にて全項目未入力の状態で出品ボタンを押すとリダイレクトせず商品出品画面以外のページへ遷移してしまう(出品できてしまっている可能性あり)\n"
+    # トップ画面へ
+    @d.get(@url)
+    @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
+
+    # 再度出品画面へ
+    click_purchase_btn(false)
+  end
+end
+
+
+# 商品購入画面でのエラーハンドリングログを取得
+def check_19_3
+  # 全項目未入力でいきなり「購入する」ボタンをクリック
+  @d.find_element(:class,"buy-red-btn").click
+  @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
+
+  # 念の為購入できてしまわないかチェック
+  if /クレジットカード情報入力/ .match(@d.page_source)
+    # 購入できなかった場合
+    # エラーログの表示有無
+    display_flag = @d.find_element(:class,"error-alert").displayed? rescue false
+    if display_flag
+      @error_log_hash["商品購入"] = "◯：【商品購入画面】にて全項目未入力の状態で購入ボタンを押すと購入が完了せずエラーメッセージが出力される\n\n"
+      @error_log_hash["商品購入"] << "↓↓↓ エラーログ全文(出力された内容) ↓↓↓\n"
+      # エラーログの親要素
+      error_parent = @d.find_element(:class,"error-alert")
+      error_strings = error_parent.find_elements(:class,"error-message")
+      error_strings.each{|ele|
+        @error_log_hash["商品購入"] << "・" + ele.text + "\n"
+      }
+
+      # 出力されたエラーログに漏れがないか目視確認しやすいように比較文章をいれる
+      @error_log_hash["商品購入"] << "\n\n↓↓↓ エラーログ模範出力文章(英語表記ですが、出力文との比較にお使いください) ↓↓↓\n"
+      @error_log_hash["商品購入"] << <<-EOT
+      ----------------------------
+      ・Post code can't be blank
+      ・Post code is invalid
+      ・City can't be blank
+      ・Address line can't be blank
+      ・Phone number can't be blank
+      ・Phone number is invalid
+      ・Token can't be blank
+      ・Prefecture must be other than 0
+      ----------------------------
+
+
+      EOT
+    else
+      # エラーログが出力されていなかったら
+      @error_log_hash["商品購入"] = "×：【商品購入画面】にて全項目未入力の状態で購入ボタンを押すと出品は完了しないが、エラーメッセージは出力されない\n\n"
+    end
+  else
+    # 購入できてしまう場合
+    @error_log_hash["商品購入"] = "×：【商品購入画面】にて全項目未入力の状態で購入ボタンを押すとリダイレクトせず商品購入画面以外のページへ遷移してしまう(購入できてしまっている可能性あり)\n"
+    # トップ画面へ
+    @d.get(@url)
+    @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
+    # 商品詳細画面へ
+    @d.find_element(:class,"item-img-content").click
+    @wait.until {@d.find_element(:class, "item-red-btn").displayed?}
+    # 購入画面へ
+    @d.find_element(:class,"item-red-btn").click
+    @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
+
+  end
+end
+
+
+# 新規登録、商品出品、商品購入の際にエラーハンドリングができていること（適切では無い値が入力された場合、情報は保存されず、エラーメッセージを出力させる）
+def check_19
+  check_detail = {"チェック番号"=> 19 , "チェック合否"=> "" , "チェック内容"=> "新規登録、商品出品、商品購入の際にエラーハンドリングができていること（適切では無い値が入力された場合、情報は保存されず、エラーメッセージを出力させる）" , "チェック詳細"=> ""}
+  check_flag = 0
+
+  begin
+    if @error_log_hash["新規登録"].include?("◯：") then check_flag += 1 end
+    if @error_log_hash["商品出品"].include?("◯：") then check_flag += 1 end
+    if @error_log_hash["商品購入"].include?("◯：") then check_flag += 1 end
+
+    check_detail["チェック詳細"] << @error_log_hash["新規登録"]
+    check_detail["チェック詳細"] << @error_log_hash["商品出品"]
+    check_detail["チェック詳細"] << @error_log_hash["商品購入"]
+
+    check_detail["チェック合否"] = check_flag == 3 ? "◯：出力内容を目視で確認が必要" : "×：異常あり"
 
   ensure
     @check_log.push(check_detail)
