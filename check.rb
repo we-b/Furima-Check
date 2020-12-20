@@ -77,9 +77,10 @@ randm_word = SecureRandom.hex(10) #=> "4a01bbd139f5e94bd249"
 @item_image2 = "/Users/tech-camp/projects/furima_checkApp/photo/sunglass.jpg"
 @order_url_glasses = ""
 
-@item_name3 = "激安マンション"
+@item_name3 = "マグロ(時価)"
 @item_info3 = "価格の限界に挑戦中"
 @item_price3 = 299
+@item_image3 = "/Users/tech-camp/projects/furima_checkApp/photo/tuna.jpg"
 
 # 購入時のカード情報
 @card_number = 4242424242424242

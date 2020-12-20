@@ -262,8 +262,9 @@ end
 # check_6で活用する
 def sign_up_user3
 
+  display_flag = @d.find_element(:class,"logout").displayed? rescue false
   # もしまだログイン状態であればログアウトしておく
-  if @d.find_element(:class,"logout").displayed? then @d.find_element(:class,"logout").click end
+  if display_flag then @d.find_element(:class,"logout").click end
 
   @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
 
@@ -646,11 +647,82 @@ def check_13
   begin
     # user3でログイン
     login_any_user(@email3, @password)
+    # トップ画面にて「出品」ボタンをクリックするメソッド
+    click_purchase_btn(false)
+    # 商品出品時の入力項目へ入力するメソッド
+    # 価格設定299円で出品
+    input_item_new_method(@item_name3, @item_info3, @item_price3, @item_image3)
+    # 「出品する」ボタンをクリック
+    @d.find_element(:class,"sell-btn").click
+    @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
 
+    jard
+    if /商品の情報を入力/.match(@d.page_source)
+      check_detail["チェック詳細"] << "◯：商品出品の際、価格を「299円」にすると出品できない\n"
+      check_flag += 1
+    else
+      check_detail["チェック詳細"] << "×：商品出品の際、価格を「299円」にすると出品できてしまう\n"
+      # 出品できてしまった際は削除し出品画面へ戻ってくる
+      return_purchase_before_delete_item(@item_name3)
+    end
 
-    check_detail["チェック合否"] = check_flag == 2 ? "◯" : "×"
+    # 1000万に再設定して再出品
+    @item_price3 = 10000000
+    clear_item_new_method
+    input_item_new_method(@item_name3, @item_info3, @item_price3, @item_image3)
+    @d.find_element(:class,"sell-btn").click
+    @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
+
+    jard
+    if /商品の情報を入力/.match(@d.page_source)
+      check_detail["チェック詳細"] << "◯：商品出品の際、価格を「1000万円」にすると出品できない\n"
+      check_flag += 1
+    else
+      check_detail["チェック詳細"] << "×：商品出品の際、価格を「1000万円」にすると出品できてしまう\n"
+      # 出品できてしまった際は削除し出品画面へ戻ってくる
+      return_purchase_before_delete_item(@item_name3)
+    end
+
+    # 300円に再設定して再出品
+    @item_price3 = 300
+    clear_item_new_method
+    input_item_new_method(@item_name3, @item_info3, @item_price3, @item_image3)
+    @d.find_element(:class,"sell-btn").click
+    @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
+
+    jard
+    if /商品の情報を入力/.match(@d.page_source)
+      check_detail["チェック詳細"] << "×：商品出品の際、価格を「300円」にすると出品できない\n"
+    else
+      check_detail["チェック詳細"] << "◯：商品出品の際、価格を「300円」にすると出品できる\n"
+      check_flag += 1
+
+      # 出品した際は削除し出品画面へ戻ってくる
+      return_purchase_before_delete_item(@item_name3)
+    end
+
+    # 300円に再設定して再出品
+    @item_price3 = 9999999
+    clear_item_new_method
+    input_item_new_method(@item_name3, @item_info3, @item_price3, @item_image3)
+    @d.find_element(:class,"sell-btn").click
+    @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
+    jard
+    if /商品の情報を入力/.match(@d.page_source)
+      check_detail["チェック詳細"] << "×：商品出品の際、価格を「999万円」にすると出品できない\n"
+    else
+      check_detail["チェック詳細"] << "◯：商品出品の際、価格を「999万円」にすると出品できる\n"
+      check_flag += 1
+
+      # 出品した際は削除し出品画面へ戻ってくる
+      return_purchase_before_delete_item(@item_name3)
+    end
+
+    check_detail["チェック合否"] = check_flag == 4 ? "◯" : "×"
 
   ensure
+    @d.get(@url)
+    @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
     @check_log.push(check_detail)
   end
 end

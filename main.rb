@@ -79,7 +79,7 @@ def main
   login_user2
   # user2が商品購入
   login_user2_item_buy
-  jard
+
   # 出品者・出品者以外にかかわらず、ログイン状態のユーザーが、URLを直接入力して売却済み商品の商品情報編集ページへ遷移しようとすると、トップページに遷移すること
   check_16
 
@@ -299,8 +299,10 @@ end
 
 # 再出品するために必須項目を全クリア
 def clear_item_new_method
-  @wait.until {@d.find_element(:id,"item-name").displayed?}
-  # 商品名をクリア
+  @wait.until {@d.find_element(:id,"item-image").displayed?}
+  # 商品画像
+  @d.find_element(:id,"item-image").clear
+  # 商品名
   @d.find_element(:id,"item-name").clear
   # 商品説明
   @d.find_element(:id,"item-info").clear
@@ -330,24 +332,49 @@ def clear_item_new_method
 end
 
 # トップ画面にて「出品」ボタンをクリックするメソッド
-def click_purchase_btn
+# 引数flagは遷移後にputs分の出力有無
+def click_purchase_btn(flag)
 
   # 出品ボタンを押して画面遷移できるかどうか
   if /出品する/ .match(@d.page_source)
     @d.find_element(:class,"purchase-btn").click
-    puts "!出品ページに遷移 ※[class: purchase-btn]で遷移"
+    if flag then puts "!出品ページに遷移 ※[class: purchase-btn]で遷移" end
   elsif /出品する/ .match(@d.page_source)
     @d.find_element(:class,"purchase-btn-text").click
-    puts "!出品ページに遷移 ※[class: purchase-btn-text]で遷移"
+    if flag then puts "!出品ページに遷移 ※[class: purchase-btn-text]で遷移" end
   elsif /出品する/ .match(@d.page_source)
     @d.find_element(:class,"purchase-btn-icon").click
-    puts "!出品ページに遷移 ※[class: purchase-btn-icon]で遷移"
+    if flag then puts "!出品ページに遷移 ※[class: purchase-btn-icon]で遷移" end
   else
     puts "×：トップ画面から出品ページに遷移できない"
     raise '以降の自動チェックに影響を及ぼす致命的なエラーのため、処理を中断します。手動チェックに切り替えてください'
   end
+  @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
 end
 
+
+# 直前に出品した商品を削除して再度出品画面に戻る
+def return_purchase_before_delete_item(item_name)
+
+  @d.get(@url)
+  @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
+  items = @d.find_elements(:class,"item-name")
+  # 商品名を判別してクリック
+  items.each{|item|
+    if item.text == item_name then item.click end
+    @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
+    break
+  }
+
+  # 商品削除ボタンをクリック
+  @d.find_element(:class,"item-destroy").click
+  @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
+  # 削除完了画面があるかもしれないのでトップに戻る
+  @d.get(@url)
+  @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
+  # 出品画面へ
+  click_purchase_btn(false)
+end
 
 
 
@@ -366,7 +393,6 @@ def sign_up_nickname_input
   @wait.until {@d.find_element(:id, 'nickname').displayed?}
   @d.find_element(:id, 'nickname').clear
 
-  jard
   @d.find_element(:class,"register-red-btn").click
 end
 
@@ -375,7 +401,6 @@ def sign_up_retry
 
   @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
 
-  jard
   if /会員情報入力/ .match(@d.page_source)
     puts "◯：ニックネームを入力しないと、ユーザー登録ができない。"
     puts "◯：必須項目が一つでも欠けている場合は、ユーザー登録ができない"
@@ -407,7 +432,7 @@ def sign_up_retry
 
   # 今度はニックネーム含めた全項目に情報を入力していく
   input_sign_up_method(@nickname, @email, @password, @first_name, @last_name, @first_name_kana, @last_name_kana)
-  jard
+
   @d.find_element(:class,"register-red-btn").click
   @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
 
@@ -502,7 +527,7 @@ def item_new_no_image
 
   @wait.until {@d.find_element(:class,"purchase-btn").displayed?}
   # 出品ボタンをクリック
-  click_purchase_btn
+  click_purchase_btn(true)
 
   # 商品出品時の必須項目へ入力するメソッド
   input_item_new_method(@item_name, @item_info, @item_price, @item_image)
@@ -510,7 +535,6 @@ def item_new_no_image
   # 商品画像のみ空白
   @d.find_element(:id,"item-image").clear
 
-  jard
   # 入力された販売価格によって、販売手数料や販売利益が変わること(JavaScriptを使用して実装すること)
   check_17
 
@@ -818,8 +842,7 @@ def login_user2
   # 「商品出品」ボタンが存在するかチェック
   # トップページかどうか
   @wait.until {@d.find_element(:class,"purchase-btn").displayed?} rescue puts "Error: class:purchase-btnが見つかりません"
-  
-  jard
+
   # ログイン状態の出品者以外のユーザーは、URLを直接入力して出品していない商品の商品情報編集ページへ遷移しようとすると、トップページに遷移すること
   check_15
   # ログイン状態の出品者以外のユーザーのみ、「購入画面に進むボタン」が表示されること
