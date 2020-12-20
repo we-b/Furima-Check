@@ -352,20 +352,24 @@ def click_purchase_btn(flag)
   @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
 end
 
+# トップ画面にて商品名を基準に該当の商品をクリックして商品詳細画面へ遷移する
+def item_name_click_from_top(name)
+  items = @d.find_elements(:class,"item-name")
+  # 商品名を判別してクリック
+  items.each{|item|
+    if item.text == name then item.click end
+    @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
+    break
+  }
+end
 
 # 直前に出品した商品を削除して再度出品画面に戻る
 def return_purchase_before_delete_item(item_name)
 
   @d.get(@url)
   @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
-  items = @d.find_elements(:class,"item-name")
-  # 商品名を判別してクリック
-  items.each{|item|
-    if item.text == item_name then item.click end
-    @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
-    break
-  }
-
+  # トップ画面にて商品名を基準に該当の商品をクリックして商品詳細画面へ遷移する
+  item_name_click_from_top(item_name)
   # 商品削除ボタンをクリック
   @d.find_element(:class,"item-destroy").click
   @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
@@ -423,6 +427,7 @@ def sign_up_retry
     @email = "user1_#{randm_word}@co.jp"
   end
 
+  # 目視ではなくメソッドとして詳細をlogに書き込む
   sleep 3
   puts "◯【目視で確認】エラーハンドリングができていること（適切では無い値が入力された場合、情報は保存されず、エラーメッセージを出力させる）"
 
@@ -576,7 +581,7 @@ def item_new_price_uninput
   end
 
   puts "◯必須項目が一つでも欠けている場合は、出品ができない"
-  sleep 3
+  sleep 1
 
 end
 
@@ -585,67 +590,25 @@ end
 def item_new_require_input
 
   puts '◯【目視で確認】エラーハンドリングができていること（適切では無い値が入力された場合、情報は保存されず、エラーメッセージを出力させる）'
-  @d.find_element(:id,"item-image").clear
-  @d.find_element(:id,"item-name").clear
-  @d.find_element(:id,"item-info").clear
-  item_category_blank = @d.find_element(:id,"item-category")
-  item_category_blank = select_new(item_category_blank)
-  item_category_blank.select_by(:value, @blank)
+  clear_item_new_method
 
-  item_sales_status_blank = @d.find_element(:id,"item-sales-status")
-  item_sales_status_blank = select_new(item_sales_status_blank )
-  item_sales_status_blank.select_by(:value, @blank)
+  input_item_new_method(@item_name, @item_info, @item_price, @item_image)
 
-  item_shipping_fee_status_blank = @d.find_element(:id,"item-shipping-fee-status")
-  item_shipping_fee_status_blank = select_new(item_shipping_fee_status_blank )
-  item_shipping_fee_status_blank.select_by(:value, @blank)
+  # 商品情報のセレクトタグにて選択した情報を変数に代入
+  @item_category_word            = select_new(@d.find_element(:id,"item-category")).selected_options[0].text
+  @item_status_word              = select_new(@d.find_element(:id,"item-sales-status")).selected_options[0].text
+  @item_shipping_fee_status_word = select_new(@d.find_element(:id,"item-shipping-fee-status")).selected_options[0].text
+  @item_prefecture_word          = select_new(@d.find_element(:id,"item-prefecture")).selected_options[0].text
+  @item_scheduled_delivery_word  = select_new(@d.find_element(:id,"item-scheduled-delivery")).selected_options[0].text
 
-  item_prefecture_blank = @d.find_element(:id,"item-prefecture")
-  item_prefecture_blank = select_new(item_prefecture_blank )
-  item_prefecture_blank.select_by(:value, @blank)
-
-  item_scheduled_delivery_blank = @d.find_element(:id,"item-scheduled-delivery")
-  item_scheduled_delivery_blank = select_new(item_scheduled_delivery_blank )
-  item_scheduled_delivery_blank.select_by(:value, @blank)
-
-
-  @d.find_element(:id,"item-price").clear
-
-  @d.find_element(:id,"item-image").send_keys(@item_image)
   puts "◯画像は1枚必須である"
-
-  @d.find_element(:id,"item-name").send_keys(@item_name) 
   puts "◯商品名が必須である"
-
-  @d.find_element(:id,"item-info").send_keys(@item_info)
   puts "◯商品の説明が必須である"
-
-  item_category_element = @d.find_element(:id,"item-category")
-  item_category = select_new(item_category_element)
-  item_category.select_by(:value, @value)
   puts "◯カテゴリーの情報が必須である"
-
-  item_sales_status_element = @d.find_element(:id,"item-sales-status")
-  item_sales_status = select_new(item_sales_status_element)
-  item_sales_status.select_by(:value, @value)
   puts "◯商品の状態についての情報が必須である"
-
-  item_shipping_fee_status_element = @d.find_element(:id,"item-shipping-fee-status")
-  item_shipping_fee_status = select_new(item_shipping_fee_status_element)
-  item_shipping_fee_status.select_by(:value, @value)
   puts "◯配送料の負担についての情報が必須である"
-
-  item_prefecture_element = @d.find_element(:id,"item-prefecture")
-  item_prefecture = select_new(item_prefecture_element)
-  item_prefecture.select_by(:value, @value)
   puts "◯発送元の地域についての情報が必須である"
-
-  item_scheduled_delivery_element = @d.find_element(:id,"item-scheduled-delivery")
-  item_scheduled_delivery = select_new(item_scheduled_delivery_element)
-  item_scheduled_delivery.select_by(:value, @value)
   puts "◯発送までの日数についての情報が必須である"
-
-  @d.find_element(:id,"item-price").send_keys(@item_price)
   puts "◯価格についての情報が必須である"
   puts "◯販売価格は半角数字のみ入力可能"
 
@@ -685,9 +648,8 @@ end
 # トップページ　→　商品詳細画面(自分で出品した商品)
 # 商品編集(エラーハンドリング)
 def item_edit
-  #商品表示が昇順か降順
-  @d.find_element(:class,"item-img-content").click 
-
+  # トップ画面にて商品名を基準に該当の商品をクリックして商品詳細画面へ遷移する
+  item_name_click_from_top(@item_name)
   # 商品詳細画面
   if /編集/.match(@d.page_source)
     puts "!ログインした上で自分が出品した商品詳細ページへアクセスした場合は、「編集」のリンクが表示される" 
@@ -703,6 +665,9 @@ def item_edit
     @wait.until {@d.find_element(:class,"detail-item").displayed?}
   end
 
+  jard
+  # 商品詳細ページで商品出品時に登録した情報が見られるようになっている
+  check_18
 
   @wait.until {@d.find_element(:class,"item-red-btn").displayed?}
   # 商品編集ボタンクリック
@@ -734,7 +699,7 @@ def item_edit
     @wait.until {@d.find_element(:id,"sell-btn").displayed?}
   end
 
-  sleep 3
+  sleep 1
   puts "【目視で確認】エラーハンドリングができていること（適切では無い値が入力された場合、情報は保存されず、エラーメッセージを出力させる）"
 
   # 「商品の説明」項目に正しい値を入力して再度出品してみる

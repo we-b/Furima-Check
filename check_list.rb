@@ -656,7 +656,6 @@ def check_13
     @d.find_element(:class,"sell-btn").click
     @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
 
-    jard
     if /商品の情報を入力/.match(@d.page_source)
       check_detail["チェック詳細"] << "◯：商品出品の際、価格を「299円」にすると出品できない\n"
       check_flag += 1
@@ -673,7 +672,6 @@ def check_13
     @d.find_element(:class,"sell-btn").click
     @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
 
-    jard
     if /商品の情報を入力/.match(@d.page_source)
       check_detail["チェック詳細"] << "◯：商品出品の際、価格を「1000万円」にすると出品できない\n"
       check_flag += 1
@@ -690,7 +688,6 @@ def check_13
     @d.find_element(:class,"sell-btn").click
     @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
 
-    jard
     if /商品の情報を入力/.match(@d.page_source)
       check_detail["チェック詳細"] << "×：商品出品の際、価格を「300円」にすると出品できない\n"
     else
@@ -707,7 +704,7 @@ def check_13
     input_item_new_method(@item_name3, @item_info3, @item_price3, @item_image3)
     @d.find_element(:class,"sell-btn").click
     @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
-    jard
+
     if /商品の情報を入力/.match(@d.page_source)
       check_detail["チェック詳細"] << "×：商品出品の際、価格を「999万円」にすると出品できない\n"
     else
@@ -737,7 +734,7 @@ def check_14
 
     # basic認証の情報を含まない本番環境のURLのみでアクセスしてみる
     @d.get("https://" + @url_ele)
-    sleep 5
+    sleep 1
 
     display_flag = @d.find_element(:class,"furima-icon").displayed? rescue false
     # basic認証が実装されていたらトップ画面には遷移できないはず
@@ -890,6 +887,94 @@ def check_17
     end
 
     check_detail["チェック合否"] = check_flag == 2 ? "◯" : "×"
+
+  ensure
+    @check_log.push(check_detail)
+  end
+end
+
+# 商品詳細ページで商品出品時に登録した情報が見られるようになっている
+def check_18
+  check_detail = {"チェック番号"=> 18 , "チェック合否"=> "" , "チェック内容"=> "商品詳細ページで商品出品時に登録した情報が見られるようになっている" , "チェック詳細"=> ""}
+  check_flag = 0
+
+  begin
+
+    item_data_answers = {"商品名" => @item_name, "商品画像" => @item_image_name, "商品価格" => @item_price, "商品説明" => @item_info }
+    item_data = {}
+    # 商品名
+    item_data["商品名"] = @d.find_element(:class,"name").text rescue "×：Error：商品名を表示する要素class：nameが見つかりません\n"
+    # 商品画像
+    item_data["商品画像"] = @d.find_element(:class,"item-box-img").attribute("src") rescue "×：Error：商品の画像を表示する要素class：item-box-imgが見つかりません\n"
+    # 商品の価格
+    item_data["商品価格"] = @d.find_element(:class,"item-price").text rescue "×：Error：商品の価格を表示する要素class：item-priceが見つかりません\n"
+    # 商品説明文の親要素
+    show_item_info_parent = @d.find_element(:class,"item-explain-box") rescue "×：Error：商品の説明を表示する要素class：item-explain-boxが見つかりません\n"
+    # 商品説明文章
+    item_data["商品説明"] = show_item_info_parent.find_element(:tag_name,'span').text
+    # 出品情報詳細(配列)
+    show_item_details = @d.find_elements(:class,"detail-value") rescue "×：Error：商品の詳細(出品者・カテゴリー・状態・発送先・配送料の負担・発送目安)を表示する要素class：detail-valueが見つかりません\n"
+
+    item_data_answers.each{|k, v|
+
+      # 商品画像の時だけincludeでチェック
+      if k == "商品画像" || k == "商品価格"
+        if item_data[k].include?(v.to_s)
+          check_detail["チェック詳細"] << "◯：商品詳細画面に【#{k}】情報が表示されている\n"
+          check_flag += 1
+        else
+          # 表示内容が合致しない場合はエラーになっていないかチェック
+          if item_data[k].include?("Error")
+            # そもそも要素取得の段階でエラーの場合はエラー文章を代入
+            check_detail["チェック詳細"] << item_data[k]
+          elsif k == "商品画像"
+            # エラージャない場合は単純に表示内容に食い違いが起きている
+            check_detail["チェック詳細"] << "×：商品詳細画面にて【#{k}】情報が正しく表示されていない可能性あり。詳細画面表示画像URL →「#{item_data[k]}」  出品時添付ファイル名 →「#{v}」\n"
+          elsif k == "商品価格"
+            check_detail["チェック詳細"] << "×：商品詳細画面にて【#{k}】情報が正しく表示されていない可能性あり。詳細画面表示内容 →「#{item_data[k]}」  出品時入力内容 →「#{v}」\n"
+          end
+        end
+
+        next
+      end
+
+      # 画像以外のチェック方法
+      if item_data[k] == v
+        check_detail["チェック詳細"] << "◯：商品詳細画面に【#{k}】情報が表示されている\n"
+        check_flag += 1
+      else
+        # 表示内容が合致しない場合はエラーになっていないかチェック
+        if item_data[k].include?("Error")
+          # そもそも要素取得の段階でエラーの場合はエラー文章を代入
+          check_detail["チェック詳細"] << item_data[k]
+        else
+          # エラージャない場合は単純に表示内容に食い違いが起きている
+          check_detail["チェック詳細"] << "×：商品詳細画面にて【#{k}】情報が正しく表示されていない可能性あり。詳細画面表示内容 →「#{item_data[k]}」  出品時入力内容 →「#{v}」\n"
+        end
+      end
+    }
+
+    #  detail要素が文字列だったらエラー出力処理
+    if show_item_details.is_a?(String)
+      check_detail["チェック詳細"] << show_item_details
+    else
+      # 文字列以外 = 配列だったら正常に情報が取得できた時の処理
+      # 出品詳細情報の答えをハッシュに格納[出品者、カテゴリー、商品の状態、配送料の負担、発送元の地域、発送日の目安]
+      item_detail_answers = { "出品者" => @nickname, "カテゴリー" => @item_category_word, "商品の状態" => @item_status_word, "配送料の負担" => @item_shipping_fee_status_word, "発送元の地域" => @item_prefecture_word, "発送日の目安" => @item_scheduled_delivery_word }
+      show_item_details_text = show_item_details.map { |e| e.text }
+      # 答えハッシュの中身全てをチェック
+      item_detail_answers.each{|k, v|
+        # 表示されている情報にハッシュ の中身が該当するかチェック
+        if show_item_details_text.include?(v)
+          check_detail["チェック詳細"] << "◯：商品詳細画面に【#{k}】情報が表示されている\n"
+          check_flag += 1
+        else
+          check_detail["チェック詳細"] << "×：商品詳細画面に【#{k}】情報が表示されていない\n"
+        end
+      }
+    end
+
+    check_detail["チェック合否"] = check_flag == 10 ? "◯" : "×"
 
   ensure
     @check_log.push(check_detail)

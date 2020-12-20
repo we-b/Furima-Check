@@ -65,6 +65,12 @@ randm_word = SecureRandom.hex(10) #=> "4a01bbd139f5e94bd249"
 @value = '2'
 @item_price = 40000
 @item_image = "/Users/tech-camp/projects/furima_checkApp/photo/coat.jpg"
+@item_category_word = ""
+@item_status_word = ""
+@item_shipping_fee_status_word = ""
+@item_prefecture_word = ""
+@item_scheduled_delivery_word = ""
+
 
 # 購入ページのURLを直接入力でリダイレクトされるかのチェック用
 @order_url_coat = ""
@@ -81,6 +87,7 @@ randm_word = SecureRandom.hex(10) #=> "4a01bbd139f5e94bd249"
 @item_info3 = "価格の限界に挑戦中"
 @item_price3 = 299
 @item_image3 = "/Users/tech-camp/projects/furima_checkApp/photo/tuna.jpg"
+@item_image_name3 = "tuna.jpg"
 
 # 購入時のカード情報
 @card_number = 4242424242424242
