@@ -206,9 +206,8 @@ def check_4
     else
       check_detail["チェック詳細"] << "×：ログアウト状態で、トップ画面にclass「item-name」が存在しない\n"
     end
-    
+
     check_detail["チェック合否"] = check_flag == 1 ? "◯" : "×"
-  
   ensure
     @check_log.push(check_detail)
   end
