@@ -31,10 +31,7 @@ require 'securerandom'
 randm_word = SecureRandom.hex(10) #=> "4a01bbd139f5e94bd249"
 
 
-@item_image = "/Users/tech-camp/projects/furima_checkApp/photo/coat.jpg"
-@item_image2 = "/Users/tech-camp/projects/furima_checkApp/photo/sunglass.jpg"
-@password = "aaa111" #パスワードは共通
-
+# ユーザー情報
 @nickname = "lifecoach_test_user1"
 @email = "user1_#{randm_word}@co.jp"
 @first_name = "愛"
@@ -56,27 +53,35 @@ randm_word = SecureRandom.hex(10) #=> "4a01bbd139f5e94bd249"
 @first_name_kana3 = "ランバ"
 @last_name_kana3 = "ラル"
 
+@password = "aaa111" #パスワードは全ユーザー共通
 
 
 
+# 出品商品情報
 @item_image_name = "coat.jpg"
 @item_name = "コート"
 @item_info = "今年イチオシのトレンチコート"
 @item_info_re = "昨年イチオシのトレンチコート"
 @value = '2'
 @item_price = 40000
+@item_image = "/Users/tech-camp/projects/furima_checkApp/photo/coat.jpg"
+
 # 購入ページのURLを直接入力でリダイレクトされるかのチェック用
 @order_url_coat = ""
 # user1によるコート情報編集画面のURL
 @edit_url_coat = ""
 
-
-
 @item_name2 = "サングラス"
 @item_info2 = "限定5品のサングラス"
 @item_price2 = 30000
+@item_image2 = "/Users/tech-camp/projects/furima_checkApp/photo/sunglass.jpg"
 @order_url_glasses = ""
 
+@item_name3 = "激安マンション"
+@item_info3 = "価格の限界に挑戦中"
+@item_price3 = 299
+
+# 購入時のカード情報
 @card_number = 4242424242424242
 @card_exp_month = 10
 @card_exp_year = 30

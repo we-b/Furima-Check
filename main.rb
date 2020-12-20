@@ -118,6 +118,13 @@ def main
 
   # ログアウトしたユーザーで購入できるかチェック
   no_user_item_buy
+
+  # 価格の範囲が、¥300~¥9,999,999の間であること
+  # 出品を何度かしてチェック
+  check_13
+
+  # 自動チェック処理の終了のお知らせ
+  finish_puts
 end
 
 # チェック前の準備
@@ -188,7 +195,7 @@ end
 # 新規登録に必要な項目入力を行うメソッド
 def input_sign_up_method(nickname, email, pass, first, last, first_kana, last_kana)
   @wait.until {@d.find_element(:id, 'nickname').displayed?}
-  @d.find_element(:id, 'email').send_keys(nickname)
+  @d.find_element(:id, 'nickname').send_keys(nickname)
   @wait.until {@d.find_element(:id, 'email').displayed?}
   @d.find_element(:id, 'email').send_keys(email)
   @wait.until {@d.find_element(:id, 'password').displayed?}
@@ -238,6 +245,114 @@ def clear_sign_up_method
   # 将来的には生年月日のセレクトもクリアにしたい
 end
 
+# 商品出品時の入力項目へ入力するメソッド
+def input_item_new_method(name, info, price, image)
+
+  # 以下、各項目の入力を行う
+  # 商品画像
+  @wait.until {@d.find_element(:id,"item-image").displayed?}
+  @d.find_element(:id,"item-image").send_keys(image)
+
+  # 商品名
+  @wait.until {@d.find_element(:id,"item-name").displayed?}
+  @d.find_element(:id,"item-name").send_keys(name)
+
+  # 商品説明
+  @wait.until {@d.find_element(:id,"item-info").displayed?}
+  @d.find_element(:id,"item-info").send_keys(info)
+
+  # カテゴリーはセレクトタグから値を選択
+  @wait.until {@d.find_element(:id,"item-category").displayed?}
+  item_category_element = @d.find_element(:id,"item-category")
+  item_category = select_new(item_category_element)
+  item_category.select_by(:value, @value)
+
+  # 商品の状態はセレクトタグから値を選択
+  @wait.until {@d.find_element(:id,"item-sales-status").displayed?}
+  item_sales_status_element = @d.find_element(:id,"item-sales-status")
+  item_sales_status = select_new(item_sales_status_element)
+  item_sales_status.select_by(:value, @value)
+
+  # 送料の負担はセレクトタグから値を選択
+  @wait.until {@d.find_element(:id,"item-shipping-fee-status").displayed?}
+  item_shipping_fee_status_element = @d.find_element(:id,"item-shipping-fee-status")
+  item_shipping_fee_status = select_new(item_shipping_fee_status_element)
+  item_shipping_fee_status.select_by(:value, @value)
+
+  # 発送先はセレクトタグから値を選択
+  @wait.until {@d.find_element(:id,"item-prefecture").displayed?}
+  item_prefecture_element = @d.find_element(:id,"item-prefecture")
+  item_prefecture = select_new(item_prefecture_element)
+  item_prefecture.select_by(:value, @value)
+
+  # 発送までの日数
+  @wait.until {@d.find_element(:id,"item-scheduled-delivery").displayed?}
+  item_scheduled_delivery_element = @d.find_element(:id,"item-scheduled-delivery")
+  item_scheduled_delivery = select_new(item_scheduled_delivery_element)
+  item_scheduled_delivery.select_by(:value, @value)
+
+
+  # 価格
+  @wait.until {@d.find_element(:id,"item-price").displayed?}
+  @d.find_element(:id,"item-price").send_keys(price)
+end
+
+# 再出品するために必須項目を全クリア
+def clear_item_new_method
+  @wait.until {@d.find_element(:id,"item-name").displayed?}
+  # 商品名をクリア
+  @d.find_element(:id,"item-name").clear
+  # 商品説明
+  @d.find_element(:id,"item-info").clear
+
+  item_category_blank = @d.find_element(:id,"item-category")
+  item_category_blank = select_new(item_category_blank)
+  item_category_blank.select_by(:value, @blank)
+
+  item_sales_status_blank = @d.find_element(:id,"item-sales-status")
+  item_sales_status_blank = select_new(item_sales_status_blank )
+  item_sales_status_blank.select_by(:value, @blank)
+
+  item_shipping_fee_status_blank = @d.find_element(:id,"item-shipping-fee-status")
+  item_shipping_fee_status_blank = select_new(item_shipping_fee_status_blank )
+  item_shipping_fee_status_blank.select_by(:value, @blank)
+
+  item_prefecture_blank = @d.find_element(:id,"item-prefecture")
+  item_prefecture_blank = select_new(item_prefecture_blank )
+  item_prefecture_blank.select_by(:value, @blank)
+
+  item_scheduled_delivery_blank = @d.find_element(:id,"item-scheduled-delivery")
+  item_scheduled_delivery_blank = select_new(item_scheduled_delivery_blank )
+  item_scheduled_delivery_blank.select_by(:value, @blank)
+
+  # 価格
+  @d.find_element(:id,"item-price").clear
+end
+
+# トップ画面にて「出品」ボタンをクリックするメソッド
+def click_purchase_btn
+
+  # 出品ボタンを押して画面遷移できるかどうか
+  if /出品する/ .match(@d.page_source)
+    @d.find_element(:class,"purchase-btn").click
+    puts "!出品ページに遷移 ※[class: purchase-btn]で遷移"
+  elsif /出品する/ .match(@d.page_source)
+    @d.find_element(:class,"purchase-btn-text").click
+    puts "!出品ページに遷移 ※[class: purchase-btn-text]で遷移"
+  elsif /出品する/ .match(@d.page_source)
+    @d.find_element(:class,"purchase-btn-icon").click
+    puts "!出品ページに遷移 ※[class: purchase-btn-icon]で遷移"
+  else
+    puts "×：トップ画面から出品ページに遷移できない"
+    raise '以降の自動チェックに影響を及ぼす致命的なエラーのため、処理を中断します。手動チェックに切り替えてください'
+  end
+end
+
+
+
+
+
+
 
 # 新規登録
 # ニックネームは未入力
@@ -245,12 +360,13 @@ def sign_up_nickname_input
   @d.find_element(:class,"sign-up").click
   @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
 
-
+  # 新規登録に必要な項目入力を行うメソッド
   input_sign_up_method(@nickname, @email, @password, @first_name, @last_name, @first_name_kana, @last_name_kana)
 
   @wait.until {@d.find_element(:id, 'nickname').displayed?}
   @d.find_element(:id, 'nickname').clear
 
+  jard
   @d.find_element(:class,"register-red-btn").click
 end
 
@@ -259,6 +375,7 @@ def sign_up_retry
 
   @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
 
+  jard
   if /会員情報入力/ .match(@d.page_source)
     puts "◯：ニックネームを入力しないと、ユーザー登録ができない。"
     puts "◯：必須項目が一つでも欠けている場合は、ユーザー登録ができない"
@@ -288,70 +405,94 @@ def sign_up_retry
   # まず入力の準備として項目情報をクリア
   clear_sign_up_method
 
-  input_sign_up_method(@nickname, @email, @password, @first_name, @last_name, @first_name_kana, @last_name_kana)
-
-
   # 今度はニックネーム含めた全項目に情報を入力していく
-  # ここで再度.displayed?メソッド使う意味はあるのか？？ = 高速処理によって処理がエラーを起こさないように記述している
-  puts "◯ニックネームが必須である"
-  puts "◯メールアドレスが必須である"
-  puts "◯メールアドレスは一意性である"  #これはまだ立証できない
-  puts "◯メールアドレスは@を含む必要がある"  #これはまだ立証できない
-  puts "◯パスワードが必須である"
-  puts "◯パスワードは6文字以上である"  #これはまだ立証できない
-  puts "◯パスワードは半角英数字混合である"  #これはまだ立証できない
-  puts "◯パスワードは確認用を含めて2回入力する"  #これはまだ立証できない
-
-  puts "◯ユーザー本名が、名字と名前がそれぞれ必須である"  #これはまだ立証できない
-  puts "◯ユーザー本名は全角（漢字・ひらがな・カタカナ）で入力させる"  #これはまだ立証できない
-
-  puts "◯ユーザー本名のフリガナが、名字と名前でそれぞれ必須である"
-  puts "◯ユーザー本名のフリガナは全角（カタカナ）で入力させる"
-
-
+  input_sign_up_method(@nickname, @email, @password, @first_name, @last_name, @first_name_kana, @last_name_kana)
+  jard
   @d.find_element(:class,"register-red-btn").click
+  @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
+
+  if /FURIMAが選ばれる3つの理由/ .match(@d.page_source)
+    puts "◯必須項目を入力し、ユーザー登録ができる"
+    puts "◯ニックネームが必須である"
+    puts "◯メールアドレスが必須である"
+    puts "◯メールアドレスは一意性である"  #これはまだ立証できない
+    puts "◯メールアドレスは@を含む必要がある"  #これはまだ立証できない
+    puts "◯パスワードが必須である"
+    puts "◯パスワードは6文字以上である"  #これはまだ立証できない
+    puts "◯パスワードは半角英数字混合である"  #これはまだ立証できない
+    puts "◯パスワードは確認用を含めて2回入力する"  #これはまだ立証できない
+    puts "◯ユーザー本名が、名字と名前がそれぞれ必須である"  #これはまだ立証できない
+    puts "◯ユーザー本名は全角（漢字・ひらがな・カタカナ）で入力させる"  #これはまだ立証できない
+    puts "◯ユーザー本名のフリガナが、名字と名前でそれぞれ必須である"
+    puts "◯ユーザー本名のフリガナは全角（カタカナ）で入力させる"
+    puts "◯生年月日が必須である"  #これはまだ立証できない
+  
+  # 登録に失敗した場合はパスワードを疑う
+  elsif /会員情報入力/ .match(@d.page_source)
+    puts "×：パスワードに大文字が入っていないと登録できない可能性あり、パスワード文字列に大文字(aaa111 → Aaa111)を追加して再登録トライ"
+
+    # パスワードの内容でエラーになった可能性あるため、大文字含めた文字列に変更
+    @password = "Aaa111"
+    clear_sign_up_method
+    input_sign_up_method(@nickname, @email, @password, @first_name, @last_name, @first_name_kana, @last_name_kana)
+    @d.find_element(:class,"register-red-btn").click
+    @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
+
+    if /FURIMAが選ばれる3つの理由/ .match(@d.page_source)
+
+      puts "◯必須項目を入力し、ユーザー登録ができる" 
+      puts "◯ニックネームが必須である"
+      puts "◯メールアドレスが必須である"
+      puts "◯メールアドレスは一意性である"  #これはまだ立証できない
+      puts "◯メールアドレスは@を含む必要がある"  #これはまだ立証できない
+      puts "◯パスワードが必須である"
+      puts "◯パスワードに大文字が含まれていることが必須である"  #追記
+      puts "◯パスワードは6文字以上である"  #これはまだ立証できない
+      puts "◯パスワードは半角英数字混合である"  #これはまだ立証できない
+      puts "◯パスワードは確認用を含めて2回入力する"  #これはまだ立証できない
+      puts "◯ユーザー本名が、名字と名前がそれぞれ必須である"  #これはまだ立証できない
+      puts "◯ユーザー本名は全角（漢字・ひらがな・カタカナ）で入力させる"  #これはまだ立証できない
+      puts "◯ユーザー本名のフリガナが、名字と名前でそれぞれ必須である"
+      puts "◯ユーザー本名のフリガナは全角（カタカナ）で入力させる"
+      puts "◯生年月日が必須である"  #これはまだ立証できない
+
+    
+      # パスワードの上書きでも登録が成功しない場合は処理を終了
+    else
+      puts "☒必須項目を入力してもユーザー登録ができていない" 
+      puts "ユーザー登録バリデーションが複雑なためuser1が登録できません。ユーザー登録できない場合、以降の自動チェックにて不備が発生するため自動チェック処理を終了します"
+      puts "手動でのアプリチェックを行ってください"
+    end
+  end
 end
 
 
 # トップメニューに戻ってきた後にログアウトする
 def logout_from_the_topMenu
-  # 「出品する」ボタンが存在するかでトップ画面かどうか判断
-  # {@d.find_element(:class,"purchase-btn").displayed?}　←必要あるのか？？
-  # 要検討：ログアウト状態だと「出品する」ボタンを表示させない実装をしている受講生あり
-  @wait.until {@d.find_element(:class,"purchase-btn").displayed?}
-  puts "◯生年月日が必須である"
 
-  if /FURIMAが選ばれる3つの理由/ .match(@d.page_source)
-  puts "◯必須項目を入力し、ユーザー登録ができる" 
-  else
-  puts "☒必須項目を入力し、ユーザー登録ができていない" 
-  @wait.until {@d.find_element(:class,"purchase-btn").displayed?}
-  end
-
-  # if /ログアウト/.match(@d.page_source)
   @d.find_element(:class,"logout").click
-  # else
+  @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
 
-  # end
 end
 
 # ログイン
 def login_user1
   @wait.until {@d.find_element(:class,"login").displayed?}
-  @d.find_element(:class,"login").click 
+  @d.find_element(:class,"login").click
   @wait.until {@d.find_element(:id, 'email').displayed?}
   @d.find_element(:id, 'email').send_keys(@email)
   @wait.until {@d.find_element(:id, 'password').displayed?}
   @d.find_element(:id, 'password').send_keys(@password)
   @wait.until {@d.find_element(:class,"login-red-btn").displayed?}
   @d.find_element(:class,"login-red-btn").click
+  @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
 
   # トップ画面に戻れているか
   if /FURIMAが選ばれる3つの理由/ .match(@d.page_source)
-  puts "◯ログイン/ログアウトができる" 
+    puts "◯ログイン/ログアウトができる"
   else
-  puts "☒ログイン/ログアウトができない" 
-  @wait.until {@d.find_element(:class,"purchase-btn").displayed?}
+    puts "☒ログイン/ログアウトができない"
+    @d.get(@url)
   end
 end
 
@@ -360,87 +501,30 @@ end
 def item_new_no_image
 
   @wait.until {@d.find_element(:class,"purchase-btn").displayed?}
+  # 出品ボタンをクリック
+  click_purchase_btn
 
-  # 出品ボタンを押して画面遷移できるかどうか
-  if /出品する/ .match(@d.page_source)
-    @d.find_element(:class,"purchase-btn").click
-    puts "!出品ページに遷移1"
-    puts 1
-  elsif /出品する/ .match(@d.page_source)
-    @d.find_element(:class,"purchase-btn-text").click
-    puts "!出品ページに遷移2"
-    puts 2
-  elsif /出品する/ .match(@d.page_source)
-    @d.find_element(:class,"purchase-btn-icon").click
-    puts "!出品ページに遷移3"
-    puts 3
-  else
-    puts "!出品ページに遷移できない"
-    @wait.until {@d.find_element(:id,"item-name").displayed?}
-  end
+  # 商品出品時の必須項目へ入力するメソッド
+  input_item_new_method(@item_name, @item_info, @item_price, @item_image)
 
-  @wait.until {@d.find_element(:id,"item-name").displayed?}
-  @d.find_element(:id,"item-name").send_keys(@item_name)
+  # 商品画像のみ空白
+  @d.find_element(:id,"item-image").clear
 
-  @wait.until {@d.find_element(:id,"item-info").displayed?}
-  @d.find_element(:id,"item-info").send_keys(@item_info)
-
-  @wait.until {@d.find_element(:id,"item-category").displayed?}
-  # 「カテゴリー」のセレクトタグから値を選択
-  item_category_element = @d.find_element(:id,"item-category")
-  item_category = select_new(item_category_element)
-  item_category.select_by(:value, @value)
-  # 「商品の状態」のセレクトタグから値を選択
-  @wait.until {@d.find_element(:id,"item-sales-status").displayed?}
-  item_sales_status_element = @d.find_element(:id,"item-sales-status")
-  item_sales_status = select_new(item_sales_status_element)
-  item_sales_status.select_by(:value, @value)
-
-
-  @wait.until {@d.find_element(:id,"item-shipping-fee-status").displayed?}
-  item_shipping_fee_status_element = @d.find_element(:id,"item-shipping-fee-status")
-  item_shipping_fee_status = select_new(item_shipping_fee_status_element)
-  item_shipping_fee_status.select_by(:value, @value)
-
-  @wait.until {@d.find_element(:id,"item-prefecture").displayed?}
-  item_prefecture_element = @d.find_element(:id,"item-prefecture")
-  item_prefecture = select_new(item_prefecture_element)
-  item_prefecture.select_by(:value, @value)
-
-
-  @wait.until {@d.find_element(:id,"item-price").displayed?}
-  @d.find_element(:id,"item-price").send_keys(@item_price)
-  @d.find_element(:class,"price-content").click
-
-  #javascriptが動作しているかどうかを判断
-  item_price_benefit = @item_price*0.9
-  item_price_benefit = item_price_benefit.round
-  item_price_benefit2 = item_price_benefit.to_s.gsub(/\@d{2}/, '\0,').to_i
-
-  puts "!利益は#{item_price_benefit}" 
-
-
-  @wait.until {@d.find_element(:id,"item-scheduled-delivery").displayed?}
-  item_scheduled_delivery_element = @d.find_element(:id,"item-scheduled-delivery")
-  item_scheduled_delivery = select_new(item_scheduled_delivery_element)
-  item_scheduled_delivery.select_by(:value, @value)
-
-  #表記をに,を入れているかどうかで又はを追記
-  if /#{item_price_benefit}/.match(@d.page_source) || /#{item_price_benefit2}/.match(@d.page_source)
-  puts "◯入力された販売価格によって、非同期的に販売手数料や販売利益が変わる(JavaScriptを使用して実装すること)" 
-  else
-  puts "☒入力された販売価格によって、非同期的に販売手数料や販売利益が変わらない" 
-  @wait.until {@d.find_element(:id,'profit').text == item_price_benefit}
-  end
+  jard
+  # 入力された販売価格によって、販売手数料や販売利益が変わること(JavaScriptを使用して実装すること)
+  check_17
 
   # 「出品する」ボタンをクリック
   @d.find_element(:class,"sell-btn").click
+  @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
 
   if /商品の情報を入力/.match(@d.page_source)
-    puts "◯画像が0枚の場合は、出品できない" 
-    else
-    puts "☒画像が0枚の場合は、出品できる" 
-    @wait.until {@d.find_element(:id,"item-name").displayed?}
+    puts "◯画像が0枚の場合は、出品できない"
+  else
+    puts "☒画像が0枚の場合でも、出品できてしまう"
+    @d.get(@url)
+    @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
+
   end
 end
 
@@ -450,59 +534,14 @@ end
 # 価格未入力
 def item_new_price_uninput
 
-  @wait.until {@d.find_element(:id,"item-name").displayed?}
-  @d.find_element(:id,"item-name").clear
-  @d.find_element(:id,"item-info").clear
-  item_category_blank = @d.find_element(:id,"item-category")
-  item_category_blank = select_new(item_category_blank)
-  item_category_blank.select_by(:value, @blank)
+  # 再出品するために必須項目を全クリア
+  clear_item_new_method
 
-  item_sales_status_blank = @d.find_element(:id,"item-sales-status")
-  item_sales_status_blank = select_new(item_sales_status_blank )
-  item_sales_status_blank.select_by(:value, @blank)
+  # 商品出品時の必須項目へ入力するメソッド
+  input_item_new_method(@item_name, @item_info, @item_price, @item_image)
 
-  item_shipping_fee_status_blank = @d.find_element(:id,"item-shipping-fee-status")
-  item_shipping_fee_status_blank = select_new(item_shipping_fee_status_blank )
-  item_shipping_fee_status_blank.select_by(:value, @blank)
-
-  item_prefecture_blank = @d.find_element(:id,"item-prefecture")
-  item_prefecture_blank = select_new(item_prefecture_blank )
-  item_prefecture_blank.select_by(:value, @blank)
-
-  item_scheduled_delivery_blank = @d.find_element(:id,"item-scheduled-delivery")
-  item_scheduled_delivery_blank = select_new(item_scheduled_delivery_blank )
-  item_scheduled_delivery_blank.select_by(:value, @blank)
-
+  # 商品価格のみ空白
   @d.find_element(:id,"item-price").clear
-
-  @wait.until {@d.find_element(:id,"item-image").displayed?}
-  @d.find_element(:id,"item-image").send_keys(@item_image)
-  @d.find_element(:id,"item-name").send_keys(@item_name) 
-  @d.find_element(:id,"item-info").send_keys(@item_info)
-
-  item_category_element = @d.find_element(:id,"item-category")
-  item_category = select_new(item_category_element)
-  item_category.select_by(:value, @value)
-
-  item_sales_status_element = @d.find_element(:id,"item-sales-status")
-  item_sales_status = select_new(item_sales_status_element)
-  item_sales_status.select_by(:value, @value)
-
-  item_shipping_fee_status_element = @d.find_element(:id,"item-shipping-fee-status")
-  item_shipping_fee_status = select_new(item_shipping_fee_status_element)
-  item_shipping_fee_status.select_by(:value, @value)
-
-  item_prefecture_element = @d.find_element(:id,"item-prefecture")
-  item_prefecture = select_new(item_prefecture_element)
-  item_prefecture.select_by(:value, @value)
-
-
-  item_scheduled_delivery_element = @d.find_element(:id,"item-scheduled-delivery")
-  item_scheduled_delivery = select_new(item_scheduled_delivery_element)
-  item_scheduled_delivery.select_by(:value, @value)
-
-  # @wait.until {@d.find_element(:id,"item-price").displayed?}
-  # @d.find_element(:id,"item-price").send_keys(@item_price)
 
   @d.find_element(:class,"sell-btn").click
 
@@ -510,7 +549,6 @@ def item_new_price_uninput
     puts "!価格の記入なしで商品出品を行うと、商品出品ページリダイレクトされる"
   else
     puts "!価格の記入なしで商品出品を行っても、商品出品ページリダイレクトされない"
-    @wait.until {@d.find_element(:id,"item-name").displayed?}
   end
 
   puts "◯必須項目が一つでも欠けている場合は、出品ができない"
@@ -1042,7 +1080,7 @@ def login_user1_item_buy
   @d.get(@url)
 end
 
-# ログイン状態で商品購入
+# ログアウト状態で商品購入
 def no_user_item_buy
   @wait.until {@d.find_element(:class,"purchase-btn").displayed?}
   @d.find_element(:class,"logout").click
@@ -1149,26 +1187,11 @@ def no_user_item_buy
     end
     puts "◯ログアウトした状態でも、商品詳細ページを閲覧できる"
   end
+end
 
-
+# 自動チェック処理の終了のお知らせ
+def finish_puts
   puts "プログラム終了"
   puts "ログイン情報1 user1_email #{@email} password #{@password}"
   puts "ログイン情報2 user2_email #{@email2} password #{@password}\n\n\n"
-  # puts "【目視で確認】商品出品時に登録した情報が見られるようになっている"
-  # puts "【目視で確認】新規登録、商品出品、商品購入の際にエラーハンドリングができていること（適切では無い値が入力された場合、情報は保存されず、エラーメッセージを出力させる）"
-  # puts "【目視で確認】basic認証が実装されている"
-  # puts "【目視で確認】ログイン/ログアウトによって、ヘッダーにてユーザーへ表示する情報が変わる"
-  # puts "【目視で確認】画像が表示されており、画像がリンク切れなどになっていない"
-  # puts "【目視で確認】ログアウト状態のユーザーは、商品出品ページへ遷移しようとすると、ログインページへ遷移すること"
-  # puts "【目視で確認】パスワードは半角英数字混合であること"
-  # puts "【目視で確認】パスワードは6文字以上であること"
-  # puts "【目視で確認】価格の範囲が、¥300~¥9,999,999の間であること"
-  # puts "【目視で確認】商品出品時とほぼ同じ見た目で商品情報編集機能が実装されていること"
-  # puts "【目視で確認】商品購入ページでは、一覧や詳細ページで選択した商品の情報が出力されること"
-  # puts "【目視で確認】ログイン状態の出品者でも、売却済みの商品に対しては「編集・削除ボタン」が表示されないこと"
-  # puts "【目視で確認】出品者・出品者以外にかかわらず、ログイン状態のユーザーが、URLを直接入力して売却済み商品の商品情報編集ページへ遷移しようとすると、トップページに遷移すること"
-  # puts "【目視で確認】ログアウト状態のユーザーが、URLを直接入力して売却済み商品の商品情報編集ページへ遷移しようとすると、ログインページに遷移すること"
-  # puts "【目視で確認】ログアウト状態のユーザーは、URLを直接入力して商品情報編集ページへ遷移しようとすると、ログインページに遷移すること"
-  # puts "【目視で確認】商品購入画面で出品時に登録した情報が見られるようになっていること"
-  # puts "【目視で確認】商品詳細ページでログアウト状態のユーザーには、「編集・削除・購入画面に進むボタン」が表示されないこと\n"
 end

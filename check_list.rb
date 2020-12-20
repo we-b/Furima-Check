@@ -640,23 +640,13 @@ end
 
 # 価格の範囲が、¥300~¥9,999,999の間であること
 def check_13
-  check_detail = {"チェック番号"=> 13 , "チェック合否"=> "" , "チェック内容"=> "価格の範囲が、¥300~¥9,999,999の間であること" , "チェック詳細"=> ""}
+  check_detail = {"チェック番号"=> 13 , "チェック合否"=> "" , "チェック内容"=> "出品できる商品の価格の範囲が、¥300~¥9,999,999の間であること" , "チェック詳細"=> ""}
   check_flag = 0
 
   begin
-    @wait.until {@d.find_element(:class,"purchase-btn").displayed?}
-    # ログイン状態でトップ画面にユーザーのニックネームとログアウトボタンが表示されているか
-    if @d.find_element(:class,"user-nickname").displayed?
-      check_ele1 = @d.find_element(:class,"user-nickname").displayed? ? "○：ログイン状態で、ヘッダーにニックネームボタンが表示されている\n" : "×：ログアウト状態では、ヘッダーにユーザーのニックネームが表示されない\n"
-      check_detail["チェック詳細"] << check_ele1
-      check_flag += 1
-    end
+    # user3でログイン
+    login_any_user(@email3, @password)
 
-    if @d.find_element(:class,"logout").displayed?
-      check_ele2 = @d.find_element(:class,"logout").displayed? ? "○：ログイン状態で、ヘッダーにログアウトボタンが表示されている\n" : "×：ログアウト状態では、ヘッダーにログアウトボタンが表示されない\n"
-      check_detail["チェック詳細"] << check_ele1
-      check_flag += 1
-    end
 
     check_detail["チェック合否"] = check_flag == 2 ? "◯" : "×"
 
@@ -777,6 +767,62 @@ def check_16
   end
 end
 
+# 入力された販売価格によって、販売手数料や販売利益が変わること(JavaScriptを使用して実装すること)
+def check_17
+  check_detail = {"チェック番号"=> 17 , "チェック合否"=> "" , "チェック内容"=> "入力された販売価格によって、販売手数料や販売利益が変わること(JavaScriptを使用して実装すること)" , "チェック詳細"=> ""}
+  check_flag = 0
+
+  begin
+    # 商品価格のクラスをクリック？？
+    @d.find_element(:class,"price-content").click
+
+    #javascriptが動作しているかどうかを判断
+    # 販売利益
+    item_price_profit = (@item_price*0.9).round
+    # 販売利益の[1,000]のコンマ表記バージョン
+    item_price_profit2 = item_price_profit.to_s.gsub(/\@d{2}/, '\0,').to_s
+
+
+    # 販売手数料(10%)
+    item_price_commission = (@item_price*0.1).round
+    # 販売利益の[1,000]のコンマ表記バージョン
+    item_price_commission2 = item_price_commission.to_s.gsub(/\@d{2}/, '\0,').to_s
+
+    check_detail["チェック詳細"] << "!価格設定：#{@item_price}円、販売手数料(10%)：#{item_price_commission}円、販売利益：#{item_price_profit}円\n"
+
+    sleep 1
+
+    item_commission = @d.find_element(:id,'add-tax-price').text rescue "販売手数料を表す[id: add-tax-price]が見つかりませんでした"
+    item_profit = @d.find_element(:id,'profit').text rescue "販売利益を表す[id: profit]が見つかりませんでした"
+
+    item_profit_flag1 = item_profit.to_s.include?(item_price_profit) rescue false
+    item_profit_flag2 = item_profit.to_s.include?(item_price_profit2) rescue false
+
+    item_commission_flag1 = item_commission.to_s.include?(item_price_commission) rescue false
+    item_commission_flag2 = item_commission.to_s.include?(item_price_commission2) rescue false
+
+    # 販売利益の整合性をチェック
+    if item_profit_flag1 || item_profit_flag2
+      check_detail["チェック詳細"] << "◯：入力された販売価格によって、非同期的に販売利益が表示されている\n"
+      check_flag += 1
+    else
+      check_detail["チェック詳細"] << "×：入力された販売価格によって、非同期的に販売利益が表示されていない\n"
+    end
+
+    # 販売手数料の整合性をチェック
+    if item_commission_flag1 || item_commission_flag2
+      check_detail["チェック詳細"] << "◯：入力された販売価格によって、非同期的に販売手数料が表示されている\n"
+      check_flag += 1
+    else
+      check_detail["チェック詳細"] << "×：入力された販売価格によって、非同期的に販売手数料が表示されていない\n"
+    end
+
+    check_detail["チェック合否"] = check_flag == 2 ? "◯" : "×"
+
+  ensure
+    @check_log.push(check_detail)
+  end
+end
 
 
 def test_method
