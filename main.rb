@@ -852,8 +852,6 @@ def login_user2_item_buy
   # コート購入前にチェック
   check_5
 
-  raise "exit"
-
   # check_5メソッドの中で別ウィンドウにてuser1に切り替えたためuser2で再ログイン
   login_any_user(@email2, @password)
   @d.find_element(:class,"item-img-content").click
