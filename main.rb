@@ -11,7 +11,7 @@ require 'ruby_jard'
 
 def main
 
-  # start
+  start
 
   # basic認証が実装されている
   check_14
