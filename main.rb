@@ -589,8 +589,8 @@ end
 # 必須項目を全て入力した上で出品
 # エラーハンドリングのチェック
 def item_new_require_input
-
-  puts '◯【目視で確認】エラーハンドリングができていること（適切では無い値が入力された場合、情報は保存されず、エラーメッセージを出力させる）'
+  # 不要なputs
+  # puts '◯【目視で確認】エラーハンドリングができていること（適切では無い値が入力された場合、情報は保存されず、エラーメッセージを出力させる）'
   clear_item_new_method
 
   input_item_new_method(@item_name, @item_info, @item_price, @item_image)
@@ -770,7 +770,8 @@ def logout_item_edit_and_buy
   # 商品詳細ページでログアウト状態のユーザーには、「編集・削除・購入画面に進むボタン」が表示されないこと
   check_11
 
-  puts "【説明】購入ボタン自体を消しているてる場合があるので一度、サインアップする"
+  # 不要なputs
+  # puts "【説明】購入ボタン自体を消しているてる場合があるので一度、サインアップする"
 
 end
 
@@ -896,7 +897,8 @@ def login_user2_item_buy
 
   puts "◯クレジットカード情報は必須であり、正しいクレジットカードの情報で無いときは決済できない"
   sleep 3
-  puts "◯【目視で確認】エラーハンドリングができていること（適切では無い値が入力された場合、情報は保存されず、エラーメッセージを出力させる）"
+  # 不要なputs
+  # puts "◯【目視で確認】エラーハンドリングができていること（適切では無い値が入力された場合、情報は保存されず、エラーメッセージを出力させる）"
   #アラートが出るとエラーがでる
 
   # if /#{@item_name}/.match(@d.page_source)
@@ -909,13 +911,16 @@ def login_user2_item_buy
 
   @wait.until {@d.find_element(:id, 'card-number').displayed?}
   @d.find_element(:id, 'card-number').send_keys(@card_number)
-  puts "【説明】クレジットカードの番号記入"
+  # 不要なputs
+  # puts "【説明】クレジットカードの番号記入"
   @wait.until {@d.find_element(:id, 'card-exp-month').displayed?}
   @d.find_element(:id, 'card-exp-month').send_keys(@card_exp_month)
-  puts "【説明】クレジットカードの有効月を記入"
+  # 不要なputs
+  # puts "【説明】クレジットカードの有効月を記入"
   @wait.until {@d.find_element(:id, 'card-exp-year').displayed?}
   @d.find_element(:id, 'card-exp-year').send_keys(@card_exp_year)
-  puts "【説明】クレジットカードの有効年を記入"
+  # 不要なputs
+  # puts "【説明】クレジットカードの有効年を記入"
   @wait.until {@d.find_element(:id, 'card-cvc').displayed?}
   @d.find_element(:id, 'card-cvc').send_keys(@card_cvc)
   puts "◯購入時、クレジットカードの情報を都度入力できる"
