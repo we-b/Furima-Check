@@ -899,12 +899,12 @@ def login_user2_item_buy
   puts "◯【目視で確認】エラーハンドリングができていること（適切では無い値が入力された場合、情報は保存されず、エラーメッセージを出力させる）"
   #アラートが出るとエラーがでる
 
-  if /#{@item_name}/.match(@d.page_source)
-    puts "☒ログインしていないユーザーでも、商品の編集が行える" 
-    @wait.until {@d.find_element(:class,"buy-red-btn").displayed?}
-  else
-    puts "◯ログインしていないユーザーは、商品の編集が行えない。" 
-  end
+  # if /#{@item_name}/.match(@d.page_source)
+  #   puts "☒ログインしていないユーザーでも、商品の編集が行える" 
+  #   @wait.until {@d.find_element(:class,"buy-red-btn").displayed?}
+  # else
+  #   puts "◯ログインしていないユーザーは、商品の編集が行えない。" 
+  # end
 
 
   @wait.until {@d.find_element(:id, 'card-number').displayed?}
