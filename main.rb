@@ -11,7 +11,7 @@ require './check_list'
 
 def main
 
-  start
+  # start
 
   # basic認証が実装されている
   check_14
@@ -22,6 +22,10 @@ def main
   # @url = "http://#{b_id}:#{b_password}@localhost:3000/"
 
   @d.get(@url)
+
+  # ランダム情報で生成されるユーザー情報を出力する(再度ログインなどをする可能性もあるため)
+  print_user_status
+
 
   # ユーザー状態：ログアウト
   # 出品：コート = ,サングラス =
@@ -123,6 +127,10 @@ def main
   # 出品を何度かしてチェック
   check_13
 
+  # パスワードとパスワード（確認用）、値の一致が必須であること
+  check_20
+
+
   # 自動チェック処理の終了のお知らせ
   finish_puts
 end
@@ -139,19 +147,26 @@ def start
 ②basic認証[ユーザー名]
 ③basic認証[パスワード]
 
-「①動作チェックするアプリの本番環境URL」を入力しenterキーを押してください
+「①動作チェックするアプリの本番環境URL」を入力しenterキーを押してください (例：https://afternoon-bayou-26262.herokuapp.com/)
 EOT
 
   input_url = gets.chomp
   # 「https://」を削除
   @url_ele = input_url.gsub(/https:\/\//,"")
-  puts "次に「②basic認証[ユーザー名]」を入力しenterキーを押してください"
+  puts "次に「②basic認証[ユーザー名]」を入力しenterキーを押してください (例：admin)"
   @b_id= gets.chomp
-  puts "次に「③basic認証[パスワード]」を入力しenterキーを押してください"
+  puts "次に「③basic認証[パスワード]」を入力しenterキーを押してください (例：2222)"
   @b_password = gets.chomp
 
   puts "自動チェックを開始します"
 
+end
+
+# ランダム情報で生成されるユーザー情報を出力する(再度ログインなどをする可能性もあるため)
+def print_user_status
+  puts "【ユーザー詳細情報の出力(手動でのログイン時に使用)】\n"
+  puts "パスワード: #{@password} (全ユーザー共通)\n"
+  puts "ユーザー名: lifecoach_test_user1\nemail: #{@email}\n\nユーザー名: lifecoach_test_user2\nemail: #{@email2}\n\nユーザー名: lifecoach_test_user3\nemail: #{@email3}\n\n"
 end
 
 # よく使う冗長なコードをメソッド化
@@ -389,6 +404,16 @@ end
 # 新規登録
 # ニックネームは未入力
 def sign_up_nickname_input
+
+  display_flag = @d.find_element(:class,"logout").displayed? rescue false
+  # ログイン状態であればログアウトしておく
+  if display_flag
+    @d.find_element(:class,"logout").click
+    @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
+    @d.get(@url)
+    @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
+  end
+
   @d.find_element(:class,"sign-up").click
   @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
 
@@ -427,6 +452,11 @@ def sign_up_retry
     # 登録できてしまったアカウントと異なる情報に更新しておく = 再登録&再ログインできなくなってしまため
     randm_word = SecureRandom.hex(5)
     @email = "user1_#{randm_word}@co.jp"
+
+    puts "\nユーザー1の情報が更新されたため更新されたユーザー情報を出力します(手動でのログイン時に使用)"
+    puts "パスワード: #{@password}"
+    puts "ユーザー名: 未入力\nemail: #{@email}\n"
+
   end
 
 
@@ -1065,6 +1095,10 @@ end
 def no_user_item_buy
   @wait.until {@d.find_element(:class,"purchase-btn").displayed?}
   @d.find_element(:class,"logout").click
+  @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
+  
+  # ログアウト状態のユーザーは、URLを直接入力して売却済みの商品情報編集ページへ遷移しようとすると、ログインページに遷移すること
+  check_21
 
   @d.get(@order_url_glasses)
   @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
@@ -1174,5 +1208,6 @@ end
 def finish_puts
   puts "プログラム終了"
   puts "ログイン情報1 user1_email #{@email} password #{@password}"
-  puts "ログイン情報2 user2_email #{@email2} password #{@password}\n\n\n"
+  puts "ログイン情報2 user2_email #{@email2} password #{@password}"
+  puts "ログイン情報3 user3_email #{@email3} password #{@password}\n\n\n"
 end

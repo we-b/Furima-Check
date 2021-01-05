@@ -6,6 +6,10 @@ require './check_list'
 # ランダム文字列の生成ライブラリ
 require 'securerandom'
 
+# httpリクエストの実行に必要なライブラリ
+require "net/http"
+require "json"
+
 @wait = Selenium::WebDriver::Wait.new(:timeout => 180000)
 @d = Selenium::WebDriver.for :chrome
 # チェック用のドライバー
@@ -52,6 +56,15 @@ randm_word = SecureRandom.hex(10) #=> "4a01bbd139f5e94bd249"
 @last_name3 = "ラル"
 @first_name_kana3 = "ランバ"
 @last_name_kana3 = "ラル"
+
+# 新規登録等での繰り返し登録テスト用アカウント
+@nicknam4 = "lifecoach_test_user4"
+@email4 = "user4_#{randm_word}@co.jp"
+@first_name4 = "ニコラ"
+@last_name4 = "テスラ"
+@first_name_kana4 = "ニコラ"
+@last_name_kana4 = "テスラ"
+
 
 @password = "aaa111" #パスワードは全ユーザー共通
 
@@ -126,9 +139,10 @@ ensure
 
         }
     end
-    sleep 30000000000
     puts $!
     puts $@
+    sleep 30000000000
+
 end
 
 
