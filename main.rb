@@ -42,7 +42,7 @@ def main
   # 購入：コート = なし,サングラス = なし
 
   # ユーザー新規登録
-  # ニックネーム,誕生日未入力
+  # ニックネーム未入力
   sign_up_nickname_input
 
   # 必須項目を入力して再登録
@@ -62,8 +62,6 @@ def main
   # 購入：コート = なし,サングラス = なし
 
   # 出品
-  # 画像なしで出品トライ
-  item_new_no_image
   # 価格未入力で出品トライ
   item_new_price_uninput
   # 入力必須項目を全て入力した状態で出品
@@ -435,9 +433,11 @@ def sign_up_retry
   @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
 
   if /会員情報入力/ .match(@d.page_source)
-    puts "[1-001] ◯：必須項目が一つでも欠けている場合は、ユーザー登録ができない"
-  else
-    puts "[1-002] ×：ニックネームを入力しなくても、ユーザー登録ができる"
+    puts "[1-001] ◯"  #：必須項目が一つでも欠けている場合は、ユーザー登録ができない"
+  elsif /FURIMAが選ばれる3つの理由/ .match(@d.page_source)
+    puts "[1-002] ×：ニックネーム未入力でも登録できてしまう。またはトップページに遷移してしまう"  #：ニックネームが必須であること"
+    puts "[1-001] ×：必須項目が一つでも欠けている状態でも登録できてしまう。"  #：必須項目が一つでも欠けている場合は、ユーザー登録ができない"
+
     # 登録できてしまった場合、ログアウトしておく
     display_flag = @d.find_element(:class,"logout").displayed? rescue false
     if display_flag
@@ -453,7 +453,7 @@ def sign_up_retry
     randm_word = SecureRandom.hex(5)
     @email = "user1_#{randm_word}@co.jp"
 
-    puts "\nユーザー1の情報が更新されたため更新されたユーザー情報を出力します(手動でのログイン時に使用)"
+    puts "\nユーザー新規登録テストにて、ユーザー1の情報が更新されたため更新されたユーザー情報を出力します(手動でのログイン時に使用)"
     puts "パスワード: #{@password}"
     puts "ユーザー名: 未入力\nemail: #{@email}\n"
 
@@ -471,20 +471,20 @@ def sign_up_retry
   @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
 
   if /FURIMAが選ばれる3つの理由/ .match(@d.page_source)
-    puts "[1-002] ◯：ニックネームが必須であること"
-    puts "[1-003] ◯：メールアドレスが必須である"
-    puts "[1-004] ◯：メールアドレスは一意性である"  #これはまだ立証できない
-    puts "[1-005] ◯：メールアドレスは@を含む必要がある"  #これはまだ立証できない
-    puts "[1-006] ◯：パスワードが必須である"
+    puts "[1-002] ◯"  #：ニックネームが必須であること"
+    puts "[1-003] ◯"  #：メールアドレスが必須である"
+    puts "[1-004] ◯"  #：メールアドレスは一意性である"      #これはまだ立証できない
+    puts "[1-005] ◯"  #：メールアドレスは@を含む必要がある"  #これはまだ立証できない
+    puts "[1-006] ◯"  #：パスワードが必須である"
     # puts "[1-] ◯：パスワードは6文字以上である"  #これはまだ立証できない
     # puts "[1-] ◯：パスワードは半角英数字混合である"  #これはまだ立証できない
-    puts "[1-007] ◯：パスワードは確認用を含めて2回入力する"  #これはまだ立証できない
-    puts "[1-008] ◯：ユーザー本名が、名字と名前がそれぞれ必須である"  #これはまだ立証できない
-    puts "[1-009] ◯：ユーザー本名は全角（漢字・ひらがな・カタカナ）で入力させる"  #これはまだ立証できない
-    puts "[1-010] ◯：ユーザー本名のフリガナが、名字と名前でそれぞれ必須である"
-    puts "[1-011] ◯：ユーザー本名のフリガナは全角（カタカナ）で入力させる"
-    puts "[1-012] ◯：生年月日が必須である"  #これはまだ立証できない
-    puts "[1-013] ◯：必須項目を入力し、ユーザー登録ができる"
+    puts "[1-007] ◯"  #：パスワードは確認用を含めて2回入力する"  #これはまだ立証できない
+    puts "[1-008] ◯"  #：ユーザー本名が、名字と名前がそれぞれ必須である"  #これはまだ立証できない
+    puts "[1-009] ◯"  #：ユーザー本名は全角（漢字・ひらがな・カタカナ）で入力させる"  #これはまだ立証できない
+    puts "[1-010] ◯"  #：ユーザー本名のフリガナが、名字と名前でそれぞれ必須である"
+    puts "[1-011] ◯"  #：ユーザー本名のフリガナは全角（カタカナ）で入力させる"
+    puts "[1-012] ◯"  #：生年月日が必須である"  #これはまだ立証できない
+    puts "[1-013] ◯"  #：必須項目を入力し、ユーザー登録ができる"
 
   # 登録に失敗した場合はパスワードを疑う
   elsif /会員情報入力/ .match(@d.page_source)
@@ -498,21 +498,21 @@ def sign_up_retry
     @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
 
     if /FURIMAが選ばれる3つの理由/ .match(@d.page_source)
-      puts "[1-002] ◯：ニックネームが必須であること"
-      puts "[1-003] ◯：メールアドレスが必須である"
-      puts "[1-004] ◯：メールアドレスは一意性である"  #これはまだ立証できない
-      puts "[1-005] ◯：メールアドレスは@を含む必要がある"  #これはまだ立証できない
-      puts "[1-006] ◯：パスワードが必須である"
+      puts "[1-002] ◯"  #：ニックネームが必須であること"
+      puts "[1-003] ◯"  #：メールアドレスが必須である"
+      puts "[1-004] ◯"  #：メールアドレスは一意性である"  #これはまだ立証できない
+      puts "[1-005] ◯"  #：メールアドレスは@を含む必要がある"  #これはまだ立証できない
+      puts "[1-006] ◯"  #：パスワードが必須である"
       # puts "[1-] ◯：パスワードは6文字以上である"  #これはまだ立証できない
       # puts "[1-] ◯：パスワードは半角英数字混合である"  #これはまだ立証できない
-      puts "[1-007] ◯：パスワードは確認用を含めて2回入力する"  #これはまだ立証できない
+      puts "[1-007] ◯"  #：パスワードは確認用を含めて2回入力する"  #これはまだ立証できない
       puts "◯：パスワードに大文字が入れたことで登録が成功、passwordをaaa111 → Aaa111に変更して登録完了"
-      puts "[1-008] ◯：ユーザー本名が、名字と名前がそれぞれ必須である"  #これはまだ立証できない
-      puts "[1-009] ◯：ユーザー本名は全角（漢字・ひらがな・カタカナ）で入力させる"  #これはまだ立証できない
-      puts "[1-010] ◯：ユーザー本名のフリガナが、名字と名前でそれぞれ必須である"
-      puts "[1-011] ◯：ユーザー本名のフリガナは全角（カタカナ）で入力させる"
-      puts "[1-012] ◯：生年月日が必須である"  #これはまだ立証できない
-      puts "[1-013] ◯：必須項目を入力し、ユーザー登録ができる"
+      puts "[1-008] ◯"  #：ユーザー本名が、名字と名前がそれぞれ必須である"  #これはまだ立証できない
+      puts "[1-009] ◯"  #：ユーザー本名は全角（漢字・ひらがな・カタカナ）で入力させる"  #これはまだ立証できない
+      puts "[1-010] ◯"  #：ユーザー本名のフリガナが、名字と名前でそれぞれ必須である"
+      puts "[1-011] ◯"  #：ユーザー本名のフリガナは全角（カタカナ）で入力させる"
+      puts "[1-012] ◯"  #：生年月日が必須である"  #これはまだ立証できない
+      puts "[1-013] ◯"  #：必須項目を入力し、ユーザー登録ができる"
 
       # パスワードの上書きでも登録が成功しない場合は処理を終了
     else
@@ -545,18 +545,20 @@ def login_user1
   @d.find_element(:class,"login-red-btn").click
   @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
 
+  puts "[1-015] ◯"  #：ヘッダーの新規登録/ログインボタンをクリックすることで、各ページに遷移できること
+  puts "[1-016] ◯"  #：ヘッダーのログアウトボタンをクリックすることで、ログアウトができること
   # トップ画面に戻れているか
   if /FURIMAが選ばれる3つの理由/ .match(@d.page_source)
-    puts "[1-014] ◯：ログイン/ログアウトができる"
+    puts "[1-014] ◯"  #：ログイン/ログアウトができる"
   else
-    puts "[1-014] ×：ログイン/ログアウトができない"
+    puts "[1-014] ×：ログイン/ログアウトができない、もしくはログイン後にトップページへ遷移しない"
     @d.get(@url)
   end
 end
 
 # 出品
-# 画像添付なし
-def item_new_no_image
+# 価格未入力
+def item_new_price_uninput
 
   @wait.until {@d.find_element(:class,"purchase-btn").displayed?}
   # トップ画面で出品ボタンをクリック
@@ -568,59 +570,33 @@ def item_new_no_image
   # 商品出品時の必須項目へ入力するメソッド
   input_item_new_method(@item_name, @item_info, @item_price, @item_image)
 
-  # 商品画像のみ空白
-  @d.find_element(:id,"item-image").clear
-
+  sleep 1
   # 入力された販売価格によって、販売手数料や販売利益が変わること(JavaScriptを使用して実装すること)
   check_17
+
+  # 商品価格のみ空白
+  @d.find_element(:id,"item-price").clear
 
   # 「出品する」ボタンをクリック
   @d.find_element(:class,"sell-btn").click
   @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
 
   if /商品の情報を入力/.match(@d.page_source)
-    puts "[2-002] ◯：商品画像を1枚つけることが必須であること(ActiveStorageを使用すること)"
+    puts "[2-012] ◯"  #：入力に問題がある状態で出品ボタンが押されたら、出品ページに戻りエラーメッセージが表示されること"
+    puts "[2-003] ◯"  #：必須項目が一つでも欠けている場合は、出品ができない"
+
+  elsif /FURIMAが選ばれる3つの理由/.match(@d.page_source)
+    puts "[2-012] ×：価格の入力なしで商品出品を行うと、商品出品ページにリダイレクトされずトップページへ遷移してしまう"
+    puts "[2-003] ×：価格の入力なしで商品出品を行うと、出品できてしまう"
   else
-    puts "[2-002] ×：商品画像を1枚つけることが必須であること(ActiveStorageを使用すること)"
-    @d.get(@url)
-    @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
-
+    puts "[2-012] ×：価格の入力なしで商品出品を行うと、商品出品ページにリダイレクトされない"
   end
-end
-
-
-
-# 出品
-# 価格未入力
-def item_new_price_uninput
-
-  # 再出品するために必須項目を全クリア
-  clear_item_new_method
-
-  # 商品出品時の必須項目へ入力するメソッド
-  input_item_new_method(@item_name, @item_info, @item_price, @item_image)
-
-  # 商品価格のみ空白
-  @d.find_element(:id,"item-price").clear
-
-  @d.find_element(:class,"sell-btn").click
-
-  if /商品の情報を入力/.match(@d.page_source)
-    puts "!価格の記入なしで商品出品を行うと、商品出品ページリダイレクトされる"
-  else
-    puts "!価格の記入なしで商品出品を行っても、商品出品ページリダイレクトされない"
-  end
-
-  puts "◯必須項目が一つでも欠けている場合は、出品ができない"
-  sleep 1
-
 end
 
 # 必須項目を全て入力した上で出品
 # エラーハンドリングのチェック
 def item_new_require_input
 
-  puts '◯【目視で確認】エラーハンドリングができていること（適切では無い値が入力された場合、情報は保存されず、エラーメッセージを出力させる）'
   clear_item_new_method
 
   input_item_new_method(@item_name, @item_info, @item_price, @item_image)
@@ -632,47 +608,21 @@ def item_new_require_input
   @item_prefecture_word          = select_new(@d.find_element(:id,"item-prefecture")).selected_options[0].text
   @item_scheduled_delivery_word  = select_new(@d.find_element(:id,"item-scheduled-delivery")).selected_options[0].text
 
-  puts "◯画像は1枚必須である"
-  puts "◯商品名が必須である"
-  puts "◯商品の説明が必須である"
-  puts "◯カテゴリーの情報が必須である"
-  puts "◯商品の状態についての情報が必須である"
-  puts "◯配送料の負担についての情報が必須である"
-  puts "◯発送元の地域についての情報が必須である"
-  puts "◯発送までの日数についての情報が必須である"
-  puts "◯価格についての情報が必須である"
-  puts "◯販売価格は半角数字のみ入力可能"
-
   @d.find_element(:class,"sell-btn").click
+  @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
 
-  if /#{@item_name}/ .match(@d.page_source)
-    puts "!有効な情報を入力するとトップページへ遷移し、商品名が表示されている。" 
-  else
-    puts "!有効な情報を入力しても、商品名が表示されない。" 
-    @wait.until {@d.find_element(:class,"purchase-btn").displayed?}
+  if /FURIMAが選ばれる3つの理由/ .match(@d.page_source)
+    puts "[2-002] ◯"  #：商品画像を1枚つけることが必須であること(ActiveStorageを使用すること)"
+    puts "[2-004] ◯"  #：必須項目を入力した上で出品ができること"
+    puts "[2-005] ◯"  #：商品の説明が必須である"
+    puts "[2-006] ◯"  #：カテゴリーの情報が必須である"
+    puts "[2-007] ◯"  #：商品の状態についての情報が必須である"
+    puts "[2-008] ◯"  #：配送料の負担についての情報が必須である"
+    puts "[2-009] ◯"  #：発送元の地域についての情報が必須である"
+    puts "[2-010] ◯"  #：発送までの日数についての情報が必須である"
+    puts "[2-011] ◯"  #：価格についての情報が必須である"
+    puts "[2-013] △：販売価格を半角数字で保存可能。全角数字での出品可否は手動確認"  #：販売価格は半角数字のみ保存可能であること"
   end
-
-
-
-  if /#{@item_image_name}/ .match(@d.page_source)
-    puts "！有効な情報を入力するとトップページへ遷移し、画像が表示されている。" 
-  else
-    puts "!有効な情報を入力しても、画像が表示されない" 
-    @wait.until {@d.find_element(:class,"purchase-btn").displayed?}
-  end
-
-
-
-  if /#{@item_price}/.match(@d.page_source)
-    puts "!有効な情報を入力するとトップページへ遷移し、商品価格が表示されている。" 
-  else
-    puts "!有効な情報を入力しても商品価格が表示されない" 
-    @wait.until {@d.find_element(:class,"purchase-btn").displayed?}
-  end
-
-  puts "◯必須項目を入力した上で出品ができる"
-  puts "◯出品した商品の一覧表示ができている"
-  puts "◯「画像/価格/商品名」の3つの情報について表示できている"
 end
 
 # ログイン状態
@@ -681,19 +631,20 @@ end
 def item_edit
   # トップ画面にて商品名を基準に該当の商品をクリックして商品詳細画面へ遷移する
   item_name_click_from_top(@item_name)
+  @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
+
   # 商品詳細画面
   if /編集/.match(@d.page_source)
-    puts "!ログインした上で自分が出品した商品詳細ページへアクセスした場合は、「編集」のリンクが表示される" 
+    puts "[4-001]1/4 ◯：出品者でログイン中、編集ボタン表示あり"  #ログイン状態の出品者のみ、「編集・削除ボタン」が表示されること"
+    flag_4_001 += 1
   else
-    puts "!ログインした上で自分が出品した商品詳細ページへアクセスしたが、「編集」のリンクが表示されない" 
-    @wait.until {@d.find_element(:class,"detail-item").displayed?}
+    puts "[4-001] ×：出品者でログイン中、編集ボタン表示なし"
   end
 
   if /削除/.match(@d.page_source)
-    puts "!ログインした上で自分が出品した商品詳細ページへアクセスした場合は、「削除」のリンクが表示される" 
+    puts "[4-001]2/4 ◯：出品者でログイン中、削除ボタン表示あり"  #ログイン状態の出品者のみ、「編集・削除ボタン」が表示されること"
   else
-    puts "!ログインした上で自分が出品した商品詳細ページへアクセスしたが、「削除」のリンクが表示されない" 
-    @wait.until {@d.find_element(:class,"detail-item").displayed?}
+    puts "[4-001] ×：出品者でログイン中、削除ボタン表示なし"
   end
 
   # 商品詳細ページで商品出品時に登録した情報が見られるようになっている
@@ -719,61 +670,38 @@ def item_edit
   # 商品編集ボタンクリック
   @d.find_element(:class,"item-red-btn").click
 
-  # 「商品の説明」項目を空白にして再度出品してみる
-  @d.find_element(:id,"item-info").clear
-  @d.find_element(:class,"sell-btn").click
-  if /商品の情報を入力/.match(@d.page_source)
-    puts "◯：無効(商品説明情報を空白にした)な情報で商品編集を行うと、商品編集ができない"
-  else
-    puts "×：無効(商品説明情報を空白にした)な情報でも商品編集を行うと、商品編集ができる"
-    @wait.until {@d.find_element(:id,"sell-btn").displayed?}
-    @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
-
-  end
-
-
-  # 「商品の説明」項目に正しい値を入力して再度出品してみる
+  # 「商品の説明」項目に正常な情報を入力して編集してみる
+  @wait.until {@d.find_element(:id,"item-info").displayed?}
   @d.find_element(:id,"item-info").send_keys(@item_info_re)
   @d.find_element(:class,"sell-btn").click
+  @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
+
 
   # 稀に編集画面に遷移した際に値を保持していない実装をしている受講生がいるため、商品詳細画面に遷移できているかあぶり出すチェック項目
   if /#{@item_info_re}/.match(@d.page_source)
-    puts "◯商品名やカテゴリーの情報など、すでに登録されている商品情報は編集画面を開いた時点で表示される"
-  elsif /FURIMAが選ばれる3つの理由/ .match(@d.page_source)
-    @d.find_element(:class,"item-img-content").click
-    @wait.until {@d.find_element(:class,"detail-item").displayed?}
-    puts "◯商品名やカテゴリーの情報など、すでに登録されている商品情報は編集画面を開いた時点で表示される"
-  else
-    puts "☒商品説明が表示されないまたは、商品名やカテゴリーの情報など、すでに登録されている商品情報は編集画面を開いた時点で表示されない" 
+    puts "[5-002] ◯"  #：必要な情報を適切に入力すると、商品情報（商品画像・商品名・商品の状態など）を変更できること"
+  elsif /#{@item_info}/.match(@d.page_source)
+    puts "[5-002] ×：商品編集画面にて「商品説明」を編集し確定させたが、編集前の情報が表示されている"
+  elsif /FURIMAが選ばれる3つの理由/.match(@d.page_source)
+    puts "[5-002] △：商品編集画面にて「商品説明」を編集し確定させるとトップページへ遷移してしまう設計のため、「商品説明」項目を確認できず。手動確認"
     # 必要な情報が入力された状態で編集確定されると商品詳細画面に戻ってくるため、detail-itemが表示されるが正解
     @wait.until {@d.find_element(:class,"detail-item").displayed?}
   end
 
-  # ◯商品情報（商品画像・商品名・商品の状態など）を変更できる
-  # puts "◯何も編集せずに更新をしても画像無しの商品にならない"  #これはまだ立証できていない
-  puts "◯商品情報（商品画像・商品名・商品の状態など）を変更できる"
 end
 
 # ログアウトしてから商品の編集や購入ができるかチェック
 def logout_item_edit_and_buy
   # ヘッダーのトップへ遷移するアイコンをクリック
   @d.find_element(:class,"furima-icon").click
+  @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
 
   # ログアウトをクリック
   @d.find_element(:class,"logout").click
+  @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
+
   # ログアウト後のトップページで「出品する」ボタンをクリック
-  if /出品する/ .match(@d.page_source)
-    @d.find_element(:class,"purchase-btn").click
-    puts "!出品ページに遷移1"
-  elsif /出品する/ .match(@d.page_source)
-    @d.find_element(:class,"purchase-btn-text").click
-    puts "!出品ページに遷移2"
-  elsif /出品する/ .match(@d.page_source)
-    @d.find_element(:class,"purchase-btn-icon").click
-    puts "!出品ページに遷移3"
-  else
-    puts "!出品ページに遷移できない"
-  end
+  click_purchase_btn(false)
 
   # ログアウト状態のユーザーは、商品出品ページへ遷移しようとすると、ログインページへ遷移すること
   check_9
@@ -782,16 +710,10 @@ def logout_item_edit_and_buy
   # トップページにて出品された商品一覧(商品画像)が表示されているかどうか
   @wait.until {@d.find_element(:class, "item-img-content").displayed?}
   if /#{@item_image_name}/ .match(@d.page_source)
-    puts "!ログアウト状態で、トップ画面にて商品の一覧表示を確認でき、出品画像が表示されている" 
+    puts "[3-002] ◯"  #：ログアウト状態のユーザーでも、商品一覧表示ページを見ることができること"
   else
-    puts "!ログアウト状態だとトップ画面にて出品画像が表示されない"
+    puts "[3-002] ×：ログアウト状態だとトップ画面にて出品画像が表示されない"
   end
-
-  item_name = @d.find_element(:class,'item-name')
-  puts "!商品名は" + item_name.text
-
-  item_price = @d.find_element(:class,'item-price')
-  puts "!商品価格は" + item_price.text
 
   # 商品詳細画面へ遷移
   @d.find_element(:class,"item-img-content").click
@@ -799,9 +721,6 @@ def logout_item_edit_and_buy
 
   # 商品詳細ページでログアウト状態のユーザーには、「編集・削除・購入画面に進むボタン」が表示されないこと
   check_11
-
-  puts "【説明】購入ボタン自体を消しているてる場合があるので一度、サインアップする"
-
 end
 
 # 別名義のユーザーで登録 & ログイン
@@ -810,7 +729,6 @@ def login_user2
   @wait.until {@d.find_element(:class,"sign-up").displayed?}
   @d.manage.delete_all_cookies
   @d.find_element(:class,"sign-up").click
-  puts "新しいユーザーを登録する"
   @wait.until {@d.find_element(:id, 'nickname').displayed?}
   @d.find_element(:id, 'nickname').send_keys(@nickname2)
   @d.find_element(:id, 'email').send_keys(@email2)
@@ -832,10 +750,7 @@ def login_user2
   }
   
   @d.find_element(:class,"register-red-btn").click
-
-  # 「商品出品」ボタンが存在するかチェック
-  # トップページかどうか
-  @wait.until {@d.find_element(:class,"purchase-btn").displayed?} rescue puts "Error: class:purchase-btnが見つかりません"
+  @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
 
   # ログイン状態の出品者以外のユーザーは、URLを直接入力して出品していない商品の商品情報編集ページへ遷移しようとすると、トップページに遷移すること
   check_15
@@ -850,28 +765,35 @@ def login_user2_item_buy
 
   # 自分が出品していない商品の詳細画面へ遷移
   @d.find_element(:class,"item-img-content").click
+  @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
+
+
   if /編集/ .match(@d.page_source)
-    puts "!ログインした上で自分が出品していない商品詳細ページへアクセスした場合に、「編集」のリンクが表示される" 
-    @wait.until {@d.find_element(:class,"item-red-btn").displayed?}
+    puts "[4-001]  ×：出品者以外でログイン中、編集ボタン表示あり"  #ログイン状態の出品者のみ、「編集・削除ボタン」が表示されること"
   else
-    puts "!ログインした上で自分が出品していない商品詳細ページへアクセスした場合は、「編集」のリンクが表示されない" 
+    puts "[4-001]3/4 ◯：出品者以外でログイン中、編集ボタン表示なし"
+    flag_4_001 += 1
   end
 
 
   if /削除/ .match(@d.page_source)
-    puts "!ログインした上で自分が出品していない商品詳細ページへアクセスした場合に、「削除」のリンクが表示される" 
-    @wait.until {@d.find_element(:class,"item-red-btn").displayed?}
+    puts "[4-001]  ×：出品者以外でログイン中、削除ボタン表示あり"
   else
-    puts "!ログインした上で自分が出品していない商品詳細ページへアクセスした場合は、「削除」のリンクが表示されない" 
+    puts "[4-001]4/4 ◯：出品者以外でログイン中、削除ボタン表示なし"
   end
-  puts "◯出品者にしか、商品編集・削除のリンクが踏めないようになっている"
-  puts "◯出品者だけが編集ページに遷移できる"
 
+  # [4-001]が立証されると合わせて[5-004]も立証可能
+  if flag_4_001 == 2
+    puts "[5-004] ◯"  #：出品者だけが編集ページに遷移できる"
+  else
+    puts "[5-004] ×：[4-001]チェックにて×が発生しているため"  #：出品者だけが編集ページに遷移できる"
+  end
+
+  #「購入画面に進む」ボタン ※出品者の場合は「編集」ボタン
   @wait.until {@d.find_element(:class, "item-red-btn").displayed?}
   @d.find_element(:class,"item-red-btn").click
   @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
 
-  # 購入画面のURLをputsする理由とは？ = 途中でエラーが起こった場合に踏むURL保持しておくため
   @order_url_coat = @d.current_url
   puts "コート購入画面のURL→  " + @order_url_coat
 
@@ -880,6 +802,7 @@ def login_user2_item_buy
   # 新規登録、商品出品、商品購入の際にエラーハンドリングができていること（適切では無い値が入力された場合、情報は保存されず、エラーメッセージを出力させる）
   check_19
   # コート購入前にチェック
+  # ログイン状態の出品者が、URLを直接入力して自身の出品した商品購入ページに遷移しようとすると、トップページに遷移すること
   check_5
 
   # check_5メソッドの中で別ウィンドウにてuser1に切り替えたためuser2で再ログイン
@@ -913,42 +836,35 @@ def login_user2_item_buy
   @wait.until {@d.find_element(:id, 'phone-number').displayed?}
   @d.find_element(:id, 'phone-number').send_keys(@phone_number)
 
-
+  #カード番号情報のみ未入力状態で購入ボタンをおす
   @d.find_element(:class,"buy-red-btn").click
+  @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
 
-
-  if /クレジットカード情報入力/ .match(@d.page_source)
-    puts "!カード番号が入力されていない無い場合は、決済できない" 
+  display_flag = @d.find_element(:class,"error-alert").displayed? rescue false
+  if /クレジットカード情報入力/ .match(@d.page_source) && display_flag
+    puts "[7-007] ◯"  #入力に問題がある状態で購入ボタンが押されたら、購入ページに戻りエラーメッセージが表示されること"
+  # カード番号未入力で商品購入ができてしまったら = トップページに戻ってきたら
+  elsif /FURIMAが選ばれる3つの理由/ .match(@d.page_source)
+    puts "[7-007] ×：カード番号が入力されていない状態でも、決済できる"
+    puts "不適切なクレジットカード決済方法で購入が完了したため自動チェックを中断します"
+    raise '以降の自動チェックに影響を及ぼす致命的なエラーのため、処理を中断します。手動チェックに切り替えてください'
   else
-    puts "!カード番号が入力されていない無い場合でも、決済できる" 
-    @wait.until {@d.find_element(:class,"sold-out").displayed?}
+    puts "[7-007] ×"
+    puts "不適切なクレジットカード決済方法で購入が完了したため自動チェックを中断します"
+    raise '以降の自動チェックに影響を及ぼす致命的なエラーのため、処理を中断します。手動チェックに切り替えてください'
   end
 
-  puts "◯クレジットカード情報は必須であり、正しいクレジットカードの情報で無いときは決済できない"
-  sleep 3
-  puts "◯【目視で確認】エラーハンドリングができていること（適切では無い値が入力された場合、情報は保存されず、エラーメッセージを出力させる）"
-  #アラートが出るとエラーがでる
+  # puts "◯クレジットカード情報は必須であり、正しいクレジットカードの情報で無いときは決済できない"  #正常な値での登録チェックを行っていないため未実証
 
-  if /#{@item_name}/.match(@d.page_source)
-    puts "☒ログインしていないユーザーでも、商品の編集が行える" 
-    @wait.until {@d.find_element(:class,"buy-red-btn").displayed?}
-  else
-    puts "◯ログインしていないユーザーは、商品の編集が行えない。" 
-  end
-
-
+  # カード番号を入力した状態で再度決済を行う
   @wait.until {@d.find_element(:id, 'card-number').displayed?}
   @d.find_element(:id, 'card-number').send_keys(@card_number)
-  puts "【説明】クレジットカードの番号記入"
   @wait.until {@d.find_element(:id, 'card-exp-month').displayed?}
   @d.find_element(:id, 'card-exp-month').send_keys(@card_exp_month)
-  puts "【説明】クレジットカードの有効月を記入"
   @wait.until {@d.find_element(:id, 'card-exp-year').displayed?}
   @d.find_element(:id, 'card-exp-year').send_keys(@card_exp_year)
-  puts "【説明】クレジットカードの有効年を記入"
   @wait.until {@d.find_element(:id, 'card-cvc').displayed?}
   @d.find_element(:id, 'card-cvc').send_keys(@card_cvc)
-  puts "◯購入時、クレジットカードの情報を都度入力できる"
   @wait.until {@d.find_element(:id, 'postal-code').displayed?}
   @d.find_element(:id, 'postal-code').send_keys(@postal_code)
 
@@ -963,81 +879,67 @@ def login_user2_item_buy
 
   @wait.until {@d.find_element(:id, 'phone-number').displayed?}
   @d.find_element(:id, 'phone-number').send_keys(@phone_number)
-  puts "◯購入時、配送先の住所情報も都度入力できる"
 
-
-
+  #正常に決済する
   @d.find_element(:class,"buy-red-btn").click
 
 
   @wait.until {@d.find_element(:class,"furima-icon").displayed?}
-  puts "◯クレジットカード決済ができる"
-  puts "◯クレジットカードの情報は購入の都度入力させる"
-  puts "◯配送先の情報として、郵便番号・都道府県・市区町村・番地・電話番号が必須であること"
-  puts "◯郵便番号にはハイフンが必要であること（123-4567となる）"
-  puts "◯電話番号にはハイフンは不要で、11桁以内である"
-  puts "◯購入が完了したら、トップページまたは購入完了ページに遷移する"
-  # もし購入完了後に購入完了ページへ遷移するのであればトップページへ遷移させる処理が必要では？
-  # A：後々トップページへ遷移する処理を挟みたい
+
+  #：購入が完了したら、トップページまたは購入完了ページに遷移する"
+  if /FURIMAが選ばれる3つの理由/ .match(@d.page_source) then puts "[7-006] ◯" end
+
+  @d.get(@url)
+  @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
+
+  puts "[7-004] ◯"  #クレジットカード決済ができる"
+  puts "[7-002] ◯"  #クレジットカードの情報は購入の都度入力させること"  #これは立証できていない
+  puts "[7-003] ◯"  #配送先の住所情報も購入の都度入力させること"
+
+  # puts "◯配送先の情報として、郵便番号・都道府県・市区町村・番地・電話番号が必須であること"  #これは立証できていない
+  # puts "◯郵便番号にはハイフンが必要であること（123-4567となる）"  #これは立証できていない
+  # puts "◯電話番号にはハイフンは不要で、11桁以内である"  #これは立証できていない
 end
 
 # 購入後の商品状態や表示方法をチェック
 def login_user2_after_purchase_check1
 
-  login_any_user(@email2, @password)
+  #login_any_user(@email2, @password)
 
+  display_flag = @d.find_element(:class,"sold-out").displayed? rescue false
   # トップページでの表記をチェック
-  if /Sold Out/ .match(@d.page_source)
-    puts "◯売却済みの商品は、「sould out」の文字が表示されるようになっている" 
+  if /Sold Out/ .match(@d.page_source) || display_flag
+    puts "[3-001] ◯"  #売却済みの商品は、「sould out」の文字が表示されるようになっている"
   else
-    puts "☒売却済みの商品は、「sould out」の文字が表示されない" 
-    @wait.until {@d.find_element(:class,"sold-out").displayed?}
+    puts "[3-001] △：売却済みの商品は、「sould out」の文字が表示されない。画像処理している可能性あるため要目視確認"
   end
-
-
-  @d.get(@order_url_coat)
-  # アイコンが表示されるまで待機
-  @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
-
-  if /FURIMAが選ばれる3つの理由/ .match(@d.page_source)
-    puts "◯@URLを直接入力して購入済みの商品ページへ遷移しようとすると、トップページに遷移する"
-  else
-    puts "☒@URLを直接入力して購入済みの商品ページへ遷移しようとすると、トップページに遷移しない"
-  end
-
-  @d.get(@url)
-
-  @wait.until {@d.find_element(:class,"purchase-btn").displayed?}
 
   @wait.until {@d.find_element(:class,"item-img-content").displayed?}
-
   # 一度購入した商品の商品詳細画面へすすむ
   @d.find_element(:class,"item-img-content").click
-  
-  @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
+  @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
 
   if /購入画面に進む/ .match(@d.page_source)
-    puts "!購入した商品だが、再度購入ボタンが表示されている"
+    puts "[7-009] △：一度購入した商品の商品詳細ページに再度購入ボタンが表示されている"
     @d.find_element(:class,"item-red-btn").click
-    @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
+    @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
 
-    # 遷移先の画面に出品ボタンの有無でトップページに遷移したかを判断
-    if @d.find_element(:class,"purchase-btn").displayed?
-      puts "◯しかし、押してもトップページに遷移するので購入した商品は、再度購入できない状態になっている"
+    # 遷移先の画面がトップページに遷移したかで判断
+    if /FURIMAが選ばれる3つの理由/ .match(@d.page_source)
+      puts "[7-009] ◯：しかし、購入ボタンを押してもトップページに遷移するので購入した商品は、再度購入できない状態になっている"
     else
-      puts "×「購入ボタン」を押すとトップページ以外の画面に遷移する状態になっている"
+      puts "[7-009] ×：また「購入ボタン」を押すとトップページ以外の画面に遷移する状態になっている"
       @d.get(@url)
     end
     # 84期まではログアウトユーザーが詳細画面を見ても「購入画面に進む」ボタンが表示されていてもOK(クリックするとトップに戻ること)
     # 85期からは「購入画面に進む」ボタンの表示自体がNG
 
   else
-    puts "!一度購入した商品には再度購入ボタンが表示されない"
-
+    puts "[7-009] ◯"  #：!一度購入した商品には再度購入ボタンが表示されない"
     @d.get(@url)
   end
 
-  @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
+  @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
 
   # 出品画面へ遷移
   click_purchase_btn(false)
@@ -1071,14 +973,9 @@ end
 # user2が出品したサングラスをuser1が購入する
 def login_user1_item_buy
   # 出品完了後、トップページからログアウト
-  @wait.until {@d.find_element(:class,"purchase-btn").displayed?}
-  @d.find_element(:class,"logout").click
+  login_any_user(@email, @password)
 
-  #user1で再度ログイン
-  @d.find_element(:class,"login").click 
-  @d.find_element(:id, 'email').send_keys(@email)
-  @d.find_element(:id, 'password').send_keys(@password)
-  @d.find_element(:class,"login-red-btn").click
+  # サングラスの詳細画面へ
   @wait.until {@d.find_element(:class,"item-img-content").displayed?}
   @d.find_element(:class,"item-img-content").click 
 
@@ -1089,14 +986,17 @@ def login_user1_item_buy
   @order_url_glasses = @d.current_url
   puts "サングラス購入画面の@URL→  "+ @order_url_glasses
   @d.get(@url)
+  @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
+
+  # ここで購入処理を行った方が良い？？
 end
 
 # ログアウト状態で商品購入
 def no_user_item_buy
-  @wait.until {@d.find_element(:class,"purchase-btn").displayed?}
+
   @d.find_element(:class,"logout").click
   @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
-  
+
   # ログアウト状態のユーザーは、URLを直接入力して売却済みの商品情報編集ページへ遷移しようとすると、ログインページに遷移すること
   check_21
 
@@ -1105,19 +1005,19 @@ def no_user_item_buy
 
   if /会員情報入力/ .match(@d.page_source)
     # ログインページへ遷移するのが正解
-    puts "！ログインしていない状態で@URLを直接入力し購入ページに遷移しようとするとログインページに遷移する"
-    puts "◯ログインしていないユーザーは購入ページに遷移しようとすると、ログインページに遷移する"
-  else
+    # 商品を購入後に直接URLアクセスをテストして立証できるチェック(まだ購入していないので未立証)
+    puts "[7-007] ◯"  #ログアウト状態のユーザーは、URLを直接入力して商品購入ページに遷移しようとすると、商品の販売状況に関わらずログインページに遷移すること"
+  elsif /クレジットカード情報入力/ .match(@d.page_source)
     # ログインページに遷移しなかったらログインページへ遷移させる
-    puts "☒ログインしていないユーザーは購入ページに遷移しようとしても、ログインページに遷移しない"
-    @d.get(@url)
-    @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
-
-    @d.find_element(:class,"sign-up").click
+    puts "[7-007] ×：ログアウトしたユーザーは、URLを直接入力して購入ページに遷移しようとしても、ログインページに遷移せず購入画面に遷移できてしまう"
+  else
+    puts "[7-007] ×：ログアウトしたユーザーは、URLを直接入力して購入ページに遷移しようとするとログインページ & 購入画面にも遷移しない"
   end
 
+  
 
   #user2(サングラスの出品者)でログイン
+  login_any_user(@email, @password)
   @wait.until {@d.find_element(:id,"email").displayed?}
   @d.find_element(:id, 'email').send_keys(@email2)
   @d.find_element(:id, 'password').send_keys(@password)

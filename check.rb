@@ -124,6 +124,8 @@ randm_word = SecureRandom.hex(10) #=> "4a01bbd139f5e94bd249"
 # {チェック番号： 3 , チェック合否： "〇" , チェック内容： "〇〇をチェック" , チェック詳細： "○○×"}
 @check_log = []
 
+#各チェックのフラグ変数
+flag_4_001 = 0;
 
 begin
     main()
