@@ -188,10 +188,21 @@ def check_4
   check_flag = 0
 
   begin
-    @wait.until {@d.find_element(:class,"purchase-btn").displayed?}
+    # ログアウト状態にしておく
+    # トップページに遷移
+    @d.get(@url)
+    @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
+
+    display_flag = @d.find_element(:class,"logout").displayed? rescue false
+    # ログイン状態であればログアウトしておく
+    if display_flag
+      @d.find_element(:class,"logout").click
+      @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
+      @d.get(@url)
+      @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
+    end
 
     display_flag = @d.find_element(:class,"item-name").displayed? rescue false
-    # ログアウト状態でトップ画面にログインボタンとサインアップボタンが表示されているかチェック
     # 直前で出品している商品は「サングラス」
     if display_flag
       # 最新の商品名を取得
@@ -433,10 +444,11 @@ def check_8
 
     # 商品編集画面のURLを取得
     @edit_url_coat = @d.current_url
+    @puts_num_array[0].push("売却済みのコート(user1出品)編集画面のURL→  " + @edit_url_coat)
 
     # ウィンドウ切り替え
     @d.switch_to.window( @window2_id )
-    
+
     @d.get(@url)
     # 他ユーザーでログイン中のためログアウト
     @d.find_element(:class,"logout").click
@@ -611,9 +623,7 @@ def check_12
   begin
 
     # トップページ　→　商品(コート)詳細画面へ遷移
-    @wait.until {@d.find_element(:class,"item-img-content").displayed?}
-    @d.find_element(:class,"item-img-content").click
-    @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
+    item_name_click_from_top(@item_name)
 
     if /購入画面に進む/.match(@d.page_source)
       check_detail["チェック詳細"] << "◯：出品者以外のログインユーザーだと商品詳細画面に「購入ボタン」が表示される\n"
@@ -625,12 +635,25 @@ def check_12
     @d.get(@url)
     @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
 
-    check_detail["チェック合否"] = check_flag == 1 ? "◯" : "×"
+    # 出品者であるuser1でログインし直す
+    login_any_user(@email, @password)
+    item_name_click_from_top(@item_name)
+
+    if /購入画面に進む/.match(@d.page_source)
+      check_detail["チェック詳細"] << "×：出品者でログインし、商品詳細画面に遷移すると「購入ボタン」が表示されてしまう\n"
+    else
+      check_detail["チェック詳細"] << "◯：出品者でログインし、商品詳細画面に遷移しても「購入ボタン」が表示されない\n"
+      check_flag += 1
+    end
+
+    check_detail["チェック合否"] = check_flag == 2 ? "◯" : "×"
 
   ensure
     @d.get(@url)
     @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
 
+    # 以降の処理をスムーズに行うためにuser2でログインし直す
+    login_any_user(@email2, @password)
     @check_log.push(check_detail)
   end
 end
@@ -817,7 +840,7 @@ def check_16
       check_detail["チェック詳細"] << "○：出品者が、自身の出品した売却済みの商品の商品情報編集ページにURLを直接入力して遷移しようとすると、トップページに遷移する\n"
       check_flag += 1
     else
-      check_detail["チェック詳細"] << "×：出品者が、自身の出品した売却済みの商品の商品情報編集ページにURLを直接入力して遷移しようとすると、トップページ以外に遷移する\n"
+      check_detail["チェック詳細"] << "×：出品者が、自身の出品した売却済みの商品の商品情報編集ページにURLを直接入力して遷移しようとすると、トップページ以外に遷移する(トップページに遷移が正解)\n"
     end
 
     @d.get(@url)
@@ -866,6 +889,8 @@ def check_17
 
     item_commission_flag1 = item_commission.to_s.include?(item_price_commission) rescue false
     item_commission_flag2 = item_commission.to_s.include?(item_price_commission2) rescue false
+
+    sleep 1
 
     # 販売利益の整合性をチェック
     if item_profit_flag1 || item_profit_flag2
@@ -1143,10 +1168,13 @@ def check_19_3
     else
       # エラーログが出力されていなかったら
       @error_log_hash["商品購入"] = "×：【商品購入画面】にて全項目未入力の状態で購入ボタンを押すと出品は完了しないが、エラーメッセージは出力されない\n\n"
+      puts "[7-007] ×：入力に問題がある状態で購入ボタンが押されたら、購入ページに戻るがエラーメッセージが表示されない"
     end
   else
     # 購入できてしまう場合
     @error_log_hash["商品購入"] = "×：【商品購入画面】にて全項目未入力の状態で購入ボタンを押すとリダイレクトせず商品購入画面以外のページへ遷移してしまう(購入できてしまっている可能性あり)\n"
+    puts "[7-007] ×：入力に問題がある状態で購入ボタンが押されたら、購入ページに戻らない"
+
     # トップ画面へ
     @d.get(@url)
     @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
@@ -1159,6 +1187,67 @@ def check_19_3
 
   end
 end
+
+# 商品編集画面でのエラーハンドリングログを取得
+def check_19_4
+  # 全項目未入力でいきなり「購入する」ボタンをクリック
+  @d.find_element(:class,"buy-red-btn").click
+  @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
+
+  # 念の為購入できてしまわないかチェック
+  if /クレジットカード情報入力/ .match(@d.page_source)
+    # 購入できなかった場合
+    # エラーログの表示有無
+    display_flag = @d.find_element(:class,"error-alert").displayed? rescue false
+    if display_flag
+      @error_log_hash["商品購入"] = "◯：【商品購入画面】にて全項目未入力の状態で購入ボタンを押すと購入が完了せずエラーメッセージが出力される\n\n"
+      @error_log_hash["商品購入"] << "↓↓↓ エラーログ全文(出力された内容) ↓↓↓\n"
+      # エラーログの親要素
+      error_parent = @d.find_element(:class,"error-alert")
+      error_strings = error_parent.find_elements(:class,"error-message")
+      error_strings.each{|ele|
+        @error_log_hash["商品購入"] << "・" + ele.text + "\n"
+      }
+
+      # 出力されたエラーログに漏れがないか目視確認しやすいように比較文章をいれる
+      @error_log_hash["商品購入"] << "\n\n↓↓↓ エラーログ模範出力文章(英語表記ですが、出力文との比較にお使いください) ↓↓↓\n"
+      @error_log_hash["商品購入"] << <<-EOT
+      ----------------------------
+      ・Post code can't be blank
+      ・Post code is invalid
+      ・City can't be blank
+      ・Address line can't be blank
+      ・Phone number can't be blank
+      ・Phone number is invalid
+      ・Token can't be blank
+      ・Prefecture must be other than 0
+      ----------------------------
+
+
+      EOT
+    else
+      # エラーログが出力されていなかったら
+      @error_log_hash["商品購入"] = "×：【商品購入画面】にて全項目未入力の状態で購入ボタンを押すと出品は完了しないが、エラーメッセージは出力されない\n\n"
+      puts "[7-007] ×：入力に問題がある状態で購入ボタンが押されたら、購入ページに戻るがエラーメッセージが表示されない"
+    end
+  else
+    # 購入できてしまう場合
+    @error_log_hash["商品購入"] = "×：【商品購入画面】にて全項目未入力の状態で購入ボタンを押すとリダイレクトせず商品購入画面以外のページへ遷移してしまう(購入できてしまっている可能性あり)\n"
+    puts "[7-007] ×：入力に問題がある状態で購入ボタンが押されたら、購入ページに戻らない"
+
+    # トップ画面へ
+    @d.get(@url)
+    @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
+    # 商品詳細画面へ
+    @d.find_element(:class,"item-img-content").click
+    @wait.until {@d.find_element(:class, "item-red-btn").displayed?}
+    # 購入画面へ
+    @d.find_element(:class,"item-red-btn").click
+    @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
+
+  end
+end
+
 
 
 # 新規登録、商品出品、商品購入の際にエラーハンドリングができていること（適切では無い値が入力された場合、情報は保存されず、エラーメッセージを出力させる）
@@ -1178,6 +1267,150 @@ def check_19
     check_detail["チェック合否"] = check_flag == 3 ? "◯：出力内容を目視で確認が必要" : "×：異常あり"
 
   ensure
+    @check_log.push(check_detail)
+  end
+end
+
+
+# パスワードとパスワード（確認用）、値の一致が必須であること
+def check_20
+  check_detail = {"チェック番号"=> 20 , "チェック合否"=> "" , "チェック内容"=> "パスワードとパスワード（確認用）、値の一致が必須であること" , "チェック詳細"=> ""}
+  check_flag = 0
+  begin
+
+    display_flag = @d.find_element(:class,"logout").displayed? rescue false
+    # ログイン状態であればログアウトしておく
+    if display_flag
+      @d.find_element(:class,"logout").click
+      @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
+      @d.get(@url)
+      @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
+    end
+
+    # 新規登録画面へ
+    @d.find_element(:class,"sign-up").click
+    @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
+
+    # 新規登録に必要な項目入力を行うメソッド
+    input_sign_up_method(@nickname4, @email4, @password, @first_name4, @last_name4, @first_name_kana4, @last_name_kana4)
+
+    #確認用パスワードの項目のみ異なる情報を入力する
+    @wait.until {@d.find_element(:id, 'password-confirmation').displayed?}
+    @d.find_element(:id, 'password-confirmation').send_keys("aaa222")
+
+    @d.find_element(:class,"register-red-btn").click
+    @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
+
+    # パスワードと確認用パスワードが異なる情報で登録ボタンをおす
+    # 登録できなかったら
+    if /会員情報入力/ .match(@d.page_source)
+      check_detail["チェック詳細"] << "◯：新規ユーザー登録にて、パスワード(入力内容：#{@password})と確認用パスワード(入力内容：aaa222)が異なる情報だと新規登録できない\n"
+      check_flag += 1
+
+      @d.get(@url)
+      @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
+
+    # 登録ができてしまった場合
+    else
+      check_detail["チェック詳細"] << "×：新規ユーザー登録にて、パスワード(入力内容：#{@password})と確認用パスワード(入力内容：aaa222)が異なる情報でも新規登録できてしまう\n"
+      # 再利用できるように登録できてしまったアカウントのemail情報を更新しておく
+      randm_word = SecureRandom.hex(5)
+      @email4 = "user4_#{randm_word}@co.jp"
+
+      @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
+
+      @d.get(@url)
+      @wait.until {@d.find_element(:class,"purchase-btn").displayed?}
+
+      # 登録できてしまった場合、ログアウトしておく
+      display_flag = @d.find_element(:class,"logout").displayed? rescue false
+      if display_flag
+        @d.find_element(:class,"logout").click
+        @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
+        @d.get(@url)
+        @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
+      end
+    end
+
+    check_detail["チェック合否"] = check_flag == 1 ? "◯" : "×"
+
+  ensure
+    @check_log.push(check_detail)
+  end
+end
+
+
+# ログアウト状態のユーザーは、URLを直接入力して売却済みの商品情報編集ページへ遷移しようとすると、ログインページに遷移すること
+def check_21
+  check_detail = {"チェック番号"=> 21 , "チェック合否"=> "" , "チェック内容"=> "ログアウト状態のユーザーは、URLを直接入力して売却済みの商品情報編集ページへ遷移しようとすると、ログインページに遷移すること" , "チェック詳細"=> ""}
+  check_flag = 0
+  begin
+
+    # ログアウト状態でコート編集画面に直接遷移する
+    @d.get(@edit_url_coat)
+
+    # 編集画面に遷移した時も想定した判定基準を追加
+    @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
+
+    if /会員情報入力/ .match(@d.page_source)
+      check_detail["チェック詳細"] << "◯：ログアウト状態のユーザーが、URLを直接入力して売却済みの商品情報編集ページに遷移しようとすると、ログインページに遷移する\n"
+      check_flag += 1
+    elsif /FURIMAが選ばれる3つの理由/ .match(@d.page_source)
+      check_detail["チェック詳細"] << "×：ログアウト状態のユーザーが、URLを直接入力して売却済みの商品情報編集ページに遷移しようとすると、トップページに遷移してしまう\n"
+    else
+      check_detail["チェック詳細"] << "×：ログアウト状態のユーザーが、URLを直接入力して売却済みの商品情報編集ページに遷移しようとすると、ログインページでもトップページでもないページに遷移してしまう\n"
+    end
+
+    check_detail["チェック合否"] = check_flag == 1 ? "◯" : "×"
+
+  ensure
+    @d.get(@url)
+    @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
+
+    @check_log.push(check_detail)
+  end
+end
+
+
+# ログアウト状態のユーザーは、URLを直接入力して商品購入ページに遷移しようとすると、商品の販売状況に関わらずログインページに遷移すること
+def check_22
+  check_detail = {"チェック番号"=> 22 , "チェック合否"=> "" , "チェック内容"=> "ログアウト状態のユーザーは、URLを直接入力して商品購入ページに遷移しようとすると、商品の販売状況に関わらずログインページに遷移すること" , "チェック詳細"=> ""}
+  check_flag = 0
+  begin
+
+    @d.get(@url)
+    @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
+
+    display_flag = @d.find_element(:class,"logout").displayed? rescue false
+    # ログイン状態であればログアウトしておく
+    if display_flag
+      @d.find_element(:class,"logout").click
+      @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
+      @d.get(@url)
+      @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
+    end
+  
+    # ログアウト状態でコート編集画面に直接遷移する
+    @d.get(@edit_url_coat)
+
+    # 編集画面に遷移した時も想定した判定基準を追加
+    @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
+
+    if /会員情報入力/ .match(@d.page_source)
+      check_detail["チェック詳細"] << "◯：ログアウト状態のユーザーが、URLを直接入力して商品購入ページに遷移しようとすると、ログインページに遷移する\n"
+      check_flag += 1
+    elsif /FURIMAが選ばれる3つの理由/ .match(@d.page_source)
+      check_detail["チェック詳細"] << "△：ログアウト状態のユーザーが、URLを直接入力して商品購入ページに遷移しようとすると、トップページに遷移する(受講期によっては完了定義となる)\n"
+    else
+      check_detail["チェック詳細"] << "×：ログアウト状態のユーザーが、URLを直接入力して商品購入ページに遷移しようとすると、ログインページでもトップページでもないページに遷移してしまう\n"
+    end
+
+    check_detail["チェック合否"] = check_flag == 1 ? "◯" : "×"
+
+  ensure
+    @d.get(@url)
+    @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
+
     @check_log.push(check_detail)
   end
 end
