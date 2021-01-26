@@ -779,6 +779,7 @@ def logout_item_edit_and_buy
 
   # 商品詳細ページでログアウト状態のユーザーには、「編集・削除・購入画面に進むボタン」が表示されないこと
   check_11
+
 end
 
 # 別名義のユーザーで登録 & ログイン
@@ -889,6 +890,7 @@ def login_user2_item_buy
   if /クレジットカード情報入力/ .match(@d.page_source) && display_flag
     @puts_num_array[7][7] = "[7-007] ◯"  #入力に問題がある状態で購入ボタンが押されたら、購入ページに戻りエラーメッセージが表示されること"
 
+
   # カード情報入力画面にリダイレクトのみ
   elsif /クレジットカード情報入力/ .match(@d.page_source)
     @puts_num_array[7][7] = "[7-007] ×：カード番号が入力されていない状態だと購入情報入力画面にリダイレクトはされるが、エラーメッセージは画面に出力されない"
@@ -904,10 +906,13 @@ def login_user2_item_buy
     raise '以降の自動チェックに影響を及ぼす致命的なエラーのため、処理を中断します。手動チェックに切り替えてください'
   end
 
+
   # puts "◯クレジットカード情報は必須であり、正しいクレジットカードの情報で無いときは決済できない"  #正常な値での登録チェックを行っていないため未実証
+
 
   # カード番号を入力した状態で再度決済を行う
   input_purchase_information(@card_number, @card_exp_month, @card_exp_year, @card_cvc)
+
 
   #正常に決済する
   @d.find_element(:class,"buy-red-btn").click
