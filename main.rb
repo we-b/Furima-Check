@@ -19,7 +19,7 @@ def main
   @http ="http://#{@b_id}:#{@b_password}@"
 # 受講生の@URLをhttp://以降から記入
   @url = @http + @url_ele
-  @url = "http://#{@b_id}:#{@b_password}@localhost:3000/"
+  #@url = "http://#{@b_id}:#{@b_password}@localhost:3000/"
 
   @d.get(@url)
 
