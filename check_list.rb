@@ -753,7 +753,7 @@ def check_14
   begin
 
     # basic認証の情報を含まない本番環境のURLのみでアクセスしてみる
-    @d.get("http://" + @url_ele)
+    @d.get("https://" + @url_ele)
     sleep 1
 
     display_flag = @d.find_element(:class,"furima-icon").displayed? rescue false
@@ -867,13 +867,13 @@ def check_17
 
     #javascriptが動作しているかどうかを判断
     # 販売利益
-    item_price_profit = (@item_price*0.9).round
+    item_price_profit = (@item_price*0.9).round.to_s
     # 販売利益の[1,000]のコンマ表記バージョン
     item_price_profit2 = item_price_profit.to_s.reverse.gsub(/\d{3}/, '\0,').reverse
 
 
     # 販売手数料(10%)
-    item_price_commission = (@item_price*0.1).round
+    item_price_commission = (@item_price*0.1).round.to_s
     # 販売利益の[1,000]のコンマ表記バージョン
     item_price_commission2 = item_price_commission.to_s.reverse.gsub(/\d{3}/, '\0,').reverse
 
