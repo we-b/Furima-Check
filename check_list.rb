@@ -753,7 +753,7 @@ def check_14
   begin
 
     # basic認証の情報を含まない本番環境のURLのみでアクセスしてみる
-    @d.get("https://" + @url_ele)
+    @d.get("http://" + @url_ele)
     sleep 1
 
     display_flag = @d.find_element(:class,"furima-icon").displayed? rescue false

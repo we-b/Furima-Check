@@ -14,12 +14,12 @@ def main
   start
 
   # basic認証が実装されている
-  check_14
+   check_14
 
   @http ="http://#{@b_id}:#{@b_password}@"
 # 受講生の@URLをhttp://以降から記入
   @url = @http + @url_ele
-  # @url = "http://#{b_id}:#{b_password}@localhost:3000/"
+  #@url = "http://#{@b_id}:#{@b_password}@localhost:3000/"
 
   @d.get(@url)
 
@@ -158,7 +158,7 @@ def start
 ②basic認証[ユーザー名]
 ③basic認証[パスワード]
 
-「①動作チェックするアプリの本番環境URL」を入力しenterキーを押してください (例：https://afternoon-bayou-26262.herokuapp.com/)
+「①動作チェックするアプリの本番環境URL」を入力しenterキーを押してください (例：localhost:3000/)
 EOT
 
   input_url = gets.chomp
@@ -469,7 +469,7 @@ def sign_up_nickname_input
     @d.get(@url)
     @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
   end
-
+  @wait.until {@d.find_element(:class,"sign-up").displayed?}
   @d.find_element(:class,"sign-up").click
   @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
 
