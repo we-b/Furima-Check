@@ -74,7 +74,7 @@ def check_3
     @wait.until {@d.find_element(:class, "item-name").displayed?}
     top_item_name = @d.find_element(:class,"item-name").text rescue "Error：class：item-nameが見つかりません\n"
     top_item_img = @d.find_element(:class,"item-img").attribute("src") rescue "Error：class：item-imgが見つかりません\n"
-    top_item_price = @d.find_element(:class,"item-price").find_element(:tag_name, "span").text rescue "Error：class：item-priceが見つかりません\n"
+    top_item_price = @d.find_element(:class,"item-price").find_element(:tag_name, "span").text.delete("¥").delete(",") rescue "Error：class：item-priceが見つかりません\n"
   
     # トップ画面の表示内容をチェック
     if top_item_name == @item_name
