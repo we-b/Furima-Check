@@ -74,7 +74,7 @@ def check_3
     @wait.until {@d.find_element(:class, "item-name").displayed?}
     top_item_name = @d.find_element(:class,"item-name").text rescue "Error：class：item-nameが見つかりません\n"
     top_item_img = @d.find_element(:class,"item-img").attribute("src") rescue "Error：class：item-imgが見つかりません\n"
-    top_item_price = @d.find_element(:class,"item-price").find_element(:tag_name, "span").text rescue "Error：class：item-priceが見つかりません\n"
+    top_item_price = @d.find_element(:class,"item-price").find_element(:tag_name, "span").text.delete("¥").delete(",") rescue "Error：class：item-priceが見つかりません\n"
   
     # トップ画面の表示内容をチェック
     if top_item_name == @item_name
@@ -867,15 +867,15 @@ def check_17
 
     #javascriptが動作しているかどうかを判断
     # 販売利益
-    item_price_profit = (@item_price*0.9).round
+    item_price_profit = (@item_price*0.9).round.to_s
     # 販売利益の[1,000]のコンマ表記バージョン
-    item_price_profit2 = item_price_profit.to_s.gsub(/\@d{2}/, '\0,').to_s
+    item_price_profit2 = item_price_profit.to_s.reverse.gsub(/\d{3}/, '\0,').reverse
 
 
     # 販売手数料(10%)
-    item_price_commission = (@item_price*0.1).round
+    item_price_commission = (@item_price*0.1).round.to_s
     # 販売利益の[1,000]のコンマ表記バージョン
-    item_price_commission2 = item_price_commission.to_s.gsub(/\@d{2}/, '\0,').to_s
+    item_price_commission2 = item_price_commission.to_s.reverse.gsub(/\d{3}/, '\0,').reverse
 
     check_detail["チェック詳細"] << "!価格設定：#{@item_price}円、販売手数料(10%)：#{item_price_commission}円、販売利益：#{item_price_profit}円\n"
 
@@ -889,7 +889,7 @@ def check_17
 
     item_commission_flag1 = item_commission.to_s.include?(item_price_commission) rescue false
     item_commission_flag2 = item_commission.to_s.include?(item_price_commission2) rescue false
-
+    
     sleep 1
 
     # 販売利益の整合性をチェック
@@ -917,6 +917,7 @@ end
 
 # 商品詳細ページで商品出品時に登録した情報が見られるようになっている
 def check_18
+
   check_detail = {"チェック番号"=> 18 , "チェック合否"=> "" , "チェック内容"=> "商品詳細ページで商品出品時に登録した情報が見られるようになっている" , "チェック詳細"=> ""}
   check_flag = 0
 
@@ -929,7 +930,7 @@ def check_18
     # 商品画像
     item_data["商品画像"] = @d.find_element(:class,"item-box-img").attribute("src") rescue "×：Error：商品の画像を表示する要素class：item-box-imgが見つかりません\n"
     # 商品の価格
-    item_data["商品価格"] = @d.find_element(:class,"item-price").text rescue "×：Error：商品の価格を表示する要素class：item-priceが見つかりません\n"
+    item_data["商品価格"] = @d.find_element(:class,"item-price").text.delete("¥").delete(",") rescue "×：Error：商品の価格を表示する要素class：item-priceが見つかりません\n"
     # 商品説明文の親要素
     show_item_info_parent = @d.find_element(:class,"item-explain-box") rescue "×：Error：商品の説明を表示する要素class：item-explain-boxが見つかりません\n"
     # 商品説明文章
@@ -1005,6 +1006,7 @@ end
 
 # ユーザー新規登録画面でのエラーハンドリングログを取得
 def check_19_1
+
   # 全項目未入力でいきなり「登録する」ボタンをクリック
   @d.find_element(:class,"register-red-btn").click
   @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
