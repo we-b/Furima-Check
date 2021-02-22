@@ -109,7 +109,7 @@ def check_3
     @wait.until {@d.find_element(:class, "item-box-img").displayed?}
     show_item_name = @d.find_element(:class,"name").text rescue "Error：class：nameが見つかりません\n"
     show_item_img = @d.find_element(:class,"item-box-img").attribute("src") rescue "Error：class：item-box-imgが見つかりません\n"
-    show_item_price = @d.find_element(:class,"item-price").text rescue "Error：class：item-priceが見つかりません\n"
+    show_item_price = @d.find_element(:class,"item-price").text.delete("¥").delete(",") rescue "Error：class：item-priceが見つかりません\n"
   
     # 詳細画面の表示内容をチェック
     if show_item_name == @item_name
@@ -753,7 +753,9 @@ def check_14
   begin
 
     # basic認証の情報を含まない本番環境のURLのみでアクセスしてみる
-    @d.get("https://" + @url_ele)
+    # @d.get("https://" + @url_ele)
+    ## localのときはhttp
+    @d.get("http://" + @url_ele)
     sleep 1
 
     display_flag = @d.find_element(:class,"furima-icon").displayed? rescue false
