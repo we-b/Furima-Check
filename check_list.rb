@@ -6,7 +6,7 @@ def check_1
   check_flag = 0
 
   begin
-  
+    
     display_flag = @d.find_element(:class,"login").displayed? rescue false
     if display_flag
       check_ele1 = @d.find_element(:class,"login").displayed? ? "○：ログアウト状態で、ヘッダーにログインボタンが表示されている\n" : "×：ログアウト状態では、ヘッダーにログインボタンが表示されない\n"
