@@ -6,7 +6,7 @@ def check_1
   check_flag = 0
 
   begin
-    @wait.until {@d.find_element(:class,"purchase-btn").displayed?}
+    
     display_flag = @d.find_element(:class,"login").displayed? rescue false
     if display_flag
       check_ele1 = @d.find_element(:class,"login").displayed? ? "○：ログアウト状態で、ヘッダーにログインボタンが表示されている\n" : "×：ログアウト状態では、ヘッダーにログインボタンが表示されない\n"
@@ -36,7 +36,6 @@ def check_2
   check_flag = 0
 
   begin
-    @wait.until {@d.find_element(:class,"purchase-btn").displayed?}
 
     display_flag = @d.find_element(:class,"user-nickname").displayed? rescue false
     # ログイン状態でトップ画面にユーザーのニックネームとログアウトボタンが表示されているか
@@ -235,7 +234,7 @@ def check_5
     @d.get(@url)
 
     # トップページ画面からスタート
-    @wait.until {@d.find_element(:class,"purchase-btn").displayed?}
+    
 
     # user_1でログイン
     login_any_user(@email, @password)
@@ -261,7 +260,7 @@ def check_5
     # ログアウトしておく
     @d.find_element(:class,"logout").click
     @d.get(@url)
-    @wait.until {@d.find_element(:class,"purchase-btn").displayed?}
+    
 
     @check_log.push(check_detail)
     # エラー発生有無に関係なく操作ウィンドウを元に戻す
@@ -323,7 +322,7 @@ def check_6
 
 
     # トップページ画面からスタート
-    @wait.until {@d.find_element(:class,"purchase-btn").displayed?}
+    
 
     #user3でサインアップ
     sign_up_user3
@@ -521,7 +520,7 @@ def check_10
     
     @d.get(@url)
     # トップページ画面からスタート
-    @wait.until {@d.find_element(:class,"purchase-btn").displayed?}
+
 
     # コートを出品したuser1でログイン
     login_any_user(@email, @password)
@@ -551,7 +550,7 @@ def check_10
     end
 
     @d.get(@url)
-    @wait.until {@d.find_element(:class,"purchase-btn").displayed?}
+    
 
     check_detail["チェック合否"] = check_flag == 2 ? "◯" : "×"
 
@@ -755,7 +754,7 @@ def check_14
     # basic認証の情報を含まない本番環境のURLのみでアクセスしてみる
      @d.get("https://" + @url_ele)
     ## localのときはhttp
-    ##@d.get("http://" + @url_ele)
+    # @d.get("http://" + @url_ele)
     sleep 1
 
     display_flag = @d.find_element(:class,"furima-icon").displayed? rescue false
@@ -1324,7 +1323,7 @@ def check_20
       @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
 
       @d.get(@url)
-      @wait.until {@d.find_element(:class,"purchase-btn").displayed?}
+      
 
       # 登録できてしまった場合、ログアウトしておく
       display_flag = @d.find_element(:class,"logout").displayed? rescue false
