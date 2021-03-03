@@ -74,7 +74,8 @@ def check_3
     top_item_name = @d.find_element(:class,"item-name").text rescue "Error：class：item-nameが見つかりません\n"
     top_item_img = @d.find_element(:class,"item-img").attribute("src") rescue "Error：class：item-imgが見つかりません\n"
     top_item_price = @d.find_element(:class,"item-price").find_element(:tag_name, "span").text.delete("¥").delete(",") rescue "Error：class：item-priceが見つかりません\n"
-  
+    top_item_shipping_fee_status_word = @d.find_element(:class,"item-price").find_element(:tag_name, "span").text.delete("¥").delete(",") rescue "Error：class：item-priceが見つかりません\n"
+    
     # トップ画面の表示内容をチェック
     if top_item_name == @item_name
       check_detail["チェック詳細"] << "◯：トップ画面に商品名が表示されている\n"
@@ -100,6 +101,16 @@ def check_3
       check_detail["チェック詳細"] << "×：トップ画面に商品価格が表示されていない\n"
       check_detail["チェック詳細"] << top_item_price
     end
+
+    # 配送料の負担についてのチェック
+    if top_item_shipping_fee_status_word.include?(@item_shipping_fee_status_word)
+      check_detail["チェック詳細"] << "◯：トップ画面に配送料負担が表示されている\n"
+      check_flag += 1
+    else
+      check_detail["チェック詳細"] << "×：トップ画面に配送料負担が表示されていない\n"
+      check_detail["チェック詳細"] << top_item_shipping_fee_status_word
+    end
+    
   
     # 商品詳細画面へ遷移
     @d.find_element(:class,"item-img-content").click
@@ -170,7 +181,7 @@ def check_3
       check_detail["チェック詳細"] << purchase_item_price
     end
   
-    check_detail["チェック合否"] = check_flag == 9 ? "◯" : "×"
+    check_detail["チェック合否"] = check_flag == 10 ? "◯" : "×"
   
     # トップ画面へ戻っておく
     @d.get(@url)
