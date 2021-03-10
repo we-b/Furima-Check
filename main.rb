@@ -1,7 +1,7 @@
 # チェック項目のメソッドをまとめているファイル
 require './check_list'
 # ruby_jardはデバッグの際にのみ使用する。普段はコメントアウトする
-# require 'ruby_jard'
+ require 'ruby_jard'
 
 # メモ
 # 購入時に起こっていたエラー詳細
@@ -11,7 +11,7 @@ require './check_list'
 
 def main
 
-  start
+  #start
 
   # basic認証が実装されている
   check_14
@@ -44,12 +44,13 @@ def main
   # ユーザー新規登録
   # ニックネーム未入力
   sign_up_nickname_input
-
+  # チェックがsign_up_retryに組み込まれているのでメソッドで分けたい。
+  
+  sign_up_password_short
   # 必須項目を入力して再登録
   sign_up_retry
   # トップメニュー → ログアウトする
   logout_from_the_topMenu
-
   # ログイン
   login_user1
 
@@ -250,6 +251,26 @@ def input_sign_up_method(nickname, email, pass, first, last, first_kana, last_ka
     select_ele.select_by(:index, @select_index)
   }
 
+end
+
+# 登録項目を削除するメソッド
+def input_sign_up_delete
+  @wait.until {@d.find_element(:id, 'nickname').displayed?}
+  @d.find_element(:id, 'nickname').clear
+  @wait.until {@d.find_element(:id, 'email').displayed?}
+  @d.find_element(:id, 'email').clear
+  @wait.until {@d.find_element(:id, 'password').displayed?}
+  @d.find_element(:id, 'password').clear
+  @wait.until {@d.find_element(:id, 'password-confirmation').displayed?}
+  @d.find_element(:id, 'password-confirmation').clear
+  @wait.until {@d.find_element(:id, 'first-name').displayed?}
+  @d.find_element(:id, 'first-name').clear
+  @wait.until {@d.find_element(:id, 'last-name').displayed?}
+  @d.find_element(:id, 'last-name').clear
+  @wait.until {@d.find_element(:id, 'first-name-kana').displayed?}
+  @d.find_element(:id, 'first-name-kana').clear
+  @wait.until {@d.find_element(:id, 'last-name-kana').displayed?}
+  @d.find_element(:id, 'last-name-kana').clear
 end
 
 # 新規登録に必要な入力項目を全てクリアにするメソッド
@@ -485,6 +506,25 @@ def sign_up_nickname_input
   @d.find_element(:class,"register-red-btn").click
 end
 
+# パスワードは、6文字以上での入力が必須であること
+def sign_up_password_short
+  display_flag = @d.find_element(:class,"logout").displayed? rescue false
+  # ログイン状態であればログアウトしておく
+  if display_flag
+    @d.find_element(:class,"logout").click
+    @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
+    @d.get(@url)
+    @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
+  end
+
+  # 登録項目を削除するメソッド
+  input_sign_up_delete
+  # 新規登録に必要な項目入力を行うメソッド。パスワード文字数4文字
+  input_sign_up_method(@nickname, @email, @password_short, @first_name, @last_name, @first_name_kana, @last_name_kana)
+
+  @d.find_element(:class,"register-red-btn").click
+end
+
 # まだ登録が完了していない場合、再度登録
 def sign_up_retry
 
@@ -678,7 +718,7 @@ def item_new_require_input
     @puts_num_array[2][8] = "[2-008] ◯"  #：配送料の負担についての情報が必須である"
     @puts_num_array[2][9] = "[2-009] ◯"  #：発送元の地域についての情報が必須である"
     @puts_num_array[2][10] = "[2-010] ◯"  #：発送までの日数についての情報が必須である"
-    @puts_num_array[2][11] = "[2-011] ◯"  #：価格についての情報が必須である"
+    @puts_num_array[2][11] = "[2-011] ◯"  #：販売価格についての情報が必須である"
     @puts_num_array[2][13] = "[2-013] △：販売価格を半角数字で保存可能。全角数字での出品可否は手動確認"  #：販売価格は半角数字のみ保存可能であること"
   end
 end
@@ -843,7 +883,7 @@ def login_user2_item_buy
 
   # [4-001]が立証されると合わせて[5-004]も立証可能
   if @flag_4_001 == 2
-    @puts_num_array[5][4] = "[5-004] ◯"  #：出品者だけが編集ページに遷移できる"
+    @puts_num_array[5][4] = "[5-004] ◯"  #：ログイン状態の出品者のみ、出品した商品の商品情報を編集できること"
   else
     @puts_num_array[5][4] = "[5-004] ×：[4-001]チェックにて×が発生しているため"  #：出品者だけが編集ページに遷移できる"
   end
@@ -972,7 +1012,7 @@ def login_user2_after_purchase_check1
     # 85期からは「購入画面に進む」ボタンの表示自体がNG
 
   else
-    @puts_num_array[7][9] = "[7-009] ◯"  #：一度購入した商品には再度購入ボタンが表示されない"
+    @puts_num_array[7][9] = "[7-009] ◯"  #：ログイン状態の出品者以外のユーザーのみ、「購入画面に進む」ボタンが表示されること"
     @d.get(@url)
   end
 
@@ -1065,7 +1105,7 @@ def login_user2_after_purchase_check2
   # トップページに表示されている一番最初の商品名を取得
   latest_item_name = @d.find_element(:class,"item-name").text
   if latest_item_name == @item_name2
-    @puts_num_array[6][1] = "[6-001] ×：出品者が商品詳細ページで削除ボタンを押しても削除できない(商品一覧画面から削除できていない)"
+    @puts_num_array[6][1] = "[6-001] ×：ログイン状態の出品者が出品した商品情報を削除できない(商品一覧画面から削除できていない)"
   else
     @puts_num_array[6][1] = "[6-001] ◯"  #：出品者だけが商品情報を削除できる"
   end
