@@ -1,7 +1,7 @@
 # チェック項目のメソッドをまとめているファイル
 require './check_list'
 # ruby_jardはデバッグの際にのみ使用する。普段はコメントアウトする
- require 'ruby_jard'
+# require 'ruby_jard'
 
 # メモ
 # 購入時に起こっていたエラー詳細
@@ -11,7 +11,7 @@ require './check_list'
 
 def main
 
-  #start
+  start
 
   # basic認証が実装されている
   check_14
@@ -25,12 +25,9 @@ def main
 
   # ランダム情報で生成されるユーザー情報を出力する(再度ログインなどをする可能性もあるため)
   print_user_status
-
-
   # ユーザー状態：ログアウト
   # 出品：コート = ,サングラス =
   # 購入：コート = ,サングラス =
-
   # ユーザー状態：ログアウト
   # 出品：コート = なし,サングラス = なし
   # 購入：コート = なし,サングラス = なし
@@ -40,24 +37,22 @@ def main
   # ユーザー状態：user1
   # 出品：コート = なし,サングラス = なし
   # 購入：コート = なし,サングラス = なし
-
   # ユーザー新規登録
-  # ニックネーム未入力
+  # メールアドレス未入力
   sign_up_nickname_input
-  # チェックがsign_up_retryに組み込まれているのでメソッドで分けたい。
-  
+  #パスワード5文字
   sign_up_password_short
+  # チェックがsign_up_retryに組み込まれているのでメソッドで分けたい。
+  # 【未実装】数字だけ、文字だけのパスワードで登録できるか検証する。
+  #check_23
   # 必須項目を入力して再登録
   sign_up_retry
   # トップメニュー → ログアウトする
   logout_from_the_topMenu
   # ログイン
   login_user1
-
   # ログイン状態では、ヘッダーにユーザーのニックネーム/ログアウトボタンが表示されること
   check_2
-
-
   # ユーザー状態：user1
   # 出品：コート = user1,サングラス = なし
   # 購入：コート = なし,サングラス = なし
@@ -193,6 +188,15 @@ def two_class_displayed_check(first_ele, second_ele)
   s_flag = @d.find_element(:class,first_ele).displayed? rescue false
   if f_flag || s_flag then return true end
   return false
+end
+
+# 登録できてしまったアカウントと異なる情報に更新しておく = 再登録&再ログインできなくなってしまため
+def re_sigin_up
+    randm_word = SecureRandom.hex(5)
+    @email = "user1_#{randm_word}@co.jp"
+    @puts_num_array[0].push("\n【補足情報】ユーザー新規登録テストにて、ユーザー1の情報が更新されたため更新されたユーザー情報を出力します(手動でのログイン時に使用)")
+    @puts_num_array[0].push("パスワード: #{@password}")
+    @puts_num_array[0].push("ユーザー名: 未入力\nemail: #{@email}\n")
 end
 
 # ユーザーのログインメソッド
@@ -483,30 +487,28 @@ end
 def sign_up_nickname_input
 
   display_flag = @d.find_element(:class,"logout").displayed? rescue false
-  # ログイン状態であればログアウトしておく
+  # ログイン状態であればログアウトして登録ページに遷移する。
   if display_flag
     @d.find_element(:class,"logout").click
     @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
     @d.get(@url)
     @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
+    @d.find_element(:class,"sign-up").click
   end
 
   @d.find_element(:class,"sign-up").click
   @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
-
   # ユーザー新規登録画面でのエラーハンドリングログを取得
   check_19_1
-
   # 新規登録に必要な項目入力を行うメソッド
   input_sign_up_method(@nickname, @email, @password, @first_name, @last_name, @first_name_kana, @last_name_kana)
-
-  @wait.until {@d.find_element(:id, 'nickname').displayed?}
-  @d.find_element(:id, 'nickname').clear
+  @wait.until {@d.find_element(:id, 'email').displayed?}
+  @d.find_element(:id, 'email').clear
 
   @d.find_element(:class,"register-red-btn").click
 end
 
-# パスワードは、6文字以上での入力が必須であること
+# パスワードは、6文字以上での入力が必須であること(6文字が入力されていれば、登録が可能なこと）
 def sign_up_password_short
   display_flag = @d.find_element(:class,"logout").displayed? rescue false
   # ログイン状態であればログアウトしておく
@@ -515,19 +517,40 @@ def sign_up_password_short
     @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
     @d.get(@url)
     @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
+    @d.find_element(:class,"sign-up").click
+  else
+    input_sign_up_delete
   end
-
-  # 登録項目を削除するメソッド
-  input_sign_up_delete
   # 新規登録に必要な項目入力を行うメソッド。パスワード文字数4文字
   input_sign_up_method(@nickname, @email, @password_short, @first_name, @last_name, @first_name_kana, @last_name_kana)
-
   @d.find_element(:class,"register-red-btn").click
+  # if文でチェック
+  if /FURIMAが選ばれる3つの理由/ .match(@d.page_source)
+    @puts_num_array[1][17] = "[1-017] ×：パスワードは、5文字以下でも登録できる"
+    @d.find_element(:class,"logout").click
+    @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
+    @d.get(@url)
+    @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
+    @d.find_element(:class,"sign-up").click
+    #raise "ユーザー登録バリデーションにて不備あり"
+  else
+    @puts_num_array[1][17] = "[1-017] ◯"  #：パスワードは、6文字以上での入力が必須であること(6文字が入力されていれば、登録が可能なこと
+    # パスワードの上書きでも登録が成功しない場合は処理を終了
+  end
+    # 登録できてしまった場合、ログアウトしておく
+    display_flag = @d.find_element(:class,"logout").displayed? rescue false
+    if display_flag
+      @d.find_element(:class,"logout").click
+      @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
+      @d.get(@url)
+      @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
+    end
+    # 登録できてしまったアカウントと異なる情報に更新しておく = 再登録&再ログインできなくなってしまため
+    re_sigin_up
 end
 
 # まだ登録が完了していない場合、再度登録
 def sign_up_retry
-
   @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
 
   if /会員情報入力/ .match(@d.page_source)
@@ -548,13 +571,7 @@ def sign_up_retry
     @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
 
     # 登録できてしまったアカウントと異なる情報に更新しておく = 再登録&再ログインできなくなってしまため
-    randm_word = SecureRandom.hex(5)
-    @email = "user1_#{randm_word}@co.jp"
-
-    @puts_num_array[0].push("\n【補足情報】ユーザー新規登録テストにて、ユーザー1の情報が更新されたため更新されたユーザー情報を出力します(手動でのログイン時に使用)")
-    @puts_num_array[0].push("パスワード: #{@password}")
-    @puts_num_array[0].push("ユーザー名: 未入力\nemail: #{@email}\n")
-
+    re_sigin_up
   end
 
 
@@ -682,7 +699,7 @@ def item_new_price_uninput
   if /商品の情報を入力/.match(@d.page_source)
     @puts_num_array[2][12] = "[2-012] ◯"  #：入力に問題がある状態で出品ボタンが押されたら、出品ページに戻りエラーメッセージが表示されること"
     @puts_num_array[2][3] = "[2-003] ◯"  #：必須項目が一つでも欠けている場合は、出品ができない"
-
+    @puts_num_array[2][14] = "[2-014] ◯" #:ログイン状態のユーザーだけが、商品出品ページへ遷移できること
   elsif /FURIMAが選ばれる3つの理由/.match(@d.page_source)
     @puts_num_array[2][12] = "[2-012] ×：価格の入力なしで商品出品を行うと、商品出品ページにリダイレクトされずトップページへ遷移してしまう"
     @puts_num_array[2][3] = "[2-003] ×：価格の入力なしで商品出品を行うと、出品できてしまう"
@@ -770,6 +787,7 @@ def item_edit
 
   # 「商品の説明」項目に正常な情報を入力して編集してみる
   @wait.until {@d.find_element(:id,"item-info").displayed?}
+  @puts_num_array[5][5] = "[5-005] ◯" #ログイン状態の出品者のみ、出品した商品の商品情報編集ページに遷移できること
   @d.find_element(:id,"item-info").send_keys(@item_info_re)
   @d.find_element(:class,"sell-btn").click
   @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}

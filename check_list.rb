@@ -763,9 +763,9 @@ def check_14
   begin
 
     # basic認証の情報を含まない本番環境のURLのみでアクセスしてみる
-     @d.get("https://" + @url_ele)
+    ## @d.get("https://" + @url_ele)
     ## localのときはhttp
-    # @d.get("http://" + @url_ele)
+     @d.get("http://" + @url_ele)
     sleep 1
 
     display_flag = @d.find_element(:class,"furima-icon").displayed? rescue false
@@ -1359,7 +1359,6 @@ def check_21
   check_detail = {"チェック番号"=> 21 , "チェック合否"=> "" , "チェック内容"=> "ログアウト状態のユーザーは、URLを直接入力して売却済みの商品情報編集ページへ遷移しようとすると、ログインページに遷移すること" , "チェック詳細"=> ""}
   check_flag = 0
   begin
-
     # ログアウト状態でコート編集画面に直接遷移する
     @d.get(@edit_url_coat)
 
@@ -1429,6 +1428,70 @@ def check_22
   end
 end
 
+# 数字だけ、文字だけのパスワードで登録できるか検証する。
+def check_23
+  check_detail = {"チェック番号"=> 23 , "チェック合否"=> "" , "チェック内容"=> "パスワードは、半角英数字混合での入力が必須であること" , "チェック詳細"=> ""}
+  check_flag = 0
+  begin
+
+    display_flag = @d.find_element(:class,"logout").displayed? rescue false
+    # ログイン状態であればログアウトしておく
+    if display_flag
+      @d.find_element(:class,"logout").click
+      @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
+      @d.get(@url)
+      @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
+      @d.find_element(:class,"sign-up").click
+    else
+      input_sign_up_delete
+    end
+    # 新規登録に必要な項目入力を行うメソッド。パスワードの入力を文字のみでおこなう。
+    input_sign_up_method(@nickname, @email, @password_short, @first_name, @last_name, @first_name_kana, @last_name_kana)
+    @d.find_element(:class,"register-red-btn").click
+    # if文でチェック
+    if /FURIMAが選ばれる3つの理由/ .match(@d.page_source)
+      check_detail["チェック詳細"] << "◯：ログアウト状態のユーザーが、URLを直接入力して商品購入ページに遷移しようとすると、ログインページに遷移する\n"
+      @puts_num_array[1][17] = "[1-017] ×：パスワードは、5文字以下でも登録できる"
+      @d.find_element(:class,"logout").click
+      @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
+      @d.get(@url)
+      @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
+      @d.find_element(:class,"sign-up").click
+      #raise "ユーザー登録バリデーションにて不備あり"
+    else
+      @puts_num_array[1][17] = "[1-017] ◯"  #：パスワードは、6文字以上での入力が必須であること(6文字が入力されていれば、登録が可能なこと
+      check_flag += 1
+      # パスワードの上書きでも登録が成功しない場合は処理を終了
+    end
+      # 登録できてしまった場合、ログアウトしておく
+      display_flag = @d.find_element(:class,"logout").displayed? rescue false
+      if display_flag
+        @d.find_element(:class,"logout").click
+        @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
+        @d.get(@url)
+        @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
+      end
+      # 登録できてしまったアカウントと異なる情報に更新しておく = 再登録&再ログインできなくなってしまため
+      re_sigin_up
+
+    if /会員情報入力/ .match(@d.page_source)
+      check_detail["チェック詳細"] << "◯：ログアウト状態のユーザーが、URLを直接入力して商品購入ページに遷移しようとすると、ログインページに遷移する\n"
+      check_flag += 1
+    elsif /FURIMAが選ばれる3つの理由/ .match(@d.page_source)
+      check_detail["チェック詳細"] << "△：ログアウト状態のユーザーが、URLを直接入力して商品購入ページに遷移しようとすると、トップページに遷移する(受講期によっては完了定義となる)\n"
+    else
+      check_detail["チェック詳細"] << "×：ログアウト状態のユーザーが、URLを直接入力して商品購入ページに遷移しようとすると、ログインページでもトップページでもないページに遷移してしまう\n"
+    end
+
+    check_detail["チェック合否"] = check_flag == 2 ? "◯" : "×"
+
+  ensure
+    @d.get(@url)
+    @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
+
+    @check_log.push(check_detail)
+  end
+end
 
 def test_method
   @d.switch_to.window( @window2_id )
