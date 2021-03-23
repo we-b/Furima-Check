@@ -28,8 +28,8 @@ require "json"
 #basic認証のidとpass
 @b_id = "admin"
 @b_password = "2222"
-@url_ele = "afternoon-bayou-26262.herokuapp.com/"
-#@url_ele = "localhost:3000/"
+#@url_ele = "afternoon-bayou-26262.herokuapp.com/"
+@url_ele = "localhost:3000/"
 
 # テスト登録用emailのランダム文字列
 randm_word = SecureRandom.hex(10) #=> "4a01bbd139f5e94bd249"
