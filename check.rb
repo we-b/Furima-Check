@@ -1,5 +1,5 @@
 # ruby_jardはデバッグの際にのみ使用する。普段はコメントアウトする
-# require 'ruby_jard'
+require 'ruby_jard'
 require 'selenium-webdriver'
 require './main'
 require './check_list'
@@ -68,6 +68,8 @@ randm_word = SecureRandom.hex(10) #=> "4a01bbd139f5e94bd249"
 
 @password = "aaa111" #パスワードは全ユーザー共通
 @password_short = "aa11" #6文字以下
+@password_string = "aaaaaa"
+@password_integer = "111111"
 
 
 # 出品商品情報
