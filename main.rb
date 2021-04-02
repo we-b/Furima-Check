@@ -1,7 +1,7 @@
 # チェック項目のメソッドをまとめているファイル
 require './check_list'
 # ruby_jardはデバッグの際にのみ使用する。普段はコメントアウトする
- require 'ruby_jard'
+#require 'ruby_jard'
 
 # メモ
 # 購入時に起こっていたエラー詳細
