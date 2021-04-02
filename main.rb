@@ -43,6 +43,7 @@ def main
   #パスワード5文字
   sign_up_password_short
   sign_up_password_string
+  sign_up_password_integer
   # チェックがsign_up_retryに組み込まれているのでメソッドで分けたい。
   # 【未実装】数字だけ、文字だけのパスワードで登録できるか検証する。
   #check_23
@@ -553,7 +554,6 @@ end
 # パスワードは、半角英数字混合での入力が必須であること
 # 文字のみでの入力
 def sign_up_password_string
-  jard
   display_flag = @d.find_element(:class,"logout").displayed? rescue false
   # ログイン状態であればログアウトしておく
   if display_flag
@@ -579,6 +579,48 @@ def sign_up_password_string
     #raise "ユーザー登録バリデーションにて不備あり"
   else
     @puts_num_array[1][18] = "[1-018] ◯"  #：パスワードは、半角英数字混合での入力が必須であること
+    # パスワードの上書きでも登録が成功しない場合は処理を終了
+  end
+    # 登録できてしまった場合、ログアウトしておく
+    display_flag = @d.find_element(:class,"logout").displayed? rescue false
+    if display_flag
+      @d.find_element(:class,"logout").click
+      @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
+      @d.get(@url)
+      @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
+    end
+    # 登録できてしまったアカウントと異なる情報に更新しておく = 再登録&再ログインできなくなってしまため
+    re_sigin_up
+end
+
+# パスワードは、半角英数字混合での入力が必須であること
+# 数字のみでの入力
+def sign_up_password_integer
+  display_flag = @d.find_element(:class,"logout").displayed? rescue false
+  # ログイン状態であればログアウトしておく
+  if display_flag
+    @d.find_element(:class,"logout").click
+    @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
+    @d.get(@url)
+    @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
+    @d.find_element(:class,"sign-up").click
+  else
+    input_sign_up_delete
+  end
+  # 新規登録に必要な項目入力を行うメソッド。数字のみでの入力
+  input_sign_up_method(@nickname, @email, @password_integer, @first_name, @last_name, @first_name_kana, @last_name_kana)
+  @d.find_element(:class,"register-red-btn").click
+  # if文でチェック
+  if /FURIMAが選ばれる3つの理由/ .match(@d.page_source)
+    @puts_num_array[1][19] = "[1-019] ×：パスワードは、数字のみでも登録できる"
+    @d.find_element(:class,"logout").click
+    @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
+    @d.get(@url)
+    @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
+    @d.find_element(:class,"sign-up").click
+    #raise "ユーザー登録バリデーションにて不備あり"
+  else
+    @puts_num_array[1][19] = "[1-019] ◯"  #：パスワードは、半角英数字混合での入力が必須であること
     # パスワードの上書きでも登録が成功しない場合は処理を終了
   end
     # 登録できてしまった場合、ログアウトしておく
