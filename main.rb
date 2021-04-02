@@ -698,7 +698,7 @@ def sign_up_retry
     @d.find_element(:class,"register-red-btn").click
     @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
     # 登録に失敗した場合はニックネームを疑う
-    if /会員情報入力/ .match(@d.page_source
+    if /会員情報入力/ .match(@d.page_source)
       # ニックネームの内容でエラーになった可能性あるため、
       @nickname = "ライフコーチテストユーザーイチ"
       @nickname2 = "ライフコーチテストユーザー二"
