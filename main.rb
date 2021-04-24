@@ -1,7 +1,7 @@
 # チェック項目のメソッドをまとめているファイル
 require './check_list'
 # ruby_jardはデバッグの際にのみ使用する。普段はコメントアウトする
-#require 'ruby_jard'
+require 'ruby_jard'
 
 # メモ
 # 購入時に起こっていたエラー詳細
@@ -442,6 +442,83 @@ def return_purchase_before_delete_item(item_name)
   @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
   # 出品画面へ
   click_purchase_btn(false)
+end
+
+# 購入画面で入力した情報を一度削除する。
+def input_purchase_information_clera
+  @wait.until {@d.find_element(:id, 'card-number').displayed?}
+  @d.find_element(:id, 'card-number').clear
+  @wait.until {@d.find_element(:id, 'card-exp-month').displayed?}
+  @d.find_element(:id, 'card-exp-month').clear
+  @wait.until {@d.find_element(:id, 'card-exp-year').displayed?}
+  @d.find_element(:id, 'card-exp-year').clear
+  @wait.until {@d.find_element(:id, 'card-cvc').displayed?}
+  @d.find_element(:id, 'card-cvc').clear
+  @wait.until {@d.find_element(:id, 'postal-code').displayed?}
+  @d.find_element(:id, 'postal-code').clear
+ 
+  @wait.until {@d.find_element(:id, 'city').displayed?}
+  @d.find_element(:id, 'city').clear
+  @wait.until {@d.find_element(:id, 'addresses').displayed?}
+  @d.find_element(:id, 'addresses').clear
+  @wait.until {@d.find_element(:id, 'phone-number').displayed?}
+  @d.find_element(:id, 'phone-number').clear
+end
+# 郵便番号にハイフンを入れない状態で決済を行う。
+def input_purchase_information_error_postal_code(card_number, card_exp_month, card_exp_year, card_cvc)
+  @wait.until {@d.find_element(:id, 'card-number').displayed?}
+  @d.find_element(:id, 'card-number').send_keys(card_number)
+  @wait.until {@d.find_element(:id, 'card-exp-month').displayed?}
+  @d.find_element(:id, 'card-exp-month').send_keys(card_exp_month)
+  @wait.until {@d.find_element(:id, 'card-exp-year').displayed?}
+  @d.find_element(:id, 'card-exp-year').send_keys(card_exp_year)
+  @wait.until {@d.find_element(:id, 'card-cvc').displayed?}
+  @d.find_element(:id, 'card-cvc').send_keys(card_cvc)
+  @wait.until {@d.find_element(:id, 'postal-code').displayed?}
+  @d.find_element(:id, 'postal-code').send_keys(@postal_code_error)
+
+  @wait.until {@d.find_element(:id, 'prefecture').displayed?}
+  @d.find_element(:id, 'prefecture').send_keys(@prefecture)
+
+  @wait.until {@d.find_element(:id, 'city').displayed?}
+  @d.find_element(:id, 'city').send_keys(@city)
+
+  @wait.until {@d.find_element(:id, 'addresses').displayed?}
+  @d.find_element(:id, 'addresses').send_keys(@addresses)
+
+  @wait.until {@d.find_element(:id, 'phone-number').displayed?}
+  @d.find_element(:id, 'phone-number').send_keys(@phone_number)
+  #カード番号情報のみ未入力状態で購入ボタンをおす
+  @d.find_element(:class,"buy-red-btn").click
+  @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
+
+  # バリデーションによるエラーメッセージ出力有無を確認
+  display_flag = @d.find_element(:class,"error-alert").displayed? rescue false
+
+  # カード情報入力画面にリダイレクトかつエラーメッセージが出力されている場合
+  if /クレジットカード情報入力/ .match(@d.page_source) && display_flag
+    @puts_num_array[7][10] = "[7-010] ◯"  #郵便番号の保存にはハイフンが必要であること（123-4567となる）"
+
+
+  # カード情報入力画面にリダイレクトのみ
+  elsif /クレジットカード情報入力/ .match(@d.page_source)
+    @puts_num_array[7][10] = "[7-010] ×：郵便番号の保存にハイフンがない状態だと購入情報入力画面にリダイレクトはされるが、エラーメッセージは画面に出力されない"
+
+    # カード番号未入力で商品購入ができてしまったら = トップページに戻ってきたら
+  elsif /FURIMAが選ばれる3つの理由/ .match(@d.page_source)
+    @puts_num_array[7][10] = "[7-010] ×：郵便番号の保存にハイフンがない状態でも、決済できる"
+    @puts_num_array[0].push("不適切なクレジットカード決済方法で購入が完了したため自動チェックを中断します")
+    raise '以降の自動チェックに影響を及ぼす致命的なエラーのため、処理を中断します。手動チェックに切り替えてください'
+  else
+    @puts_num_array[7][10] = "[7-010] ×"
+    @puts_num_array[0].push("不適切なクレジットカード決済方法で購入が完了したため自動チェックを中断します")
+    raise '以降の自動チェックに影響を及ぼす致命的なエラーのため、処理を中断します。手動チェックに切り替えてください'
+  end
+
+end
+
+# 電話番号にハイフンを入れた状態で決済を行う。
+input_purchase_information_error_phone_number(card_number, card_exp_month, card_exp_year, card_cvc)
 end
 
 # 購入情報の入力(入力のみ、決済ボタンクリックまではしない)
@@ -1070,9 +1147,16 @@ def login_user2_item_buy
     raise '以降の自動チェックに影響を及ぼす致命的なエラーのため、処理を中断します。手動チェックに切り替えてください'
   end
 
-
-  # puts "◯クレジットカード情報は必須であり、正しいクレジットカードの情報で無いときは決済できない"  #正常な値での登録チェックを行っていないため未実証
-
+  # 【追記する。】puts "◯クレジットカード情報は必須であり、正しいクレジットカードの情報で無いときは決済できない"  #正常な値での登録チェックを行っていないため未実証
+  jard
+  # 購入画面で入力した情報を一度削除する。
+  input_purchase_information_clera
+  # 郵便番号にハイフンを入れない状態で決済を行う。
+  input_purchase_information_error_postal_code(@card_number, @card_exp_month, @card_exp_year, @card_cvc)
+   # 購入画面で入力した情報を一度削除する。
+  input_purchase_information_clera
+  # 電話番号にハイフンを入れた状態で決済を行う。
+  input_purchase_information_error_phone_number(@card_number, @card_exp_month, @card_exp_year, @card_cvc)
 
   # カード番号を入力した状態で再度決済を行う
   input_purchase_information(@card_number, @card_exp_month, @card_exp_year, @card_cvc)

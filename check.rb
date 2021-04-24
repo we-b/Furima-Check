@@ -1,5 +1,5 @@
 # ruby_jardはデバッグの際にのみ使用する。普段はコメントアウトする
-# require 'ruby_jard'
+require 'ruby_jard'
 require 'selenium-webdriver'
 require './main'
 require './check_list'
@@ -9,9 +9,12 @@ require 'securerandom'
 # httpリクエストの実行に必要なライブラリ
 require "net/http"
 require "json"
-
+options = Selenium::WebDriver::Chrome::Options.new
+options.add_argument('--headless')
 @wait = Selenium::WebDriver::Wait.new(:timeout => 180000)
+# @d = Selenium::WebDriver.for :chrome, options: options
 @d = Selenium::WebDriver.for :chrome
+
 # チェック用のドライバー
 
 @d.manage.timeouts.implicit_wait = 3
@@ -125,6 +128,8 @@ randm_word = SecureRandom.hex(10) #=> "4a01bbd139f5e94bd249"
 @city = "会津若松市"
 @addresses = "追手町１−１"
 @phone_number = "02089001111"
+@postal_code_error = "96500873"
+@phone_number_error = "02089-01111"
 
 @blank = "1"
 
