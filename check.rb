@@ -11,9 +11,10 @@ require "net/http"
 require "json"
 options = Selenium::WebDriver::Chrome::Options.new
 options.add_argument('--headless')
-@wait = Selenium::WebDriver::Wait.new(:timeout => 180000)
-# @d = Selenium::WebDriver.for :chrome, options: options
+@wait = Selenium::WebDriver::Wait.new(:timeout => 90)
 @d = Selenium::WebDriver.for :chrome
+# @d = Selenium::WebDriver.for :chrome, options: options
+
 
 # チェック用のドライバー
 
@@ -227,8 +228,6 @@ ensure
     puts "商品名やカテゴリーの情報など、すでに登録されている商品情報は商品情報編集画面を開いた時点で表示されること（商品画像・販売手数料・販売利益に関しては、表示されない状態で良い）"
     puts "クレジットカード情報は必須であり、正しいクレジットカードの情報で無いときは決済できないこと"
     puts "配送先の情報として、郵便番号・都道府県・市区町村・番地・電話番号が必須であること"
-    puts "郵便番号の保存にはハイフンが必要であること（123-4567となる）"
-    puts "電話番号は11桁以内の数値のみ保存可能なこと（09012345678となる）"
     puts "ログイン状態のユーザーだけが、商品出品ページへ遷移できること"
     puts "入力された販売価格によって、販売手数料や販売利益が変わること(JavaScriptを使用して実装すること)"
     puts "-----------92期以降で追加で確認する項目-------------"

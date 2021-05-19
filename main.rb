@@ -1,7 +1,7 @@
 # チェック項目のメソッドをまとめているファイル
 require './check_list'
 # ruby_jardはデバッグの際にのみ使用する。普段はコメントアウトする
-require 'ruby_jard'
+# require 'ruby_jard'
 
 # メモ
 # 購入時に起こっていたエラー詳細
@@ -1202,7 +1202,7 @@ def login_user2_item_buy
   input_purchase_information_error_postal_code(@card_number, @card_exp_month, @card_exp_year, @card_cvc)
    # 購入画面で入力した情報を一度削除する。
   input_purchase_information_clera
-  jard
+  
   # 電話番号にハイフンを入れた状態で決済を行う。
   input_purchase_information_error_phone_number(@card_number, @card_exp_month, @card_exp_year, @card_cvc)
   input_purchase_information_clera
