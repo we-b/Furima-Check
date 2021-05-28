@@ -161,7 +161,11 @@ EOT
 
   input_url = gets.chomp
   # 「https://」を削除
-  @url_ele = input_url.gsub(/https:\/\//,"")
+  if input_url.include?("https")
+    @url_ele = input_url.gsub(/https:\/\//,"")
+  elsif input_url.include?("http")
+    @url_ele = input_url.gsub(/http:\/\//,"")
+  end
   puts "次に「②basic認証[ユーザー名]」を入力しenterキーを押してください (例：admin)"
   @b_id= gets.chomp
   puts "次に「③basic認証[パスワード]」を入力しenterキーを押してください (例：2222)"
