@@ -913,6 +913,10 @@ def item_new_price_uninput
   # トップ画面で出品ボタンをクリック
   click_purchase_btn(true)
 
+  check_2_015
+  check_2_016
+  check_2_017
+  check_2_018
   # 商品出品画面でのエラーハンドリングログを取得
   check_19_2
 

@@ -1429,7 +1429,135 @@ def check_21
   end
 end
 
+# カテゴリーは、「---、メンズ、レディース、ベビー・キッズ、インテリア・住まい・小物、本・音楽・ゲーム、おもちゃ・ホビー・グッズ、家電・スマホ・カメラ、スポーツ・レジャー、ハンドメイド、その他」の11項目が表示されること（--- は初期値として設定すること）
+def check_2_015
 
+  # 商品の入力項目のチェック用配列
+  begin
+    selectCategory = @d.find_element(:id,"item-category")
+  rescue 
+    puts "×：商品カテゴリー(id名：item-category)が存在しませんでした\n"
+  end
+   
+  selectCategory = Selenium::WebDriver::Support::Select.new(selectCategory)
+  selectCategoryOp = selectCategory.options
+  selectCategories = []
+  
+  for name in selectCategoryOp
+    selectCategories<< name.text
+  end
+
+  if ["---", "レディース","メンズ","レディース", "ベビー・キッズ","インテリア・住まい・小物","本・音楽・ゲーム","おもちゃ・ホビー・グッズ","家電・スマホ・カメラ","スポーツ・レジャー","ハンドメイド","その他"].all? {|i| selectCategories.include?(i)}
+    @puts_num_array[2][15] = "[2-015] ◯"
+  else
+    @puts_num_array[2][15] = "[2-015] ×：【101期以降】商品カテゴリーの要件を満たしてません。実装されているカテゴリー→ #{selectCategories}"
+  end
+
+end
+
+# 商品の状態は、「---、新品・未使用、未使用に近い、目立った傷や汚れなし、やや傷や汚れあり、傷や汚れあり、全体的に状態が悪い」の7項目が表示されること（--- は初期値として設定すること）
+def check_2_016
+
+  begin
+    selectCategory = @d.find_element(:id,"item-sales-status")
+  rescue 
+    puts "×：商品カテゴリー(id名：item-sales-status)が存在しませんでした\n"
+  end
+   
+  selectCategory = Selenium::WebDriver::Support::Select.new(selectCategory)
+  selectCategoryOp = selectCategory.options
+  selectCategories  = []
+  
+  for name in selectCategoryOp
+    selectCategories  << name.text
+  end
+  
+  
+  if ["---", "新品・未使用", "未使用に近い", "目立った傷や汚れなし", "やや傷や汚れあり", "傷や汚れあり", "全体的に状態が悪い"].all? {|i| selectCategories.include?(i)}
+    @puts_num_array[2][16] = "[2-016] ◯"
+  else
+    @puts_num_array[2][16] = "[2-016] ×：【101期以降】商品の状態の要件を満たしてません。実装されている商品の状態カテゴリー→ #{selectCategories}"
+  end
+end
+
+
+
+# 配送料の負担は、「---、着払い(購入者負担)、送料込み(出品者負担)」の3項目が表示されること（--- は初期値として設定すること）
+def check_2_017
+
+  begin
+    selectCategory = @d.find_element(:id,"item-shipping-fee-status")
+  rescue 
+    puts "×：配送料(id名：item-shipping-fee-status)が存在しませんでした\n"
+  end
+   
+  selectCategory = Selenium::WebDriver::Support::Select.new(selectCategory)
+  selectCategoryOp = selectCategory.options
+  selectCategories  = []
+  
+  for name in selectCategoryOp
+    selectCategories  << name.text
+  end
+  
+  
+  if ["---", "着払い(購入者負担)", "送料込み(出品者負担)"].all? {|i| selectCategories.include?(i)}
+    @puts_num_array[2][17] = "[2-017] ◯"
+  else
+    @puts_num_array[2][17] = "[2-017] ×：【101期以降】配送料の負担の要件を満たしてません。実装されている配送料カテゴリー→ #{selectCategories}"
+  end
+end
+
+# 発送元の地域は、「---」と47都道府県の合計48項目が表示されること（--- は初期値として設定すること）
+def check_2_018
+
+  begin
+    selectCategory = @d.find_element(:id,"item-prefecture")
+  rescue 
+    puts "×：発送元の地域(id名：item-prefecture)が存在しませんでした\n"
+  end
+   
+  selectCategory = Selenium::WebDriver::Support::Select.new(selectCategory)
+  selectCategoryOp = selectCategory.options
+  selectCategories  = []
+  
+  for name in selectCategoryOp
+    selectCategories  << name.text
+  end
+  
+ 
+  if ["---", "北海道", "青森県", "岩手県",  "宮城県", "秋田県", "山形県", "福島県", "茨城県", "栃木県", "群馬県", "埼玉県", "千葉県", "東京都", "神奈川県", "新潟県", "富山県", "石川県", "福井県", "山梨県", "長野県", "岐阜県", "静岡県", "愛知県", "三重県", "滋賀県", "京都府", "大阪府", "兵庫県", "奈良県", "和歌山県", "鳥取県", "島根県", "岡山県", "広島県", "山口県", "徳島県", "香川県", "愛媛県", "高知県", "福岡県", "佐賀県", "長崎県", "熊本県", "大分県", "宮崎県", "鹿児島県", "沖縄県"].all? {|i| selectCategories.include?(i)}
+    @puts_num_array[2][18] = "[2-018] ◯"
+  else
+    @puts_num_array[2][18] = "[2-018] ×：【101期以降】発送元の地域の要件を満たしてません。実装されている発送元の地域カテゴリー→ #{selectCategories}"
+  end
+
+end
+
+# 発送までの日数は、「---、1~2日で発送、2~3日で発送、4~7日で発送」の4項目が表示されること（--- は初期値として設定すること）
+def check_2_019
+
+  begin
+    selectCategory = @d.find_element(:id,"item-prefecture")
+  rescue 
+    puts "×：発送までの日数(id名：item-prefecture)が存在しませんでした\n"
+  end
+   
+  selectCategory = Selenium::WebDriver::Support::Select.new(selectCategory)
+  selectCategoryOp = selectCategory.options
+  selectCategories  = []
+  
+  for name in selectCategoryOp
+    selectCategories  << name.text
+  end
+  
+ 
+  if ["---", "1~2日で発送", "2~3日で発送", "4~7日で発送"].all? {|i| selectCategories.include?(i)}
+    @puts_num_array[2][19] = "[2-019] ◯"
+  else
+    @puts_num_array[2][19] = "[2-019] ×：【101期以降】発送までの日数の要件を満たしてません。実装されている発送までの日数カテゴリー→ #{selectCategories}"
+  end
+
+end
 
 def test_method
   @d.switch_to.window( @window2_id )
