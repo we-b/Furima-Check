@@ -45,8 +45,7 @@ def main
   sign_up_password_string
   sign_up_password_integer
   # チェックがsign_up_retryに組み込まれているのでメソッドで分けたい。
-  # 【未実装】数字だけ、文字だけのパスワードで登録できるか検証する。
-  #check_23
+
   # 必須項目を入力して再登録
   sign_up_retry
   # トップメニュー → ログアウトする
