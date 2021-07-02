@@ -22,7 +22,8 @@ def main
   # @url = "http://#{b_id}:#{b_password}@localhost:3000/"
 
   @d.get(@url)
-
+  #商品が出品されていない状態では、ダミーの商品情報が表示されること
+  check_dummy_item
   # ランダム情報で生成されるユーザー情報を出力する(再度ログインなどをする可能性もあるため)
   print_user_status
   # ユーザー状態：ログアウト
@@ -930,7 +931,6 @@ def item_new_price_uninput
 
   # 商品価格のみ空白
   @d.find_element(:id,"item-price").clear
-
   # 「出品する」ボタンをクリック
   @d.find_element(:class,"sell-btn").click
   @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
@@ -1415,6 +1415,15 @@ def login_user2_item_new_2nd
   @order_url_glasses = @d.current_url
   @puts_num_array[0].push("購入前のサングラス(user2出品)購入画面のURL→  "+ @order_url_glasses)
 
+end
+
+#商品が出品されていない状態では、ダミーの商品情報が表示されること
+def check_dummy_item
+  if /商品を出品してね！/.match(@d.page_source)
+    @puts_num_array[3][3] = "[3-003] ○" #商品が出品されていない状態では、ダミーの商品情報が表示されること"
+  else
+    @puts_num_array[3][3] = "[3-003] × :商品が出品されていない状態では、ダミーの商品情報が表示されてない。またはデータがリセットされていない"  #：出品者だけが商品情報を削除できる"
+  end
 end
 
 # 自動チェック処理の終了のお知らせ
