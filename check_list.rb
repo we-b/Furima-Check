@@ -1537,9 +1537,9 @@ end
 def check_2_019
 
   begin
-    selectCategory = @d.find_element(:id,"item-prefecture")
+    selectCategory = @d.find_element(:id,"item-scheduled-delivery")
   rescue 
-    puts "×：発送までの日数(id名：item-prefecture)が存在しませんでした\n"
+    puts "×：発送までの日数(id名：item-scheduled-delivery)が存在しませんでした\n"
   end
    
   selectCategory = Selenium::WebDriver::Support::Select.new(selectCategory)
