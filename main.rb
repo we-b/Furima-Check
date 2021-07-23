@@ -1,7 +1,7 @@
 # チェック項目のメソッドをまとめているファイル
 require './check_list'
 # ruby_jardはデバッグの際にのみ使用する。普段はコメントアウトする
-# require 'ruby_jard'
+require 'ruby_jard'
 
 # メモ
 # 購入時に起こっていたエラー詳細
@@ -14,16 +14,16 @@ def main
   start
 
   # basic認証が実装されている
-  check_14
+  #check_14
 
   @http ="http://#{@b_id}:#{@b_password}@"
 # 受講生の@URLをhttp://以降から記入
   @url = @http + @url_ele
   # @url = "http://#{b_id}:#{b_password}@localhost:3000/"
-
+  
   @d.get(@url)
   #商品が出品されていない状態では、ダミーの商品情報が表示されること
-  check_dummy_item
+  #check_dummy_item
   # ランダム情報で生成されるユーザー情報を出力する(再度ログインなどをする可能性もあるため)
   print_user_status
   # ユーザー状態：ログアウト
@@ -919,6 +919,7 @@ def item_new_price_uninput
   check_2_017
   check_2_018
   check_2_019
+  
   # 商品出品画面でのエラーハンドリングログを取得
   check_19_2
 

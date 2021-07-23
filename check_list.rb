@@ -543,6 +543,14 @@ def check_10
       @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
       break
     }
+    display_flag = @d.find_element(:class,"sold-out").displayed? rescue false
+    # トップページでの表記をチェック
+    if /Sold Out/ .match(@d.page_source) || display_flag
+      @puts_num_array[4][3] = "[4-003] ◯"  #売却済みの商品は、「sould out」の文字が表示されるようになっている"
+    else
+      # sold outの表示処理は受講生によって様々のため目視で最終確認
+      @puts_num_array[4][3] = "[4-003] △：売却済みの商品は、「sould out」の文字が表示されない。画像処理している可能性あるため要目視確認"
+    end
 
     # 編集ボタンの有無
     if /編集/.match(@d.page_source)
@@ -694,7 +702,6 @@ def check_13
       # 出品できてしまった際は削除し出品画面へ戻ってくる
       return_purchase_before_delete_item(@item_name3)
     end
-
     # 1000万に再設定して再出品
     @item_price3 = 10000000
     clear_item_new_method
@@ -1446,13 +1453,16 @@ def check_2_015
   for name in selectCategoryOp
     selectCategories<< name.text
   end
-
-  if ["---", "レディース","メンズ","レディース", "ベビー・キッズ","インテリア・住まい・小物","本・音楽・ゲーム","おもちゃ・ホビー・グッズ","家電・スマホ・カメラ","スポーツ・レジャー","ハンドメイド","その他"].all? {|i| selectCategories.include?(i)}
+  select_category_any = ["---", "レディース","メンズ","レディース", "ベビー・キッズ","インテリア・住まい・小物","本・音楽・ゲーム","おもちゃ・ホビー・グッズ","家電・スマホ・カメラ","スポーツ・レジャー","ハンドメイド","その他"]
+  if select_category_any.all? {|i| selectCategories.include?(i)}
     @puts_num_array[2][15] = "[2-015] ◯"
   else
-    @puts_num_array[2][15] = "[2-015] ×：【101期以降】商品カテゴリーの要件を満たしてません。実装されているカテゴリー→ #{selectCategories}"
+    false_selects =[]
+    selectCategories.each{|check_select|
+      select_category_any.include?(check_select) ?  "" : false_selects<<check_select
+    }
+    @puts_num_array[2][15] = "[2-015] ×：【101期以降】商品カテゴリーの要件を満たしてません。誤って実装されているカテゴリー→ #{false_selects}"
   end
-
 end
 
 # 商品の状態は、「---、新品・未使用、未使用に近い、目立った傷や汚れなし、やや傷や汚れあり、傷や汚れあり、全体的に状態が悪い」の7項目が表示されること（--- は初期値として設定すること）
@@ -1472,11 +1482,15 @@ def check_2_016
     selectCategories  << name.text
   end
   
-  
-  if ["---", "新品・未使用", "未使用に近い", "目立った傷や汚れなし", "やや傷や汚れあり", "傷や汚れあり", "全体的に状態が悪い"].all? {|i| selectCategories.include?(i)}
+  select_category_any = ["---", "新品・未使用", "未使用に近い", "目立った傷や汚れなし", "やや傷や汚れあり", "傷や汚れあり", "全体的に状態が悪い"]
+  if select_category_any.all? {|i| selectCategories.include?(i)}
     @puts_num_array[2][16] = "[2-016] ◯"
   else
-    @puts_num_array[2][16] = "[2-016] ×：【101期以降】商品の状態の要件を満たしてません。実装されている商品の状態カテゴリー→ #{selectCategories}"
+    false_selects =[]
+    selectCategories.each{|check_select|
+      select_category_any.include?(check_select) ?  "" : false_selects<<check_select
+    }
+    @puts_num_array[2][16] = "[2-016] ×：【101期以降】商品の状態の要件を満たしてません。誤って実装されている商品の状態カテゴリー→ #{false_selects}"
   end
 end
 
@@ -1499,11 +1513,15 @@ def check_2_017
     selectCategories  << name.text
   end
   
-  
-  if ["---", "着払い(購入者負担)", "送料込み(出品者負担)"].all? {|i| selectCategories.include?(i)}
+  select_category_any = ["---", "着払い(購入者負担)", "送料込み(出品者負担)"]
+  if select_category_any.all? {|i| selectCategories.include?(i)}
     @puts_num_array[2][17] = "[2-017] ◯"
   else
-    @puts_num_array[2][17] = "[2-017] ×：【101期以降】配送料の負担の要件を満たしてません。実装されている配送料カテゴリー→ #{selectCategories}"
+    false_selects =[]
+    selectCategories.each{|check_select|
+      select_category_any.include?(check_select) ?  "" : false_selects<<check_select
+    }
+    @puts_num_array[2][17] = "[2-017] ×：【101期以降】配送料の負担の要件を満たしてません。誤って実装されている配送料カテゴリー→ #{false_selects}"
   end
 end
 
@@ -1524,11 +1542,15 @@ def check_2_018
     selectCategories  << name.text
   end
   
- 
-  if ["---", "北海道", "青森県", "岩手県",  "宮城県", "秋田県", "山形県", "福島県", "茨城県", "栃木県", "群馬県", "埼玉県", "千葉県", "東京都", "神奈川県", "新潟県", "富山県", "石川県", "福井県", "山梨県", "長野県", "岐阜県", "静岡県", "愛知県", "三重県", "滋賀県", "京都府", "大阪府", "兵庫県", "奈良県", "和歌山県", "鳥取県", "島根県", "岡山県", "広島県", "山口県", "徳島県", "香川県", "愛媛県", "高知県", "福岡県", "佐賀県", "長崎県", "熊本県", "大分県", "宮崎県", "鹿児島県", "沖縄県"].all? {|i| selectCategories.include?(i)}
+  select_category_any = ["---", "北海道", "青森県", "岩手県",  "宮城県", "秋田県", "山形県", "福島県", "茨城県", "栃木県", "群馬県", "埼玉県", "千葉県", "東京都", "神奈川県", "新潟県", "富山県", "石川県", "福井県", "山梨県", "長野県", "岐阜県", "静岡県", "愛知県", "三重県", "滋賀県", "京都府", "大阪府", "兵庫県", "奈良県", "和歌山県", "鳥取県", "島根県", "岡山県", "広島県", "山口県", "徳島県", "香川県", "愛媛県", "高知県", "福岡県", "佐賀県", "長崎県", "熊本県", "大分県", "宮崎県", "鹿児島県", "沖縄県"]
+  if select_category_any.all? {|i| selectCategories.include?(i)}
     @puts_num_array[2][18] = "[2-018] ◯"
   else
-    @puts_num_array[2][18] = "[2-018] ×：【101期以降】発送元の地域の要件を満たしてません。実装されている発送元の地域カテゴリー→ #{selectCategories}"
+    false_selects =[]
+    selectCategories.each{|check_select|
+      select_category_any.include?(check_select) ?  "" : false_selects<<check_select
+    }
+    @puts_num_array[2][18] = "[2-018] ×：【101期以降】発送元の地域の要件を満たしてません。実装されている発送元の地域カテゴリー→ #{false_selects}"
   end
 
 end
@@ -1550,11 +1572,15 @@ def check_2_019
     selectCategories  << name.text
   end
   
- 
-  if ["---", "1~2日で発送", "2~3日で発送", "4~7日で発送"].all? {|i| selectCategories.include?(i)}
+  select_category_any = ["---", "1~2日で発送", "2~3日で発送", "4~7日で発送"]
+  if select_category_any.all? {|i| selectCategories.include?(i)}
     @puts_num_array[2][19] = "[2-019] ◯"
   else
-    @puts_num_array[2][19] = "[2-019] ×：【101期以降】発送までの日数の要件を満たしてません。実装されている発送までの日数カテゴリー→ #{selectCategories}"
+    false_selects =[]
+    selectCategories.each{|check_select|
+      select_category_any.include?(check_select) ?  "" : false_selects<<check_select
+    }
+    @puts_num_array[2][19] = "[2-019] ×：【101期以降】発送までの日数の要件を満たしてません。実装されている発送までの日数カテゴリー→ #{false_selects}"
   end
 
 end

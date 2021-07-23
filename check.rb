@@ -1,5 +1,5 @@
 # ruby_jardはデバッグの際にのみ使用する。普段はコメントアウトする
- require 'ruby_jard'
+require 'ruby_jard'
 require 'selenium-webdriver'
 require './main'
 require './check_list'
@@ -13,7 +13,7 @@ options = Selenium::WebDriver::Chrome::Options.new
 options.add_argument('--headless')
 @wait = Selenium::WebDriver::Wait.new(:timeout => 90)
 @d = Selenium::WebDriver.for :chrome
-# @d = Selenium::WebDriver.for :chrome, options: options
+#@d = Selenium::WebDriver.for :chrome, options: options
 
 
 # チェック用のドライバー
@@ -223,15 +223,18 @@ ensure
     puts $@
     # 手動確認項目
     puts "【手動での確認が必要な項目一覧】"
-    puts "売却済みの商品は、画像上に「sold out」の文字が表示されるようになっていること"
     puts "何も編集せずに更新をしても画像無しの商品にならないこと"
     puts "商品名やカテゴリーの情報など、すでに登録されている商品情報は商品情報編集画面を開いた時点で表示されること（商品画像・販売手数料・販売利益に関しては、表示されない状態で良い）"
     puts "配送先の情報として、郵便番号・都道府県・市区町村・番地・電話番号が必須であること"
-    puts "ログイン状態のユーザーだけが、商品出品ページへ遷移できること"
     puts "入力された販売価格によって、販売手数料や販売利益が変わること(JavaScriptを使用して実装すること)"
     puts "-----------92期以降で追加で確認する項目-------------"
     puts "本番環境で投稿した商品画像が、S3に保存されること"
     puts "ユーザー登録、商品出品、商品編集、商品購入時のエラーハンドリングの際、1つのエラーに対して同じエラーメッセージが重複して表示されないこと"
+    puts "-----------101期以降で追加で確認する項目-------------"
+    puts "エラーハンドリングによって出品ページに戻った場合でも、入力済みの項目（商品画像・販売手数料・販売利益以外）は消えないこと"
+    puts "エラーハンドリングによって編集ページに戻った場合でも、入力済みの項目（画像・販売手数料・販売利益以外）は消えないこと"
+    puts "エラーハンドリングによって購入ページに戻った場合でも、入力済みの項目（カード番号・有効期限・セキュリティコード以外）は消えないこと"
+
     sleep 30000000000
 
 end
