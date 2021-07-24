@@ -1024,7 +1024,8 @@ def item_edit
   @wait.until {@d.find_element(:class,"item-red-btn").displayed?}
   # 商品編集ボタンクリック
   @d.find_element(:class,"item-red-btn").click
-
+ 
+  
   # 「商品の説明」項目に正常な情報を入力して編集してみる
   @wait.until {@d.find_element(:id,"item-info").displayed?}
   @puts_num_array[5][5] = "[5-005] ◯" #ログイン状態の出品者のみ、出品した商品の商品情報編集ページに遷移できること

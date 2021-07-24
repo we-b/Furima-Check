@@ -1550,7 +1550,7 @@ def check_2_018
     selectCategories.each{|check_select|
       select_category_any.include?(check_select) ?  "" : false_selects<<check_select
     }
-    @puts_num_array[2][18] = "[2-018] ×：【101期以降】発送元の地域の要件を満たしてません。実装されている発送元の地域カテゴリー→ #{false_selects}"
+    @puts_num_array[2][18] = "[2-018] ×：【101期以降】発送元の地域の要件を満たしてません。誤って実装されている発送元の地域カテゴリー→ #{false_selects}"
   end
 
 end
@@ -1580,7 +1580,7 @@ def check_2_019
     selectCategories.each{|check_select|
       select_category_any.include?(check_select) ?  "" : false_selects<<check_select
     }
-    @puts_num_array[2][19] = "[2-019] ×：【101期以降】発送までの日数の要件を満たしてません。実装されている発送までの日数カテゴリー→ #{false_selects}"
+    @puts_num_array[2][19] = "[2-019] ×：【101期以降】発送までの日数の要件を満たしてません。誤って実装されている発送までの日数カテゴリー→ #{false_selects}"
   end
 
 end
