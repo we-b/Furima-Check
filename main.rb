@@ -1,7 +1,7 @@
 # チェック項目のメソッドをまとめているファイル
 require './check_list'
 # ruby_jardはデバッグの際にのみ使用する。普段はコメントアウトする
-require 'ruby_jard'
+#require 'ruby_jard'
 
 # メモ
 # 購入時に起こっていたエラー詳細
@@ -23,7 +23,7 @@ def main
   
   @d.get(@url)
   #商品が出品されていない状態では、ダミーの商品情報が表示されること
-  #check_dummy_item
+  check_dummy_item
   # ランダム情報で生成されるユーザー情報を出力する(再度ログインなどをする可能性もあるため)
   print_user_status
   # ユーザー状態：ログアウト
