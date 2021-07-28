@@ -1067,7 +1067,7 @@ def logout_item_edit_and_buy
   # トップページにて出品された商品一覧(商品画像)が表示されているかどうか
   @wait.until {@d.find_element(:class, "item-img-content").displayed?}
   if /#{@item_image_name}/ .match(@d.page_source)
-    @puts_num_array[3][2] = "[3-002] ◯"  #：ログアウト状態のユーザーでも、商品一覧表示ページを見ることができること"
+    @puts_num_array[3][2] = "[3-002] ◯"  #：商品一覧表示ページは、ログイン状況に関係なく、誰でも見ることができること"
   else
     @puts_num_array[3][2] = "[3-002] ×：ログアウト状態だとトップ画面にて出品画像が表示されない"
   end
