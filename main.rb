@@ -1,7 +1,7 @@
 # チェック項目のメソッドをまとめているファイル
 require './check_list'
 # ruby_jardはデバッグの際にのみ使用する。普段はコメントアウトする
-#require 'ruby_jard'
+# require 'ruby_jard'
 
 # メモ
 # 購入時に起こっていたエラー詳細
@@ -14,7 +14,7 @@ def main
   start
 
   # basic認証が実装されている
-  #check_14
+  check_14
 
   @http ="http://#{@b_id}:#{@b_password}@"
 # 受講生の@URLをhttp://以降から記入
