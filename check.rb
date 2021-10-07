@@ -1,5 +1,5 @@
 # ruby_jardはデバッグの際にのみ使用する。普段はコメントアウトする
-#require 'ruby_jard'
+# require 'ruby_jard'
 require 'selenium-webdriver'
 require './main'
 require './check_list'
