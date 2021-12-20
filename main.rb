@@ -977,6 +977,7 @@ def item_new_require_input
     @puts_num_array[2][10] = "[2-010] ◯"  #：発送までの日数についての情報が必須である"
     @puts_num_array[2][11] = "[2-011] ◯"  #：販売価格についての情報が必須である"
     @puts_num_array[2][13] = "[2-013] △：販売価格を半角数字で保存可能。全角数字での出品可否は手動確認"  #：販売価格は半角数字のみ保存可能であること"
+    @puts_num_array[2][20] = "[2-020] ○"  #：出品が完了したら、トップページに遷移すること"
   end
 end
 
@@ -986,6 +987,9 @@ end
 def item_edit
   # トップ画面にて商品名を基準に該当の商品をクリックして商品詳細画面へ遷移する
   item_name_click_from_top(@item_name)
+
+  # 詳細画面のURLを取得
+  detail_url_coat = @d.current_url
 
   # 商品詳細画面
   if /編集/.match(@d.page_source)
@@ -1025,7 +1029,20 @@ def item_edit
   # 商品編集ボタンクリック
   @d.find_element(:class,"item-red-btn").click
  
-  
+  # 商品編集ページで戻るボタンをクリック
+  @d.find_element(:class,"back-btn").click
+
+  # 詳細ページに戻れるか確認
+  if /#{@item_info}/.match(@d.page_source)
+    @puts_num_array[5][6] = "[5-006] ◯"  #：ページ下部の「もどる」ボタンを押すと、編集途中の情報は破棄され、商品詳細表示ページに遷移すること"
+  else
+    @puts_num_array[5][6] = "[5-006] ×"  #：ページ下部の「もどる」ボタンを押しても、商品詳細表示ページに遷移できない"
+    @d.get(detail_url_coat)
+  end
+
+  # 商品編集ボタンクリック
+  @d.find_element(:class,"item-red-btn").click
+
   # 「商品の説明」項目に正常な情報を入力して編集してみる
   @wait.until {@d.find_element(:id,"item-info").displayed?}
   @puts_num_array[5][5] = "[5-005] ◯" #ログイン状態の出品者のみ、出品した商品の商品情報編集ページに遷移できること
@@ -1037,10 +1054,13 @@ def item_edit
   # 稀に編集画面に遷移した際に値を保持していない実装をしている受講生がいるため、商品詳細画面に遷移できているかあぶり出すチェック項目
   if /#{@item_info_re}/.match(@d.page_source)
     @puts_num_array[5][2] = "[5-002] ◯"  #：必要な情報を適切に入力すると、商品情報（商品画像・商品名・商品の状態など）を変更できること"
+    @puts_num_array[5][7] = "[5-007] ◯"  #：編集が完了したら、商品詳細表示ページに遷移し、変更された商品情報が表示されること"
   elsif /#{@item_info}/.match(@d.page_source)
     @puts_num_array[5][2] = "[5-002] ×：商品編集画面にて「商品説明」を編集し確定させたが、編集前の情報が表示されている"
+    @puts_num_array[5][7] = "[5-007] ◯"  #：編集が完了したら、商品詳細表示ページに遷移し、変更された商品情報が表示されること"
   elsif /FURIMAが選ばれる3つの理由/.match(@d.page_source)
     @puts_num_array[5][2] = "[5-002] △：商品編集画面にて「商品説明」を編集し確定させるとトップページへ遷移してしまう設計のため、「商品説明」項目を確認できず。手動確認"
+    @puts_num_array[5][7] = "[5-007] ×"  #：編集が完了しても、商品詳細表示ページに遷移できない"
     # 必要な情報が入力された状態で編集確定されると商品詳細画面に戻ってくるため、detail-itemが表示されるが正解
     @wait.until {@d.find_element(:class,"detail-item").displayed?}
   end
@@ -1294,6 +1314,10 @@ end
 def login_user2_item_new
   # 商品出品時の入力必須項目へ入力するメソッド
   input_item_new_method(@item_name2, @item_info2, @item_price2, @item_image2)
+
+  # 販売手数料と販売利益が整数であるかをチェック
+  check_22
+
   @d.find_element(:class,"sell-btn").click
 end
 
@@ -1365,17 +1389,19 @@ def login_user2_after_purchase_check2
   # 商品削除ボタンをクリック
   @wait.until {@d.find_element(:class,"item-destroy").displayed?}
   @d.find_element(:class,"item-destroy").click
-  # 削除完了画面等があっても処理が止まらないように一度トップページへ遷移しておく
-  @d.get(@url)
-  @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
+  # 【114期以降廃止】削除完了画面等があっても処理が止まらないように一度トップページへ遷移しておく
+  # @d.get(@url)
+  # @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
 
   # 最新出品商品名 = 「サングラス」以外の商品名(サングラスを削除したため)
   # トップページに表示されている一番最初の商品名を取得
   latest_item_name = @d.find_element(:class,"item-name").text
   if latest_item_name == @item_name2
     @puts_num_array[6][1] = "[6-001] ×：ログイン状態の出品者が出品した商品情報を削除できない(商品一覧画面から削除できていない)"
+    @puts_num_array[6][2] = "[6-002] ×：削除が完了しても、トップページに遷移できない"
   else
     @puts_num_array[6][1] = "[6-001] ◯"  #：出品者だけが商品情報を削除できる"
+    @puts_num_array[6][2] = "[6-002] ○"  #：削除が完了したら、トップページに遷移すること"
   end
 end
 

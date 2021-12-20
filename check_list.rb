@@ -934,6 +934,41 @@ def check_17
   end
 end
 
+# 販売手数料と販売利益は、小数点以下を切り捨てて表示すること
+def check_22
+  check_detail = {"チェック番号"=> 22 , "チェック合否"=> "" , "チェック内容"=> "販売手数料と販売利益は、小数点以下を切り捨てて表示すること" , "チェック詳細"=> ""}
+  check_flag = 0
+
+  begin
+    # 販売手数料
+    item_commission = @d.find_element(:id,'add-tax-price').text rescue "販売手数料を表す[id: add-tax-price]が見つかりませんでした"
+
+    # 販売利益
+    item_profit = @d.find_element(:id,'profit').text rescue "販売利益を表す[id: profit]が見つかりませんでした"
+
+    # 販売手数料をチェック
+    unless item_commission.to_s.include?(".")
+      check_detail["チェック詳細"] << "◯：販売手数料は、小数点以下を切り捨てて表示されている\n"
+      check_flag += 1
+    else
+      check_detail["チェック詳細"] << "×：販売手数料は、小数点以下を切り捨てて表示していない\n"
+    end
+
+    # 販売利益をチェック
+    if item_profit.to_f % 1 == 0
+      check_detail["チェック詳細"] << "◯：販売利益は、小数点以下を切り捨てて表示されている\n"
+      check_flag += 1
+    else
+      check_detail["チェック詳細"] << "×：販売利益は、小数点以下を切り捨てて表示していない\n"
+    end
+
+    check_detail["チェック合否"] = check_flag == 2 ? "◯" : "×"
+
+  ensure
+    @check_log.push(check_detail)
+  end
+end
+
 # 商品詳細ページで商品出品時に登録した情報が見られるようになっている
 def check_18
 
@@ -990,7 +1025,7 @@ def check_18
           # そもそも要素取得の段階でエラーの場合はエラー文章を代入
           check_detail["チェック詳細"] << item_data[k]
         else
-          # エラージャない場合は単純に表示内容に食い違いが起きている
+          # エラーでない場合は単純に表示内容に食い違いが起きている
           check_detail["チェック詳細"] << "×：商品詳細画面にて【#{k}】情報が正しく表示されていない可能性あり。詳細画面表示内容 →「#{item_data[k]}」  出品時入力内容 →「#{v}」\n"
         end
       end
