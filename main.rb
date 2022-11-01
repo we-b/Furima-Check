@@ -16,8 +16,12 @@ def main
   # basic認証が実装されている
   check_14
 
-  @http ="http://#{@b_id}:#{@b_password}@"
-# 受講生の@URLをhttp://以降から記入
+  # Basic認証のチェック
+  # 2022/11/1
+  @url_ele.include?("onrender") ? @http ="http://" : @http ="http://#{@b_id}:#{@b_password}@"
+  # @http ="http://#{@b_id}:#{@b_password}@"
+
+  # 受講生の@URLをhttp://以降から記入
   @url = @http + @url_ele
   # @url = "http://#{b_id}:#{b_password}@localhost:3000/"
   
