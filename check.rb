@@ -121,8 +121,7 @@ randm_word = SecureRandom.hex(10) #=> "4a01bbd139f5e94bd249"
 
 # 購入時のカード情報
 @card_number = 4242424242424242
-@card_exp_month = 10
-@card_exp_year = 30
+@card_expiry = 1030
 @card_cvc = 123
 @postal_code = "965-0873"
 @prefecture = "福島県"
@@ -240,5 +239,3 @@ ensure
     sleep 30000000000
 
 end
-
-
