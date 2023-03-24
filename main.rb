@@ -454,34 +454,56 @@ end
 
 # 購入画面で入力した情報を一度削除する。
 def input_purchase_information_clera
-  @wait.until {@d.find_element(:id, 'card-number').displayed?}
-  @d.find_element(:id, 'card-number').clear
-  @wait.until {@d.find_element(:id, 'card-exp-month').displayed?}
-  @d.find_element(:id, 'card-exp-month').clear
-  @wait.until {@d.find_element(:id, 'card-exp-year').displayed?}
-  @d.find_element(:id, 'card-exp-year').clear
-  @wait.until {@d.find_element(:id, 'card-cvc').displayed?}
-  @d.find_element(:id, 'card-cvc').clear
+  @wait.until {@d.find_element(:id, 'number-form').displayed?}
+  numframe = @d.find_element(:css,'#number-form > iframe')
+  @d.switch_to.frame numframe
+  @d.find_element(:id, 'cardNumber').clear
+  @d.switch_to.default_content
+
+  @wait.until {@d.find_element(:id, 'expiry-form').displayed?}
+  expframe = @d.find_element(:css,'#expiry-form > iframe')
+  @d.switch_to.frame expframe
+  @d.find_element(:id, 'cardExpiry').clear
+  @d.switch_to.default_content
+
+  @wait.until {@d.find_element(:id, 'cvc-form').displayed?}
+  cvcframe = @d.find_element(:css,'#cvc-form > iframe')
+  @d.switch_to.frame cvcframe
+  @d.find_element(:id, 'cardCvc').clear
+  @d.switch_to.default_content
+
   @wait.until {@d.find_element(:id, 'postal-code').displayed?}
   @d.find_element(:id, 'postal-code').clear
  
   @wait.until {@d.find_element(:id, 'city').displayed?}
   @d.find_element(:id, 'city').clear
+
   @wait.until {@d.find_element(:id, 'addresses').displayed?}
   @d.find_element(:id, 'addresses').clear
+
   @wait.until {@d.find_element(:id, 'phone-number').displayed?}
   @d.find_element(:id, 'phone-number').clear
 end
 # 郵便番号にハイフンを入れない状態で決済を行う。
-def input_purchase_information_error_postal_code(card_number, card_exp_month, card_exp_year, card_cvc)
-  @wait.until {@d.find_element(:id, 'card-number').displayed?}
-  @d.find_element(:id, 'card-number').send_keys(card_number)
-  @wait.until {@d.find_element(:id, 'card-exp-month').displayed?}
-  @d.find_element(:id, 'card-exp-month').send_keys(card_exp_month)
-  @wait.until {@d.find_element(:id, 'card-exp-year').displayed?}
-  @d.find_element(:id, 'card-exp-year').send_keys(card_exp_year)
-  @wait.until {@d.find_element(:id, 'card-cvc').displayed?}
-  @d.find_element(:id, 'card-cvc').send_keys(card_cvc)
+def input_purchase_information_error_postal_code(card_number, card_expiry, card_cvc)
+  @wait.until {@d.find_element(:id, 'number-form').displayed?}
+  numframe = @d.find_element(:css,'#number-form > iframe')
+  @d.switch_to.frame numframe
+  @d.find_element(:id, 'cardNumber').send_keys(card_number)
+  @d.switch_to.default_content
+
+  @wait.until {@d.find_element(:id, 'expiry-form').displayed?}
+  expframe = @d.find_element(:css,'#expiry-form > iframe')
+  @d.switch_to.frame expframe
+  @d.find_element(:id, 'cardExpiry').send_keys(card_expiry)
+  @d.switch_to.default_content
+
+  @wait.until {@d.find_element(:id, 'cvc-form').displayed?}
+  cvcframe = @d.find_element(:css,'#cvc-form > iframe')
+  @d.switch_to.frame cvcframe
+  @d.find_element(:id, 'cardCvc').send_keys(card_cvc)
+  @d.switch_to.default_content
+
   @wait.until {@d.find_element(:id, 'postal-code').displayed?}
   @d.find_element(:id, 'postal-code').send_keys(@postal_code_error)
 
@@ -526,15 +548,25 @@ def input_purchase_information_error_postal_code(card_number, card_exp_month, ca
 end
 
 # 電話番号にハイフンを入れた状態で決済を行う。
-def input_purchase_information_error_phone_number(card_number, card_exp_month, card_exp_year, card_cvc)
-  @wait.until {@d.find_element(:id, 'card-number').displayed?}
-  @d.find_element(:id, 'card-number').send_keys(card_number)
-  @wait.until {@d.find_element(:id, 'card-exp-month').displayed?}
-  @d.find_element(:id, 'card-exp-month').send_keys(card_exp_month)
-  @wait.until {@d.find_element(:id, 'card-exp-year').displayed?}
-  @d.find_element(:id, 'card-exp-year').send_keys(card_exp_year)
-  @wait.until {@d.find_element(:id, 'card-cvc').displayed?}
-  @d.find_element(:id, 'card-cvc').send_keys(card_cvc)
+def input_purchase_information_error_phone_number(card_number, card_expiry, card_cvc)
+  @wait.until {@d.find_element(:id, 'number-form').displayed?}
+  numframe = @d.find_element(:css,'#number-form > iframe')
+  @d.switch_to.frame numframe
+  @d.find_element(:id, 'cardNumber').send_keys(card_number)
+  @d.switch_to.default_content
+
+  @wait.until {@d.find_element(:id, 'expiry-form').displayed?}
+  expframe = @d.find_element(:css,'#expiry-form > iframe')
+  @d.switch_to.frame expframe
+  @d.find_element(:id, 'cardExpiry').send_keys(card_expiry)
+  @d.switch_to.default_content
+
+  @wait.until {@d.find_element(:id, 'cvc-form').displayed?}
+  cvcframe = @d.find_element(:css,'#cvc-form > iframe')
+  @d.switch_to.frame cvcframe
+  @d.find_element(:id, 'cardCvc').send_keys(card_cvc)
+  @d.switch_to.default_content
+
   @wait.until {@d.find_element(:id, 'postal-code').displayed?}
   @d.find_element(:id, 'postal-code').send_keys(@postal_code)
 
@@ -580,16 +612,26 @@ end
 # 購入情報の入力(入力のみ、決済ボタンクリックまではしない)
 # 前提：購入画面に遷移していること
 # 引数：カード情報のみ引数化(複数枚のカード情報でのテストを行う可能性を加味)、住所情報は毎回固定
-def input_purchase_information(card_number, card_exp_month, card_exp_year, card_cvc)
+def input_purchase_information(card_number, card_expiry, card_cvc)
   # カード番号を入力した状態で再度決済を行う
-  @wait.until {@d.find_element(:id, 'card-number').displayed?}
-  @d.find_element(:id, 'card-number').send_keys(card_number)
-  @wait.until {@d.find_element(:id, 'card-exp-month').displayed?}
-  @d.find_element(:id, 'card-exp-month').send_keys(card_exp_month)
-  @wait.until {@d.find_element(:id, 'card-exp-year').displayed?}
-  @d.find_element(:id, 'card-exp-year').send_keys(card_exp_year)
-  @wait.until {@d.find_element(:id, 'card-cvc').displayed?}
-  @d.find_element(:id, 'card-cvc').send_keys(card_cvc)
+  @wait.until {@d.find_element(:id, 'number-form').displayed?}
+  numframe = @d.find_element(:css,'#number-form > iframe')
+  @d.switch_to.frame numframe
+  @d.find_element(:id, 'cardNumber').send_keys(card_number)
+  @d.switch_to.default_content
+
+  @wait.until {@d.find_element(:id, 'expiry-form').displayed?}
+  expframe = @d.find_element(:css,'#expiry-form > iframe')
+  @d.switch_to.frame expframe
+  @d.find_element(:id, 'cardExpiry').send_keys(card_expiry)
+  @d.switch_to.default_content
+
+  @wait.until {@d.find_element(:id, 'cvc-form').displayed?}
+  cvcframe = @d.find_element(:css,'#cvc-form > iframe')
+  @d.switch_to.frame cvcframe
+  @d.find_element(:id, 'cardCvc').send_keys(card_cvc)
+  @d.switch_to.default_content
+
   @wait.until {@d.find_element(:id, 'postal-code').displayed?}
   @d.find_element(:id, 'postal-code').send_keys(@postal_code)
 
@@ -1198,10 +1240,13 @@ def login_user2_item_buy
 
   #クレジットカード情報入力画面に遷移
   # 購入情報の入力(入力のみ、決済ボタンクリックまではしない)
-  input_purchase_information(@card_number, @card_exp_month, @card_exp_year, @card_cvc)
+  input_purchase_information(@card_number, @card_expiry,  @card_cvc)
 
   # カード番号の項目のみ削除
-  @d.find_element(:id, 'card-number').clear
+  numframe = @d.find_element(:css,'#number-form > iframe')
+  @d.switch_to.frame numframe
+  @d.find_element(:id, 'cardNumber').clear
+  @d.switch_to.default_content
 
   #カード番号情報のみ未入力状態で購入ボタンをおす
   @d.find_element(:class,"buy-red-btn").click
@@ -1215,7 +1260,7 @@ def login_user2_item_buy
     @puts_num_array[7][7] = "[7-007] ◯"  #入力に問題がある状態で購入ボタンが押されたら、購入ページに戻りエラーメッセージが表示されること"
 
 
-  # カード情報入力画面にリダイレクトのみ
+  # カード情報入力画面にリダイレクトのみs
   elsif /クレジットカード情報入力/ .match(@d.page_source)
     @puts_num_array[7][7] = "[7-007] ×：カード番号が入力されていない状態だと購入情報入力画面にリダイレクトはされるが、エラーメッセージは画面に出力されない"
 
@@ -1234,15 +1279,15 @@ def login_user2_item_buy
   # 購入画面で入力した情報を一度削除する。
   input_purchase_information_clera
   # 郵便番号にハイフンを入れない状態で決済を行う。
-  input_purchase_information_error_postal_code(@card_number, @card_exp_month, @card_exp_year, @card_cvc)
+  input_purchase_information_error_postal_code(@card_number, @card_expiry,  @card_cvc)
    # 購入画面で入力した情報を一度削除する。
   input_purchase_information_clera
   
   # 電話番号にハイフンを入れた状態で決済を行う。
-  input_purchase_information_error_phone_number(@card_number, @card_exp_month, @card_exp_year, @card_cvc)
+  input_purchase_information_error_phone_number(@card_number, @card_expiry,  @card_cvc)
   input_purchase_information_clera
   # カード番号を入力した状態で再度決済を行う
-  input_purchase_information(@card_number, @card_exp_month, @card_exp_year, @card_cvc)
+  input_purchase_information(@card_number, @card_expiry,  @card_cvc)
 
 
   #正常に決済する
@@ -1344,7 +1389,7 @@ def login_user1_item_show
   @puts_num_array[0].push("サングラス購入画面の@URL→  "+ @order_url_glasses)
 
   # # 購入情報の入力(入力のみ、決済ボタンクリックまではしない)
-  # input_purchase_information(@card_number, @card_exp_month, @card_exp_year, @card_cvc)
+  # input_purchase_information(@card_number, @card_expiry,  @card_cvc)
 
   # # 商品購入
   # @d.find_element(:class,"buy-red-btn").click

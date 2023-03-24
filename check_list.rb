@@ -1629,6 +1629,3 @@ def test_method
   @d.switch_to.window( @window1_id )
   @d.get "https://www.google.com/?hl=ja"
 end
-
-
-
