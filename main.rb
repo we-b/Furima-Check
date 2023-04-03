@@ -454,20 +454,20 @@ end
 
 # 購入画面で入力した情報を一度削除する。
 def input_purchase_information_clera
-  @wait.until {@d.find_element(:id, 'number-form').displayed?}
-  numframe = @d.find_element(:css,'#number-form > iframe')
+  @wait.until {@d.find_element(:id, 'number-form').displayed? rescue false || @d.find_element(:id,'card-number').displayed? rescue false }
+  numframe = @d.find_element(:css,'#number-form > iframe') rescue false || numframe = @d.find_element(:css,'#card-number > iframe') rescue false
   @d.switch_to.frame numframe
   @d.find_element(:id, 'cardNumber').clear
   @d.switch_to.default_content
 
-  @wait.until {@d.find_element(:id, 'expiry-form').displayed?}
-  expframe = @d.find_element(:css,'#expiry-form > iframe')
+  @wait.until {@d.find_element(:id, 'expiry-form').displayed? rescue false || @d.find_element(:id,'card-expiry').displayed? rescue false }
+  expframe = @d.find_element(:css,'#expiry-form > iframe') rescue false || expframe = @d.find_element(:css,'#card-expiry > iframe') rescue false
   @d.switch_to.frame expframe
   @d.find_element(:id, 'cardExpiry').clear
   @d.switch_to.default_content
 
-  @wait.until {@d.find_element(:id, 'cvc-form').displayed?}
-  cvcframe = @d.find_element(:css,'#cvc-form > iframe')
+  @wait.until {@d.find_element(:id, 'cvc-form').displayed? rescue false || @d.find_element(:id,'card-cvc').displayed? rescue false }
+  cvcframe = @d.find_element(:css,'#cvc-form > iframe') rescue false || cvcframe = @d.find_element(:css,'#card-cvc > iframe') rescue false
   @d.switch_to.frame cvcframe
   @d.find_element(:id, 'cardCvc').clear
   @d.switch_to.default_content
@@ -486,20 +486,20 @@ def input_purchase_information_clera
 end
 # 郵便番号にハイフンを入れない状態で決済を行う。
 def input_purchase_information_error_postal_code(card_number, card_expiry, card_cvc)
-  @wait.until {@d.find_element(:id, 'number-form').displayed?}
-  numframe = @d.find_element(:css,'#number-form > iframe')
+  @wait.until {@d.find_element(:id, 'number-form').displayed? rescue false || @d.find_element(:id,'card-number').displayed? rescue false }
+  numframe = @d.find_element(:css,'#number-form > iframe') rescue false || numframe = @d.find_element(:css,'#card-number > iframe') rescue false
   @d.switch_to.frame numframe
   @d.find_element(:id, 'cardNumber').send_keys(card_number)
   @d.switch_to.default_content
 
-  @wait.until {@d.find_element(:id, 'expiry-form').displayed?}
-  expframe = @d.find_element(:css,'#expiry-form > iframe')
+   @wait.until {@d.find_element(:id, 'expiry-form').displayed? rescue false || @d.find_element(:id,'card-expiry').displayed? rescue false }
+  expframe = @d.find_element(:css,'#expiry-form > iframe') rescue false || expframe = @d.find_element(:css,'#card-expiry > iframe') rescue false
   @d.switch_to.frame expframe
   @d.find_element(:id, 'cardExpiry').send_keys(card_expiry)
   @d.switch_to.default_content
 
-  @wait.until {@d.find_element(:id, 'cvc-form').displayed?}
-  cvcframe = @d.find_element(:css,'#cvc-form > iframe')
+  @wait.until {@d.find_element(:id, 'cvc-form').displayed? rescue false || @d.find_element(:id,'card-cvc').displayed? rescue false }
+  cvcframe = @d.find_element(:css,'#cvc-form > iframe') rescue false || cvcframe = @d.find_element(:css,'#card-cvc > iframe') rescue false
   @d.switch_to.frame cvcframe
   @d.find_element(:id, 'cardCvc').send_keys(card_cvc)
   @d.switch_to.default_content
@@ -549,20 +549,20 @@ end
 
 # 電話番号にハイフンを入れた状態で決済を行う。
 def input_purchase_information_error_phone_number(card_number, card_expiry, card_cvc)
-  @wait.until {@d.find_element(:id, 'number-form').displayed?}
-  numframe = @d.find_element(:css,'#number-form > iframe')
+  @wait.until {@d.find_element(:id, 'number-form').displayed? rescue false || @d.find_element(:id,'card-number').displayed? rescue false }
+  numframe = @d.find_element(:css,'#number-form > iframe') rescue false || numframe = @d.find_element(:css,'#card-number > iframe') rescue false
   @d.switch_to.frame numframe
   @d.find_element(:id, 'cardNumber').send_keys(card_number)
   @d.switch_to.default_content
 
-  @wait.until {@d.find_element(:id, 'expiry-form').displayed?}
-  expframe = @d.find_element(:css,'#expiry-form > iframe')
+  @wait.until {@d.find_element(:id, 'expiry-form').displayed? rescue false || @d.find_element(:id,'card-expiry').displayed? rescue false }
+  expframe = @d.find_element(:css,'#expiry-form > iframe') rescue false || expframe = @d.find_element(:css,'#card-expiry > iframe') rescue false
   @d.switch_to.frame expframe
   @d.find_element(:id, 'cardExpiry').send_keys(card_expiry)
   @d.switch_to.default_content
 
-  @wait.until {@d.find_element(:id, 'cvc-form').displayed?}
-  cvcframe = @d.find_element(:css,'#cvc-form > iframe')
+  @wait.until {@d.find_element(:id, 'cvc-form').displayed? rescue false || @d.find_element(:id,'card-cvc').displayed? rescue false }
+  cvcframe = @d.find_element(:css,'#cvc-form > iframe') rescue false || cvcframe = @d.find_element(:css,'#card-cvc > iframe') rescue false
   @d.switch_to.frame cvcframe
   @d.find_element(:id, 'cardCvc').send_keys(card_cvc)
   @d.switch_to.default_content
@@ -614,20 +614,20 @@ end
 # 引数：カード情報のみ引数化(複数枚のカード情報でのテストを行う可能性を加味)、住所情報は毎回固定
 def input_purchase_information(card_number, card_expiry, card_cvc)
   # カード番号を入力した状態で再度決済を行う
-  @wait.until {@d.find_element(:id, 'number-form').displayed?}
-  numframe = @d.find_element(:css,'#number-form > iframe')
+  @wait.until {@d.find_element(:id, 'number-form').displayed? rescue false || @d.find_element(:id,'card-number').displayed? rescue false }
+  numframe = @d.find_element(:css,'#number-form > iframe') rescue false || numframe = @d.find_element(:css,'#card-number > iframe') rescue false
   @d.switch_to.frame numframe
   @d.find_element(:id, 'cardNumber').send_keys(card_number)
   @d.switch_to.default_content
 
-  @wait.until {@d.find_element(:id, 'expiry-form').displayed?}
-  expframe = @d.find_element(:css,'#expiry-form > iframe')
+  @wait.until {@d.find_element(:id, 'expiry-form').displayed? rescue false || @d.find_element(:id,'card-expiry').displayed? rescue false }
+  expframe = @d.find_element(:css,'#expiry-form > iframe') rescue false || expframe = @d.find_element(:css,'#card-expiry > iframe') rescue false
   @d.switch_to.frame expframe
   @d.find_element(:id, 'cardExpiry').send_keys(card_expiry)
   @d.switch_to.default_content
 
-  @wait.until {@d.find_element(:id, 'cvc-form').displayed?}
-  cvcframe = @d.find_element(:css,'#cvc-form > iframe')
+  @wait.until {@d.find_element(:id, 'cvc-form').displayed? rescue false || @d.find_element(:id,'card-cvc').displayed? rescue false }
+  cvcframe = @d.find_element(:css,'#cvc-form > iframe') rescue false || cvcframe = @d.find_element(:css,'#card-cvc > iframe') rescue false
   @d.switch_to.frame cvcframe
   @d.find_element(:id, 'cardCvc').send_keys(card_cvc)
   @d.switch_to.default_content
@@ -1243,7 +1243,7 @@ def login_user2_item_buy
   input_purchase_information(@card_number, @card_expiry,  @card_cvc)
 
   # カード番号の項目のみ削除
-  numframe = @d.find_element(:css,'#number-form > iframe')
+  numframe = @d.find_element(:css,'#number-form > iframe') rescue false || numframe = @d.find_element(:css,'#card-number > iframe') rescue false
   @d.switch_to.frame numframe
   @d.find_element(:id, 'cardNumber').clear
   @d.switch_to.default_content
