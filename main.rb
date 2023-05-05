@@ -17,9 +17,9 @@ def main
   check_14
 
   # Basic認証のチェック
-  # 2022/11/1
-  @url_ele.include?("onrender") ? @http ="http://" : @http ="http://#{@b_id}:#{@b_password}@"
-  # @http ="http://#{@b_id}:#{@b_password}@"
+  # 2022/11/1 heroku・render混合時のコード
+  # @url_ele.include?("onrender") ? @http ="http://" : @http ="http://#{@b_id}:#{@b_password}@"
+  @http ="http://#{@b_id}:#{@b_password}@"
 
   # 受講生の@URLをhttp://以降から記入
   @url = @http + @url_ele
