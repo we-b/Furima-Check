@@ -377,12 +377,51 @@ def check_7
     item_input_data = {}
     item_input_data["商品画像"] = @d.find_element(:id,"item-image") rescue "×：商品画像(class名：item-image)が存在しませんでした\n"
     item_input_data["商品名"] = @d.find_element(:id,"item-name") rescue "×：商品名(class名：item-name)が存在しませんでした\n"
-    item_input_data["商品の説明"] = @d.find_element(:id,"item-info") rescue "×：商品の説明(class名：item-info)が存在しませんでした\n"
+    
+    begin
+      item_input_data["商品の説明"] = @d.find_element(:id,"item-info")
+    rescue 
+      begin
+        item_input_data["商品の説明"] = @d.find_element(:id,"item-description")
+      rescue
+        item_input_data["商品の説明"] = "×：商品の説明(class名：item-info)が存在しませんでした\n"
+      end
+    end
+  
     item_input_data["商品カテゴリー"] = @d.find_element(:id,"item-category") rescue "×：商品カテゴリー(class名：item-category)が存在しませんでした\n"
-    item_input_data["商品の状態"] = @d.find_element(:id,"item-sales-status") rescue "×：商品の状態(class名：item-sales-status)が存在しませんでした\n"
-    item_input_data["配送料の負担"] = @d.find_element(:id,"item-shipping-fee-status") rescue "×：配送料の負担(class名：item-shipping-fee-status)が存在しませんでした\n"
+
+    begin
+      item_input_data["商品の状態"] = @d.find_element(:id,"item-sales-status")
+    rescue
+      begin
+        item_input_data["商品の状態"] = @d.find_element(:id,"item-condition")
+      rescue
+        item_input_data["商品の状態"] = "×：商品の状態(class名：item-sales-status)が存在しませんでした\n"
+      end
+    end
+
+    begin
+      item_input_data["配送料の負担"] = @d.find_element(:id,"item-shipping-fee-status")
+    rescue
+      begin
+        item_input_data["配送料の負担"] = @d.find_element(:id,"item-shipping-charge")
+      rescue
+        item_input_data["配送料の負担"] = "×：配送料の負担(class名：item-shipping-fee-status)が存在しませんでした\n"
+      end
+    end
+
     item_input_data["発送元の地域"] = @d.find_element(:id,"item-prefecture") rescue "×：発送元の地域(class名：item-prefecture)が存在しませんでした\n"
-    item_input_data["発送までの日数"] = @d.find_element(:id,"item-scheduled-delivery") rescue "×：発送までの日数(class名：item-scheduled-delivery)が存在しませんでした\n"
+
+    begin
+      item_input_data["発送までの日数"] = @d.find_element(:id,"item-scheduled-delivery")
+    rescue
+      begin
+        item_input_data["発送までの日数"] = @d.find_element(:id,"item-shipping-date")
+      rescue
+        item_input_data["発送までの日数"] =  "×：発送までの日数(class名：item-scheduled-delivery)が存在しませんでした\n"
+      end
+    end
+  
     item_input_data["商品価格"] = @d.find_element(:id,"item-price") rescue "×：商品価格(class名：item-name)が存在しませんでした\n"
 
     # 適切なタグではなかった場合のエラー文言作成メソッド
@@ -1506,7 +1545,11 @@ def check_2_016
   begin
     selectCategory = @d.find_element(:id,"item-sales-status")
   rescue 
-    puts "×：商品カテゴリー(id名：item-sales-status)が存在しませんでした\n"
+    begin
+      selectCategory = @d.find_element(:id,"item-condition")
+    rescue
+      puts "×：商品カテゴリー(id名：item-sales-status)が存在しませんでした\n"
+    end
   end
    
   selectCategory = Selenium::WebDriver::Support::Select.new(selectCategory)
@@ -1536,8 +1579,12 @@ def check_2_017
 
   begin
     selectCategory = @d.find_element(:id,"item-shipping-fee-status")
-  rescue 
-    puts "×：配送料(id名：item-shipping-fee-status)が存在しませんでした\n"
+  rescue
+    begin
+      selectCategory = @d.find_element(:id,"item-shipping-charge")
+    rescue
+      puts "×：配送料(id名：item-shipping-fee-status)が存在しませんでした\n"
+    end
   end
    
   selectCategory = Selenium::WebDriver::Support::Select.new(selectCategory)
@@ -1596,7 +1643,11 @@ def check_2_019
   begin
     selectCategory = @d.find_element(:id,"item-scheduled-delivery")
   rescue 
-    puts "×：発送までの日数(id名：item-scheduled-delivery)が存在しませんでした\n"
+    begin
+      selectCategory = @d.find_element(:id,"item-shipping_date")
+    rescue
+      puts "×：発送までの日数(id名：item-scheduled-delivery)が存在しませんでした\n"
+    end
   end
    
   selectCategory = Selenium::WebDriver::Support::Select.new(selectCategory)

@@ -17,9 +17,9 @@ def main
   check_14
 
   # Basic認証のチェック
-  # 2022/11/1 heroku・render混合時のコード
-  # @url_ele.include?("onrender") ? @http ="http://" : @http ="http://#{@b_id}:#{@b_password}@"
+  # 2022/11/1
   @http ="http://#{@b_id}:#{@b_password}@"
+  # @http ="http://#{@b_id}:#{@b_password}@"
 
   # 受講生の@URLをhttp://以降から記入
   @url = @http + @url_ele
@@ -171,7 +171,7 @@ EOT
     @url_ele = input_url.gsub(/http:\/\//,"")
   end
   puts "次に「②basic認証[ユーザー名]」を入力しenterキーを押してください (例：admin)"
-  @b_id= gets.chomp
+  @b_id = gets.chomp
   puts "次に「③basic認証[パスワード]」を入力しenterキーを押してください (例：2222)"
   @b_password = gets.chomp
 
@@ -323,8 +323,8 @@ def input_item_new_method(name, info, price, image)
   @d.find_element(:id,"item-name").send_keys(name)
 
   # 商品説明
-  @wait.until {@d.find_element(:id,"item-info").displayed?}
-  @d.find_element(:id,"item-info").send_keys(info)
+  @wait.until {@d.find_element(:id,"item-info").displayed? rescue @d.find_element(:id,"item-description").displayed? } 
+  @d.find_element(:id,"item-info").send_keys(info) rescue @d.find_element(:id,"item-description").send_keys(info)
 
   # カテゴリーはセレクトタグから値を選択
   @wait.until {@d.find_element(:id,"item-category").displayed?}
@@ -333,14 +333,14 @@ def input_item_new_method(name, info, price, image)
   item_category.select_by(:value, @value)
 
   # 商品の状態はセレクトタグから値を選択
-  @wait.until {@d.find_element(:id,"item-sales-status").displayed?}
-  item_sales_status_element = @d.find_element(:id,"item-sales-status")
+  @wait.until {@d.find_element(:id,"item-sales-status").displayed? rescue @d.find_element(:id,"item-condition").displayed?}
+  item_sales_status_element = @d.find_element(:id,"item-sales-status") rescue item_sales_status_element = @d.find_element(:id,"item-condition")
   item_sales_status = select_new(item_sales_status_element)
   item_sales_status.select_by(:value, @value)
 
   # 送料の負担はセレクトタグから値を選択
-  @wait.until {@d.find_element(:id,"item-shipping-fee-status").displayed?}
-  item_shipping_fee_status_element = @d.find_element(:id,"item-shipping-fee-status")
+  @wait.until {@d.find_element(:id,"item-shipping-fee-status").displayed? rescue @d.find_element(:id,"item-shipping-charge").displayed?}
+  item_shipping_fee_status_element = @d.find_element(:id,"item-shipping-fee-status")rescue item_shipping_fee_status_element = @d.find_element(:id,"item-shipping-charge")
   item_shipping_fee_status = select_new(item_shipping_fee_status_element)
   item_shipping_fee_status.select_by(:value, @value)
 
@@ -351,8 +351,8 @@ def input_item_new_method(name, info, price, image)
   item_prefecture.select_by(:value, @value)
 
   # 発送までの日数
-  @wait.until {@d.find_element(:id,"item-scheduled-delivery").displayed?}
-  item_scheduled_delivery_element = @d.find_element(:id,"item-scheduled-delivery")
+  @wait.until {@d.find_element(:id,"item-scheduled-delivery").displayed? rescue @d.find_element(:id,"item-shipping_date").displayed?}
+  item_scheduled_delivery_element = @d.find_element(:id,"item-scheduled-delivery") rescue item_scheduled_delivery_element = @d.find_element(:id,"item-shipping_date")
   item_scheduled_delivery = select_new(item_scheduled_delivery_element)
   item_scheduled_delivery.select_by(:value, @value)
 
@@ -371,17 +371,17 @@ def clear_item_new_method
   # 商品名
   @d.find_element(:id,"item-name").clear
   # 商品説明
-  @d.find_element(:id,"item-info").clear
+  @d.find_element(:id,"item-info").clear rescue @d.find_element(:id,"item-description").clear
 
   item_category_blank = @d.find_element(:id,"item-category")
   item_category_blank = select_new(item_category_blank)
   item_category_blank.select_by(:value, @blank)
 
-  item_sales_status_blank = @d.find_element(:id,"item-sales-status")
+  item_sales_status_blank = @d.find_element(:id,"item-sales-status") rescue item_sales_status_blank = @d.find_element(:id,"item-condition")
   item_sales_status_blank = select_new(item_sales_status_blank )
   item_sales_status_blank.select_by(:value, @blank)
 
-  item_shipping_fee_status_blank = @d.find_element(:id,"item-shipping-fee-status")
+  item_shipping_fee_status_blank = @d.find_element(:id,"item-shipping-fee-status") rescue item_shipping_fee_status_blank = @d.find_element(:id,"item-shipping-charge")
   item_shipping_fee_status_blank = select_new(item_shipping_fee_status_blank )
   item_shipping_fee_status_blank.select_by(:value, @blank)
 
@@ -389,7 +389,7 @@ def clear_item_new_method
   item_prefecture_blank = select_new(item_prefecture_blank )
   item_prefecture_blank.select_by(:value, @blank)
 
-  item_scheduled_delivery_blank = @d.find_element(:id,"item-scheduled-delivery")
+  item_scheduled_delivery_blank = @d.find_element(:id,"item-scheduled-delivery") rescue item_scheduled_delivery_blank = @d.find_element(:id,"item-shipping_date")
   item_scheduled_delivery_blank = select_new(item_scheduled_delivery_blank )
   item_scheduled_delivery_blank.select_by(:value, @blank)
 
@@ -492,7 +492,7 @@ def input_purchase_information_error_postal_code(card_number, card_expiry, card_
   @d.find_element(:id, 'cardNumber').send_keys(card_number)
   @d.switch_to.default_content
 
-   @wait.until {@d.find_element(:id, 'expiry-form').displayed? rescue false || @d.find_element(:id,'card-expiry').displayed? rescue false }
+  @wait.until {@d.find_element(:id, 'expiry-form').displayed? rescue false || @d.find_element(:id,'card-expiry').displayed? rescue false }
   expframe = @d.find_element(:css,'#expiry-form > iframe') rescue false || expframe = @d.find_element(:css,'#card-expiry > iframe') rescue false
   @d.switch_to.frame expframe
   @d.find_element(:id, 'cardExpiry').send_keys(card_expiry)
@@ -1003,11 +1003,27 @@ def item_new_require_input
   input_item_new_method(@item_name, @item_info, @item_price, @item_image)
 
   # 商品情報のセレクトタグにて選択した情報を変数に代入
-  @item_category_word            = select_new(@d.find_element(:id,"item-category")).selected_options[0].text
-  @item_status_word              = select_new(@d.find_element(:id,"item-sales-status")).selected_options[0].text
-  @item_shipping_fee_status_word = select_new(@d.find_element(:id,"item-shipping-fee-status")).selected_options[0].text
+  @item_category_word = select_new(@d.find_element(:id,"item-category")).selected_options[0].text
+
+  begin
+    @item_status_word = select_new(@d.find_element(:id,"item-sales-status")).selected_options[0].text
+  rescue
+    @item_status_word = select_new(@d.find_element(:id,"item-condition")).selected_options[0].text
+  end
+
+  begin
+    @item_shipping_fee_status_word = select_new(@d.find_element(:id,"item-shipping-fee-status")).selected_options[0].text
+  rescue
+    @item_shipping_fee_status_word = select_new(@d.find_element(:id,"item-shipping-charge")).selected_options[0].text
+  end
+  
   @item_prefecture_word          = select_new(@d.find_element(:id,"item-prefecture")).selected_options[0].text
-  @item_scheduled_delivery_word  = select_new(@d.find_element(:id,"item-scheduled-delivery")).selected_options[0].text
+  
+  begin
+    @item_scheduled_delivery_word  = select_new(@d.find_element(:id,"item-scheduled-delivery")).selected_options[0].text
+  rescue
+    @item_scheduled_delivery_word  = select_new(@d.find_element(:id,"item-shipping_date")).selected_options[0].text
+  end
 
   @d.find_element(:class,"sell-btn").click
   @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
@@ -1086,13 +1102,13 @@ def item_edit
     @d.get(detail_url_coat)
   end
 
-  # 商品編集ボタンクリック
+  @wait.until {@d.find_element(:class,"item-red-btn").displayed?}
   @d.find_element(:class,"item-red-btn").click
 
   # 「商品の説明」項目に正常な情報を入力して編集してみる
-  @wait.until {@d.find_element(:id,"item-info").displayed?}
+  @wait.until {@d.find_element(:id,"item-info").displayed? rescue @d.find_element(:id,"item-description").displayed? }
   @puts_num_array[5][5] = "[5-005] ◯" #ログイン状態の出品者のみ、出品した商品の商品情報編集ページに遷移できること
-  @d.find_element(:id,"item-info").send_keys(@item_info_re)
+  @d.find_element(:id,"item-info").send_keys(@item_info_re) rescue @d.find_element(:id,"item-description").send_keys(@item_info_re)
   @d.find_element(:class,"sell-btn").click
   @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
 
