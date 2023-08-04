@@ -1031,6 +1031,8 @@ def check_18
     # 出品情報詳細(配列)
     show_item_details = @d.find_elements(:class,"detail-value") rescue "×：Error：商品の詳細(出品者・カテゴリー・状態・発送先・配送料の負担・発送目安)を表示する要素class：detail-valueが見つかりません\n"
 
+    another_category = @d.find_elements(:class,"another-item") rescue "×：Error：ページ下部にカテゴリーが表示されていません\n"
+
     item_data_answers.each{|k, v|
 
       # 商品画像の時だけincludeでチェック
@@ -1088,6 +1090,15 @@ def check_18
           check_detail["チェック詳細"] << "×：商品詳細画面に【#{k}】情報が表示されていない\n"
         end
       }
+    end
+    
+    another_category_text = another_category.map { |e| e.text }
+      # 表示されている情報にハッシュ の中身が該当するかチェック
+    if another_category_text.include?("#{@item_category_word}をもっと見る")
+      check_detail["チェック詳細"] << "◯：ページ下部にカテゴリー情報が表示されている\n"
+      check_flag += 1
+    else
+      check_detail["チェック詳細"] << "×：ページ下部にカテゴリー情報が表示されていない\n"
     end
 
     check_detail["チェック合否"] = check_flag == 10 ? "◯" : "×"
