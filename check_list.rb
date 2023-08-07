@@ -1101,7 +1101,7 @@ def check_18
       check_detail["チェック詳細"] << "×：ページ下部にカテゴリー情報が表示されていない\n"
     end
 
-    check_detail["チェック合否"] = check_flag == 10 ? "◯" : "×"
+    check_detail["チェック合否"] = check_flag == 11 ? "◯" : "×"
 
   ensure
     @check_log.push(check_detail)
