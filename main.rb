@@ -460,8 +460,8 @@ def input_purchase_information_clera
   @d.find_element(:id, 'cardNumber').clear
   @d.switch_to.default_content
 
-  @wait.until {@d.find_element(:id, 'expiry-form').displayed? rescue false || @d.find_element(:id,'card-expiry').displayed? rescue false }
-  expframe = @d.find_element(:css,'#expiry-form > iframe') rescue false || expframe = @d.find_element(:css,'#card-expiry > iframe') rescue false
+  @wait.until {@d.find_element(:id, 'expiry-form').displayed? rescue false || @d.find_element(:id,'card-exp').displayed? rescue false }
+  expframe = @d.find_element(:css,'#expiry-form > iframe') rescue false || expframe = @d.find_element(:css,'#card-exp > iframe') rescue false
   @d.switch_to.frame expframe
   @d.find_element(:id, 'cardExpiry').clear
   @d.switch_to.default_content
@@ -492,8 +492,8 @@ def input_purchase_information_error_postal_code(card_number, card_expiry, card_
   @d.find_element(:id, 'cardNumber').send_keys(card_number)
   @d.switch_to.default_content
 
-  @wait.until {@d.find_element(:id, 'expiry-form').displayed? rescue false || @d.find_element(:id,'card-expiry').displayed? rescue false }
-  expframe = @d.find_element(:css,'#expiry-form > iframe') rescue false || expframe = @d.find_element(:css,'#card-expiry > iframe') rescue false
+  @wait.until {@d.find_element(:id, 'expiry-form').displayed? rescue false || @d.find_element(:id,'card-exp').displayed? rescue false }
+  expframe = @d.find_element(:css,'#expiry-form > iframe') rescue false || expframe = @d.find_element(:css,'#card-exp > iframe') rescue false
   @d.switch_to.frame expframe
   @d.find_element(:id, 'cardExpiry').send_keys(card_expiry)
   @d.switch_to.default_content
@@ -555,8 +555,8 @@ def input_purchase_information_error_phone_number(card_number, card_expiry, card
   @d.find_element(:id, 'cardNumber').send_keys(card_number)
   @d.switch_to.default_content
 
-  @wait.until {@d.find_element(:id, 'expiry-form').displayed? rescue false || @d.find_element(:id,'card-expiry').displayed? rescue false }
-  expframe = @d.find_element(:css,'#expiry-form > iframe') rescue false || expframe = @d.find_element(:css,'#card-expiry > iframe') rescue false
+  @wait.until {@d.find_element(:id, 'expiry-form').displayed? rescue false || @d.find_element(:id,'card-exp').displayed? rescue false }
+  expframe = @d.find_element(:css,'#expiry-form > iframe') rescue false || expframe = @d.find_element(:css,'#card-exp > iframe') rescue false
   @d.switch_to.frame expframe
   @d.find_element(:id, 'cardExpiry').send_keys(card_expiry)
   @d.switch_to.default_content
@@ -620,8 +620,8 @@ def input_purchase_information(card_number, card_expiry, card_cvc)
   @d.find_element(:id, 'cardNumber').send_keys(card_number)
   @d.switch_to.default_content
 
-  @wait.until {@d.find_element(:id, 'expiry-form').displayed? rescue false || @d.find_element(:id,'card-expiry').displayed? rescue false }
-  expframe = @d.find_element(:css,'#expiry-form > iframe') rescue false || expframe = @d.find_element(:css,'#card-expiry > iframe') rescue false
+  @wait.until {@d.find_element(:id, 'expiry-form').displayed? rescue false || @d.find_element(:id,'card-exp').displayed? rescue false }
+  expframe = @d.find_element(:css,'#expiry-form > iframe') rescue false || expframe = @d.find_element(:css,'#card-exp > iframe') rescue false
   @d.switch_to.frame expframe
   @d.find_element(:id, 'cardExpiry').send_keys(card_expiry)
   @d.switch_to.default_content
