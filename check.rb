@@ -83,7 +83,7 @@ randm_word = SecureRandom.hex(10) #=> "4a01bbd139f5e94bd249"
 @item_info_re = "昨年イチオシのトレンチコート"
 @value = '2'
 @item_price = 40000
-@item_image = "/Users/tech-camp/development/Furima-Check/photo/coat.jpg"
+@item_image = Dir.getwd + "/photo/coat.jpg"
 @item_category_word = ""
 @item_status_word = ""
 @item_shipping_fee_status_word = ""
@@ -110,13 +110,13 @@ randm_word = SecureRandom.hex(10) #=> "4a01bbd139f5e94bd249"
 @item_name2 = "サングラス"
 @item_info2 = "限定5品のサングラス"
 @item_price2 = 3005
-@item_image2 = "/Users/tech-camp/development/Furima-Check/photo/sunglass.jpg"
+@item_image2 = Dir.getwd + "/photo/sunglass.jpg"
 
 
 @item_name3 = "マグロ(時価)"
 @item_info3 = "価格の限界に挑戦中"
 @item_price3 = 299
-@item_image3 = "/Users/tech-camp/development/Furima-Check/photo/tuna.jpg"
+@item_image3 = Dir.getwd + "/photo/tuna.jpg"
 @item_image_name3 = "tuna.jpg"
 
 # 購入時のカード情報
