@@ -17,7 +17,6 @@ options.add_argument('--headless')
 
 
 # チェック用のドライバー
-
 @d.manage.timeouts.implicit_wait = 3
 
 # 1つ目のウィンドウのID
@@ -28,121 +27,70 @@ options.add_argument('--headless')
 @window2_id = @d.window_handles.last
 @d.switch_to.window(@window1_id)
 
-
-#basic認証のidとpass
-@b_id = "admin"
-@b_password = "2222"
-#@url_ele = "afternoon-bayou-26262.herokuapp.com/"
-@url_ele = "localhost:3000/"
-
 # テスト登録用emailのランダム文字列
 randm_word = SecureRandom.hex(10) #=> "4a01bbd139f5e94bd249"
 
-
 # ユーザー情報
-@nickname = "lifecoach_test_user1"
-@email = "user1_#{randm_word}@co.jp"
-@first_name = "愛"
-@last_name= "不時着"
-@first_name_kana = "アイ"
-@last_name_kana = "フジチャク"
+first_name_list = ["愛","梨泰","ランバ","ニコラ"]
+last_name_list = ["不時着","院","ラル","テスラ"]
+first_name_kana_list = ["アイ","イテウォン","ランバ","ニコラ"]
+last_name_kana_list = ["フジチャク","クラス","ラル","テスラ"]
 
-@nickname2 = "lifecoach_test_user2"
-@email2 = "user2_#{randm_word}@co.jp"
-@first_name2 = "梨泰"
-@last_name2 = "院"
-@first_name_kana2 = "イテウォン"
-@last_name_kana2 = "クラス"
+@users = []
+4.times do |i|
+    @users << {
+        nickname: "lifecoach_test_user"+String(i+1),
+        email: "user"+String(i+1)+"_#{randm_word}@co.jp",
+        password: "aaa111",
+        first_name: first_name_list[0],
+        last_name: last_name_list[0],
+        first_name_kana: first_name_kana_list[0],
+        last_name_kana: last_name_kana_list[0],
+        birth_index: 2
+    }
+end
 
-@nickname3 = "lifecoach_test_user3"
-@email3 = "user3_#{randm_word}@co.jp"
-@first_name3 = "ランバ"
-@last_name3 = "ラル"
-@first_name_kana3 = "ランバ"
-@last_name_kana3 = "ラル"
+# 商品情報
+item_name_list = ["コート","サングラス","マグロ"]
+image_name_list = ["coat.jpg","sunglass.jpg","tuna.jpg"]
+info_list = ["今年イチオシのトレンチコート","限定5品のサングラス","価格の限界に挑戦中"]
+price_list = [40000,3005,299]
 
-# 新規登録等での繰り返し登録テスト用アカウント
-@nicknam4 = "lifecoach_test_user4"
-@email4 = "user4_#{randm_word}@co.jp"
-@first_name4 = "ニコラ"
-@last_name4 = "テスラ"
-@first_name_kana4 = "ニコラ"
-@last_name_kana4 = "テスラ"
+@items = []
+3.times do |i|
+    @items << {
+        name: item_name_list[i],
+        image_name: image_name_list[i],
+        image: Dir.getwd + "/photo/"+image_name_list[i],
+        info: info_list[i],
+        activehash_value: '2',
+        activehash_blank_value: '1',
+        price: price_list[i],
+    }
+end
 
-
-@password = "aaa111" #パスワードは全ユーザー共通
-@password_short = "aa11" #6文字以下
-@password_string = "aaaaaa"
-@password_integer = "111111"
-
-
-# 出品商品情報
-@item_image_name = "coat.jpg"
-@item_name = "コート"
-@item_info = "今年イチオシのトレンチコート"
-@item_info_re = "昨年イチオシのトレンチコート"
-@value = '2'
-@item_price = 40000
-@item_image = Dir.getwd + "/photo/coat.jpg"
-@item_category_word = ""
-@item_status_word = ""
-@item_shipping_fee_status_word = ""
-@item_prefecture_word = ""
-@item_scheduled_delivery_word = ""
-
-
-# 購入ページのURLを直接入力でリダイレクトされるかのチェック用
-# 売却済商品の購入ページURL
-@order_url_coat = ""
-# user1によるコート情報編集画面のURL
-# 売却済商品の編集ページURL
-@edit_url_coat = ""
-
-# 以下のURL商品はuser2が出品したサングラス = login_user2_item_new_2ndメソッド内で行われる
-# 商品の購入ページURL
-@order_url_glasses = ""
-# 商品の編集ページURL
-@edit_url_glasses = ""
+# 購入情報
+@card = {
+    number: 4242424242424242,
+    expiry: 1030,
+    cvc: 123
+}
+@purchase = {
+    postal_code: "965-0873",
+    prefecture: "福島県",
+    city:  "会津若松市",
+    addresses: "追手町１−１",
+    building: "テストビル",
+    phone_number: "02089001111"
+}
 
 # ユーザー新規登録画面,出品画面,購入画面で表示されるエラーログを保存しておくハッシュ
 @error_log_hash = {}
 
-@item_name2 = "サングラス"
-@item_info2 = "限定5品のサングラス"
-@item_price2 = 3005
-@item_image2 = Dir.getwd + "/photo/sunglass.jpg"
-
-
-@item_name3 = "マグロ(時価)"
-@item_info3 = "価格の限界に挑戦中"
-@item_price3 = 299
-@item_image3 = Dir.getwd + "/photo/tuna.jpg"
-@item_image_name3 = "tuna.jpg"
-
-# 購入時のカード情報
-@card_number = 4242424242424242
-@card_expiry = 1030
-@card_cvc = 123
-@postal_code = "965-0873"
-@prefecture = "福島県"
-@city = "会津若松市"
-@addresses = "追手町１−１"
-@phone_number = "02089001111"
-@postal_code_error = "96500873"
-@phone_number_error = "02089-01111"
-
-@blank = "1"
-
-@select_index = 1
-
 # チェック項目の結果や詳細を保存しておく配列
-# チェック項目の内容はハッシュ 
-# {チェック番号： 3 , チェック合否： "〇" , チェック内容： "〇〇をチェック" , チェック詳細： "○○×"}
 @check_log = []
 
 # 出力文章(メインチェック番号) = [1-001]等のチェック
-# @puts_num_array = []
-# [[30配列], [], [], .....]
 @puts_num_array = Array.new(9).map{Array.new(30, false)}
 
 #各チェックのフラグ変数
