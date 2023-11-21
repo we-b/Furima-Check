@@ -401,7 +401,7 @@ end
 # 引数flagは遷移後にputs分の出力有無
 # 出品ボタンは受講生によってリンクタグを付与している要素にバラ付きが見られるためこのメソッドがある
 def click_purchase_btn(flag)
-
+  @wait.until {@d.find_element(:class,"purchase-btn").displayed?}
   # 出品ボタンを押して画面遷移できるかどうか
   if /出品する/ .match(@d.page_source)
     @d.find_element(:class,"purchase-btn").click
