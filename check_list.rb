@@ -498,7 +498,7 @@ def check_8
     # ウィンドウ切り替え
     @d.switch_to.window( @window2_id )
 
-    @d.get(@url)
+    @d.get("http://" + @url_ele)
     # 他ユーザーでログイン中のためログアウト
     @d.find_element(:class,"logout").click
     @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false}
