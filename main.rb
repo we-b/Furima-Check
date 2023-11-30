@@ -213,7 +213,7 @@ end
 def login_any_user(email, pass)
   @d.get("http://" + @url_ele)
   @wait.until {@d.find_element(:class,"purchase-btn").displayed? rescue false  }
-
+  sleep(3)
   display_flag = @d.find_element(:class,"logout").displayed? rescue false
   # ログイン状態であればログアウトしておく
   if display_flag
@@ -402,6 +402,7 @@ end
 # 出品ボタンは受講生によってリンクタグを付与している要素にバラ付きが見られるためこのメソッドがある
 def click_purchase_btn(flag)
   @wait.until {@d.find_element(:class,"purchase-btn").displayed?}
+  sleep(3)
   # 出品ボタンを押して画面遷移できるかどうか
   if /出品する/ .match(@d.page_source)
     @d.find_element(:class,"purchase-btn").click

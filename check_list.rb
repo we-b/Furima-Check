@@ -318,6 +318,7 @@ def sign_up_user3
   }
 
   @d.find_element(:class,"register-red-btn").click
+  @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
 end
 
 
@@ -335,7 +336,6 @@ def check_6
 
     # トップページ画面からスタート
     
-
     #user3でサインアップ
     sign_up_user3
 
