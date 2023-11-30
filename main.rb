@@ -213,7 +213,7 @@ end
 def login_any_user(email, pass)
   @d.get("http://" + @url_ele)
   @wait.until {@d.find_element(:class,"purchase-btn").displayed? rescue false  }
-  sleep(3)
+  sleep(5)
   display_flag = @d.find_element(:class,"logout").displayed? rescue false
   # ログイン状態であればログアウトしておく
   if display_flag
@@ -1053,6 +1053,7 @@ def item_edit
 
   # 詳細画面のURLを取得
   detail_url_coat = @d.current_url
+  sleep(3)
 
   # 商品詳細画面
   if /編集/.match(@d.page_source)
@@ -1433,6 +1434,7 @@ def no_user_item_buy_check
   # ログアウト状態でサングラスの商品詳細画面へ遷移
   item_name_click_from_top(@item_name2)
   # 商品詳細画面のシンボルである「不適切な商品の通報」ボタンの有無で判断
+  sleep(3)
   if /不適切な商品の通報/ .match(@d.page_source)
     @puts_num_array[4][2] = "[4-002] ◯"  #：ログアウト状態のユーザーでも、商品詳細表示ページを閲覧できること"
   else

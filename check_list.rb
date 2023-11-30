@@ -682,6 +682,7 @@ def check_12
 
     # トップページ　→　商品(コート)詳細画面へ遷移
     item_name_click_from_top(@item_name)
+    sleep(3)
 
     if /購入画面に進む/.match(@d.page_source)
       check_detail["チェック詳細"] << "◯：出品者以外のログインユーザーだと商品詳細画面に「購入ボタン」が表示される\n"
