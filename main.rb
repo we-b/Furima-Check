@@ -213,7 +213,7 @@ end
 def login_any_user(email, pass)
   @d.get("http://" + @url_ele)
   @wait.until {@d.find_element(:class,"purchase-btn").displayed? rescue false  }
-  sleep(5)
+  sleep(3)
   display_flag = @d.find_element(:class,"logout").displayed? rescue false
   # ログイン状態であればログアウトしておく
   if display_flag
