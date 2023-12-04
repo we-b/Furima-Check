@@ -211,15 +211,15 @@ end
 
 # ユーザーのログインメソッド
 def login_any_user(email, pass)
-  @d.get(@url)
-  @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
-
+  @d.get("http://" + @url_ele)
+  @wait.until {@d.find_element(:class,"purchase-btn").displayed? rescue false  }
+  sleep(5)
   display_flag = @d.find_element(:class,"logout").displayed? rescue false
   # ログイン状態であればログアウトしておく
   if display_flag
     @d.find_element(:class,"logout").click
     @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
-    @d.get(@url)
+    @d.get("http://" + @url_ele)
     @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
   end
 
@@ -231,7 +231,7 @@ def login_any_user(email, pass)
   @d.find_element(:class,"login-red-btn").click
   @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
   # トップページ画面
-  @d.get(@url)
+  @d.get("http://" + @url_ele)
   @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
 
 end
@@ -401,7 +401,8 @@ end
 # 引数flagは遷移後にputs分の出力有無
 # 出品ボタンは受講生によってリンクタグを付与している要素にバラ付きが見られるためこのメソッドがある
 def click_purchase_btn(flag)
-
+  @wait.until {@d.find_element(:class,"purchase-btn").displayed?}
+  sleep(3)
   # 出品ボタンを押して画面遷移できるかどうか
   if /出品する/ .match(@d.page_source)
     @d.find_element(:class,"purchase-btn").click
@@ -438,7 +439,7 @@ end
 # 各チェックメソッドなどでダミーデータを使った商品登録時に万が一商品を出品できてしまった場合などにリセット目的でのメソッド
 def return_purchase_before_delete_item(item_name)
 
-  @d.get(@url)
+  @d.get("http://" + @url_ele)
   @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
   # トップ画面にて商品名を基準に該当の商品をクリックして商品詳細画面へ遷移する
   item_name_click_from_top(item_name)
@@ -446,7 +447,7 @@ def return_purchase_before_delete_item(item_name)
   @d.find_element(:class,"item-destroy").click
   @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
   # 削除完了画面があるかもしれないのでトップに戻る
-  @d.get(@url)
+  @d.get("http://" + @url_ele)
   @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
   # 出品画面へ
   click_purchase_btn(false)
@@ -668,7 +669,7 @@ def sign_up_nickname_input
   if display_flag
     @d.find_element(:class,"logout").click
     @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
-    @d.get(@url)
+    @d.get("http://" + @url_ele)
     @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
     @d.find_element(:class,"sign-up").click
   end
@@ -692,7 +693,7 @@ def sign_up_password_short
   if display_flag
     @d.find_element(:class,"logout").click
     @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
-    @d.get(@url)
+    @d.get("http://" + @url_ele)
     @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
     @d.find_element(:class,"sign-up").click
   else
@@ -706,7 +707,7 @@ def sign_up_password_short
     @puts_num_array[1][17] = "[1-017] ×：パスワードは、5文字以下でも登録できる"
     @d.find_element(:class,"logout").click
     @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
-    @d.get(@url)
+    @d.get("http://" + @url_ele)
     @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
     @d.find_element(:class,"sign-up").click
     #raise "ユーザー登録バリデーションにて不備あり"
@@ -719,7 +720,7 @@ def sign_up_password_short
     if display_flag
       @d.find_element(:class,"logout").click
       @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
-      @d.get(@url)
+      @d.get("http://" + @url_ele)
       @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
     end
     # 登録できてしまったアカウントと異なる情報に更新しておく = 再登録&再ログインできなくなってしまため
@@ -734,7 +735,7 @@ def sign_up_password_string
   if display_flag
     @d.find_element(:class,"logout").click
     @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
-    @d.get(@url)
+    @d.get("http://" + @url_ele)
     @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
     @d.find_element(:class,"sign-up").click
   else
@@ -748,7 +749,7 @@ def sign_up_password_string
     @puts_num_array[1][18] = "[1-018] ×：パスワードは、文字のみでも登録できる"
     @d.find_element(:class,"logout").click
     @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
-    @d.get(@url)
+    @d.get("http://" + @url_ele)
     @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
     @d.find_element(:class,"sign-up").click
     #raise "ユーザー登録バリデーションにて不備あり"
@@ -761,7 +762,7 @@ def sign_up_password_string
     if display_flag
       @d.find_element(:class,"logout").click
       @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
-      @d.get(@url)
+      @d.get("http://" + @url_ele)
       @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
     end
     # 登録できてしまったアカウントと異なる情報に更新しておく = 再登録&再ログインできなくなってしまため
@@ -776,7 +777,7 @@ def sign_up_password_integer
   if display_flag
     @d.find_element(:class,"logout").click
     @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
-    @d.get(@url)
+    @d.get("http://" + @url_ele)
     @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
     @d.find_element(:class,"sign-up").click
   else
@@ -790,7 +791,7 @@ def sign_up_password_integer
     @puts_num_array[1][19] = "[1-019] ×：パスワードは、数字のみでも登録できる"
     @d.find_element(:class,"logout").click
     @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
-    @d.get(@url)
+    @d.get("http://" + @url_ele)
     @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
     @d.find_element(:class,"sign-up").click
     #raise "ユーザー登録バリデーションにて不備あり"
@@ -803,7 +804,7 @@ def sign_up_password_integer
     if display_flag
       @d.find_element(:class,"logout").click
       @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
-      @d.get(@url)
+      @d.get("http://" + @url_ele)
       @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
     end
     # 登録できてしまったアカウントと異なる情報に更新しておく = 再登録&再ログインできなくなってしまため
@@ -825,7 +826,7 @@ def sign_up_retry
     if display_flag
       @d.find_element(:class,"logout").click
       @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
-      @d.get(@url)
+      @d.get("http://" + @url_ele)
       @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
     end
     @d.find_element(:class,"sign-up").click
@@ -948,7 +949,7 @@ def login_user1
     @puts_num_array[1][14] = "[1-014] ◯"  #：ログイン/ログアウトができる"
   else
     @puts_num_array[1][14] = "[1-014] ×：ログイン/ログアウトができない、もしくはログイン後にトップページへ遷移しない"
-    @d.get(@url)
+    @d.get("http://" + @url_ele)
   end
 end
 
@@ -1052,6 +1053,7 @@ def item_edit
 
   # 詳細画面のURLを取得
   detail_url_coat = @d.current_url
+  sleep(3)
 
   # 商品詳細画面
   if /編集/.match(@d.page_source)
@@ -1082,7 +1084,7 @@ def item_edit
   check_8
 
   # 別ウィンドウにて異なるユーザーでログインした際はウィンドウを元に戻す時は再度ログインし直す
-  @d.get(@url)
+  @d.get("http://" + @url_ele)
   # 元のuser1でログイン
   login_any_user(@email, @password)
 
@@ -1133,11 +1135,11 @@ end
 def logout_item_edit_and_buy
   # ヘッダーのトップへ遷移するアイコンをクリック
   @d.find_element(:class,"furima-icon").click
-  @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
+  @wait.until {@d.find_element(:class,"purchase-btn").displayed? rescue false }
 
   # ログアウトをクリック
   @d.find_element(:class,"logout").click
-  @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
+  @wait.until {@d.find_element(:class,"purchase-btn").displayed? rescue false }
 
   # ログアウト後のトップページで「出品する」ボタンをクリック
   click_purchase_btn(false)
@@ -1315,7 +1317,7 @@ def login_user2_item_buy
   #：購入が完了したら、トップページまたは購入完了ページに遷移する"
   if /FURIMAが選ばれる3つの理由/ .match(@d.page_source) then @puts_num_array[7][6] = "[7-006] ◯" end
 
-  @d.get(@url)
+  @d.get("http://" + @url_ele)
   @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
 
   @puts_num_array[7][2] = "[7-002] ◯"  #クレジットカードの情報は購入の都度入力させること"  #これは立証できていない
@@ -1359,14 +1361,14 @@ def login_user2_after_purchase_check1
       @puts_num_array[7][9] = "[7-009] 【101期以降削除】◯ ← △：しかし、購入ボタンを押してもトップページに遷移するので購入した商品は、再度購入できない状態になっているためOK"
     else
       @puts_num_array[7][9] = "[7-009]【101期以降削除】 × ← △：また「購入ボタン」を押すとトップページ以外の画面に遷移する状態になっている"
-      @d.get(@url)
+      @d.get("http://" + @url_ele)
     end
     # 84期まではログアウトユーザーが詳細画面を見ても「購入画面に進む」ボタンが表示されていてもOK(クリックするとトップに戻ること)
     # 85期からは「購入画面に進む」ボタンの表示自体がNG
 
   else
     @puts_num_array[7][9] = "[7-009]【101期以降削除】◯"  #：ログイン状態の出品者以外のユーザーのみ、「購入画面に進む」ボタンが表示されること"
-    @d.get(@url)
+    @d.get("http://" + @url_ele)
   end
 
   @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
@@ -1417,7 +1419,7 @@ end
 def no_user_item_buy_check
 
   # トップページに遷移
-  @d.get(@url)
+  @d.get("http://" + @url_ele)
   @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
 
   display_flag = @d.find_element(:class,"logout").displayed? rescue false
@@ -1425,20 +1427,21 @@ def no_user_item_buy_check
   if display_flag
     @d.find_element(:class,"logout").click
     @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
-    @d.get(@url)
+    @d.get("http://" + @url_ele)
     @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
   end
 
   # ログアウト状態でサングラスの商品詳細画面へ遷移
   item_name_click_from_top(@item_name2)
   # 商品詳細画面のシンボルである「不適切な商品の通報」ボタンの有無で判断
+  sleep(3)
   if /不適切な商品の通報/ .match(@d.page_source)
     @puts_num_array[4][2] = "[4-002] ◯"  #：ログアウト状態のユーザーでも、商品詳細表示ページを閲覧できること"
   else
     @puts_num_array[4][2] = "[4-002] ×：ログアウト状態では商品詳細表示ページに遷移できない"
   end
 
-  @d.get(@url)
+  @d.get("http://" + @url_ele)
   @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
 
 end
@@ -1481,7 +1484,7 @@ def login_user2_item_new_2nd
   input_item_new_method(@item_name2, @item_info2, @item_price2, @item_image2)
   @d.find_element(:class,"sell-btn").click
 
-  @d.get(@url)
+  @d.get("http://" + @url_ele)
   @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
 
   # サングラスの詳細画面へ
