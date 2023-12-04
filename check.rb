@@ -12,8 +12,8 @@ require "json"
 options = Selenium::WebDriver::Chrome::Options.new
 options.add_argument('--headless')
 @wait = Selenium::WebDriver::Wait.new(:timeout => 90)
-@d = Selenium::WebDriver.for :chrome
-#@d = Selenium::WebDriver.for :chrome, options: options
+# @d = Selenium::WebDriver.for :chrome
+@d = Selenium::WebDriver.for :chrome, options: options
 
 
 # チェック用のドライバー
