@@ -813,8 +813,8 @@ def check_14
     # basic認証の情報を含まない本番環境のURLのみでアクセスしてみる
     ## @d.get("https://" + @url_ele)
     ## localのときはhttp
-     @d.get("http://" + @url_ele)
-    sleep 1
+    @d.get("http://" + @url_ele)
+    sleep 60
 
     display_flag = @d.find_element(:class,"furima-icon").displayed? rescue false
     # basic認証が実装されていたらトップ画面には遷移できないはず
