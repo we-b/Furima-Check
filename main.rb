@@ -215,15 +215,19 @@ def login_any_user(email, pass)
   @wait.until {@d.find_element(:class,"purchase-btn").displayed? rescue false  }
   sleep(5)
   display_flag = @d.find_element(:class,"logout").displayed? rescue false
+  sleep(5)
   # ログイン状態であればログアウトしておく
   if display_flag
     @d.find_element(:class,"logout").click
+    sleep(5)
     @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
     @d.get("http://" + @url_ele)
     @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
+    sleep(5)
   end
-
+  sleep(5)
   @d.find_element(:class,"login").click
+  sleep(5)
   @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
 
   @d.find_element(:id, 'email').send_keys(email)
@@ -312,6 +316,8 @@ end
 # 商品出品時の入力必須項目へ入力するメソッド
 # あくまで項目の入力までを行う。入力後の出品ボタンは押さない
 def input_item_new_method(name, info, price, image)
+  # 画面のリロード
+  # @d.navigate.refresh
 
   # 以下、各項目の入力を行う
   # 商品画像
@@ -356,10 +362,15 @@ def input_item_new_method(name, info, price, image)
   item_scheduled_delivery = select_new(item_scheduled_delivery_element)
   item_scheduled_delivery.select_by(:value, @value)
 
-
+  puts "ここから"
+  sleep(10)
   # 価格
   @wait.until {@d.find_element(:id,"item-price").displayed?}
   @d.find_element(:id,"item-price").send_keys(price)
+
+  # element = @d.find_element(:id, 'item-price')
+  # @d.execute_script("arguments[0].value = '40000';", element)
+  # @d.execute_script("arguments[0].dispatchEvent(new Event('input'));", element)
 end
 
 # 再出品するために必須項目を全クリア

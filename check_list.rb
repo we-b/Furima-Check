@@ -1390,13 +1390,16 @@ def check_20
     # ログイン状態であればログアウトしておく
     if display_flag
       @d.find_element(:class,"logout").click
+      sleep(3)
       @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
       @d.get("http://" + @url_ele)
       @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
+      sleep(3)
     end
 
     # 新規登録画面へ
     @d.find_element(:class,"sign-up").click
+    sleep(3)
     @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
 
     # 新規登録に必要な項目入力を行うメソッド
