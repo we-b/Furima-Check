@@ -1517,6 +1517,7 @@ end
 
 #商品が出品されていない状態では、ダミーの商品情報が表示されること
 def check_dummy_item
+  sleep(10)
   if /商品を出品してね！/.match(@d.page_source)
     @puts_num_array[3][3] = "[3-003] ○" #商品が出品されていない状態では、ダミーの商品情報が表示されること"
   else
