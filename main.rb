@@ -674,6 +674,8 @@ def sign_up_nickname_input
     @d.find_element(:class,"sign-up").click
   end
 
+  sleep(5)
+
   @d.find_element(:class,"sign-up").click
   @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
   # ユーザー新規登録画面でのエラーハンドリングログを取得
