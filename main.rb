@@ -710,6 +710,8 @@ def sign_up_password_short
   else
     input_sign_up_delete
   end
+
+  sleep 5
   # 新規登録に必要な項目入力を行うメソッド。パスワード文字数4文字
   input_sign_up_method(@nickname, @email, @password_short, @first_name, @last_name, @first_name_kana, @last_name_kana)
   @d.find_element(:class,"register-red-btn").click
@@ -943,8 +945,10 @@ end
 
 # ログイン
 def login_user1
+  sleep 3
   @wait.until {@d.find_element(:class,"login").displayed?}
   @d.find_element(:class,"login").click
+  sleep 3
   @wait.until {@d.find_element(:id, 'email').displayed?}
   @d.find_element(:id, 'email').send_keys(@email)
   @wait.until {@d.find_element(:id, 'password').displayed?}
@@ -1100,6 +1104,7 @@ def item_edit
   login_any_user(@email, @password)
 
   @d.find_element(:class,"item-img-content").click
+  sleep 3
   @wait.until {@d.find_element(:class,"item-red-btn").displayed?}
   # 商品編集ボタンクリック
   @d.find_element(:class,"item-red-btn").click
@@ -1114,7 +1119,8 @@ def item_edit
     @puts_num_array[5][6] = "[5-006] ×"  #：ページ下部の「もどる」ボタンを押しても、商品詳細表示ページに遷移できない"
     @d.get(detail_url_coat)
   end
-
+  
+  sleep 3
   @wait.until {@d.find_element(:class,"item-red-btn").displayed?}
   @d.find_element(:class,"item-red-btn").click
 
@@ -1495,12 +1501,17 @@ def login_user2_item_new_2nd
   input_item_new_method(@item_name2, @item_info2, @item_price2, @item_image2)
   @d.find_element(:class,"sell-btn").click
 
+  sleep 10
+
   @d.get("http://" + @url_ele)
+  puts "http://" + @url_ele
   @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
 
   # サングラスの詳細画面へ
   item_name_click_from_top(@item_name2)
 
+  puts "編集ボタン"
+  sleep 5
   @wait.until {@d.find_element(:class,"item-red-btn").displayed?}
   # 商品編集ボタンクリック
   @d.find_element(:class,"item-red-btn").click
