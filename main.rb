@@ -540,7 +540,7 @@ def input_purchase_information_error_postal_code(card_number, card_expiry, card_
   # カード情報入力画面にリダイレクトかつエラーメッセージが出力されている場合
   if /クレジットカード情報入力/ .match(@d.page_source) && display_flag
     @puts_num_array[7][10] = "[7-010] ◯"  #郵便番号の保存にはハイフンが必要であること（123-4567となる）"
-
+      google_spreadsheet_input("◯",95,8)
 
   # カード情報入力画面にリダイレクトのみ
   elsif /クレジットカード情報入力/ .match(@d.page_source)
@@ -603,6 +603,7 @@ def input_purchase_information_error_phone_number(card_number, card_expiry, card
     # カード情報入力画面にリダイレクトかつエラーメッセージが出力されている場合
     if /クレジットカード情報入力/ .match(@d.page_source) && display_flag
       @puts_num_array[7][11] = "[7-011] ◯"  #電話番号は11桁以内の数値のみ保存可能なこと（09012345678となる）"
+        google_spreadsheet_input("◯",96,8)
 
 
     # カード情報入力画面にリダイレクトのみ
@@ -726,6 +727,7 @@ def sign_up_password_short
     #raise "ユーザー登録バリデーションにて不備あり"
   else
     @puts_num_array[1][17] = "[1-017] ◯"  #：パスワードは、6文字以上での入力が必須であること(6文字が入力されていれば、登録が可能なこと
+      google_spreadsheet_input("◯",12,8)
     # パスワードの上書きでも登録が成功しない場合は処理を終了
   end
     # 登録できてしまった場合、ログアウトしておく
@@ -768,6 +770,7 @@ def sign_up_password_string
     #raise "ユーザー登録バリデーションにて不備あり"
   else
     @puts_num_array[1][18] = "[1-018] ◯"  #：パスワードは、半角英数字混合での入力が必須であること
+      google_spreadsheet_input("◯",13,8)
     # パスワードの上書きでも登録が成功しない場合は処理を終了
   end
     # 登録できてしまった場合、ログアウトしておく
@@ -810,6 +813,7 @@ def sign_up_password_integer
     #raise "ユーザー登録バリデーションにて不備あり"
   else
     @puts_num_array[1][19] = "[1-019] ◯"  #：パスワードは、半角英数字混合での入力が必須であること
+      google_spreadsheet_input("◯",13,8)
     # パスワードの上書きでも登録が成功しない場合は処理を終了
   end
     # 登録できてしまった場合、ログアウトしておく
@@ -862,20 +866,25 @@ def sign_up_retry
 
   if /FURIMAが選ばれる3つの理由/ .match(@d.page_source)
     @puts_num_array[1][2]  = "[1-002] ◯"  #：ニックネームが必須であること"
+      google_spreadsheet_input("◯",7,8)
     @puts_num_array[1][3]  = "[1-003] ◯"  #：メールアドレスが必須である"
+      google_spreadsheet_input("◯",8,8)
     @puts_num_array[1][4]  = "[1-004] ◯"  #：メールアドレスは一意性である"      #これはまだ立証できない
     @puts_num_array[1][5]  = "[1-005] ◯"  #：メールアドレスは@を含む必要がある"  #これはまだ立証できない
     @puts_num_array[1][6]  = "[1-006] ◯"  #：パスワードが必須である"
+      google_spreadsheet_input("◯",11,8)
     # puts "[1-] ◯：パスワードは6文字以上である"  #これはまだ立証できない
     # puts "[1-] ◯：パスワードは半角英数字混合である"  #これはまだ立証できない
     @puts_num_array[1][7]  = "[1-007] ◯"  #：パスワードは確認用を含めて2回入力する"  #これはまだ立証できない
     @puts_num_array[1][8]  = "[1-008] ◯"  #：ユーザー本名が、名字と名前がそれぞれ必須である"  #これはまだ立証できない
     @puts_num_array[1][9]  = "[1-009] ◯"  #：ユーザー本名は全角（漢字・ひらがな・カタカナ）で入力させる"  #これはまだ立証できない
     @puts_num_array[1][10] = "[1-010] ◯"  #：ユーザー本名のフリガナが、名字と名前でそれぞれ必須である"
+      google_spreadsheet_input("◯",18,8)
     @puts_num_array[1][11] = "[1-011] ◯"  #：ユーザー本名のフリガナは全角（カタカナ）で入力させる"
+    google_spreadsheet_input("◯",19,8)
     @puts_num_array[1][12] = "[1-012] ◯"  #：生年月日が必須である"  #これはまだ立証できない
     @puts_num_array[1][13] = "[1-013] ◯"  #：必須項目を入力し、ユーザー登録ができる"
-
+      google_spreadsheet_input("◯",21,8)
   # 登録に失敗した場合はパスワードを疑う
   elsif /会員情報入力/ .match(@d.page_source)
     @puts_num_array[0].push("×：ユーザー新規登録時にパスワードに大文字が入っていないと登録できない可能性あり、パスワード文字列に大文字(aaa111 → Aaa111)を追加して再登録トライ")
@@ -958,7 +967,9 @@ def login_user1
   @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
 
   @puts_num_array[1][15] = "[1-015] ◯"  #：ヘッダーの新規登録/ログインボタンをクリックすることで、各ページに遷移できること
+    google_spreadsheet_input("◯",24,8)
   @puts_num_array[1][16] = "[1-016] ◯"  #：ヘッダーのログアウトボタンをクリックすることで、ログアウトができること
+    google_spreadsheet_input("◯",25,8)
   # トップ画面に戻れているか
   if /FURIMAが選ばれる3つの理由/ .match(@d.page_source)
     @puts_num_array[1][14] = "[1-014] ◯"  #：ログイン/ログアウトができる"
@@ -1002,6 +1013,7 @@ def item_new_price_uninput
     @puts_num_array[2][12] = "[2-012] ◯"  #：入力に問題がある状態で出品ボタンが押されたら、出品ページに戻りエラーメッセージが表示されること"
     @puts_num_array[2][3] = "[2-003] ◯"  #：必須項目が一つでも欠けている場合は、出品ができない"
     @puts_num_array[2][14] = "[2-014] ◯" #:ログイン状態のユーザーだけが、商品出品ページへ遷移できること
+      google_spreadsheet_input("◯",29,8)
   elsif /FURIMAが選ばれる3つの理由/.match(@d.page_source)
     @puts_num_array[2][12] = "[2-012] ×：価格の入力なしで商品出品を行うと、商品出品ページにリダイレクトされずトップページへ遷移してしまう"
     @puts_num_array[2][3] = "[2-003] ×：価格の入力なしで商品出品を行うと、出品できてしまう"
@@ -1046,16 +1058,26 @@ def item_new_require_input
 
   if /FURIMAが選ばれる3つの理由/ .match(@d.page_source)
     @puts_num_array[2][2] = "[2-002] ◯"  #：商品画像を1枚つけることが必須であること(ActiveStorageを使用すること)"
+      google_spreadsheet_input("◯",31,8)
     @puts_num_array[2][4] = "[2-004] ◯"  #：必須項目を入力した上で出品ができること"
+      google_spreadsheet_input("◯",32,8)
     @puts_num_array[2][5] = "[2-005] ◯"  #：商品の説明が必須である"
+      google_spreadsheet_input("◯",33,8)
     @puts_num_array[2][6] = "[2-006] ◯"  #：カテゴリーの情報が必須である"
+      google_spreadsheet_input("◯",34,8)
     @puts_num_array[2][7] = "[2-007] ◯"  #：商品の状態についての情報が必須である"
+      google_spreadsheet_input("◯",36,8)
     @puts_num_array[2][8] = "[2-008] ◯"  #：配送料の負担についての情報が必須である"
+      google_spreadsheet_input("◯",38,8)
     @puts_num_array[2][9] = "[2-009] ◯"  #：発送元の地域についての情報が必須である"
+      google_spreadsheet_input("◯",40,8)
     @puts_num_array[2][10] = "[2-010] ◯"  #：発送までの日数についての情報が必須である"
+      google_spreadsheet_input("◯",42,8)
     @puts_num_array[2][11] = "[2-011] ◯"  #：販売価格についての情報が必須である"
+      google_spreadsheet_input("◯",44,8)
     @puts_num_array[2][13] = "[2-013] △：販売価格を半角数字で保存可能。全角数字での出品可否は手動確認"  #：販売価格は半角数字のみ保存可能であること"
     @puts_num_array[2][20] = "[2-020] ○"  #：出品が完了したら、トップページに遷移すること"
+      google_spreadsheet_input("◯",50,8)
   end
 end
 
@@ -1115,6 +1137,7 @@ def item_edit
   # 詳細ページに戻れるか確認
   if /#{@item_info}/.match(@d.page_source)
     @puts_num_array[5][6] = "[5-006] ◯"  #：ページ下部の「もどる」ボタンを押すと、編集途中の情報は破棄され、商品詳細表示ページに遷移すること"
+      google_spreadsheet_input("◯",71,8)
   else
     @puts_num_array[5][6] = "[5-006] ×"  #：ページ下部の「もどる」ボタンを押しても、商品詳細表示ページに遷移できない"
     @d.get(detail_url_coat)
@@ -1127,6 +1150,7 @@ def item_edit
   # 「商品の説明」項目に正常な情報を入力して編集してみる
   @wait.until {@d.find_element(:id,"item-info").displayed? rescue @d.find_element(:id,"item-description").displayed? }
   @puts_num_array[5][5] = "[5-005] ◯" #ログイン状態の出品者のみ、出品した商品の商品情報編集ページに遷移できること
+    google_spreadsheet_input("◯",72,8)
   @d.find_element(:id,"item-info").send_keys(@item_info_re) rescue @d.find_element(:id,"item-description").send_keys(@item_info_re)
   @d.find_element(:class,"sell-btn").click
   @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
@@ -1135,7 +1159,9 @@ def item_edit
   # 稀に編集画面に遷移した際に値を保持していない実装をしている受講生がいるため、商品詳細画面に遷移できているかあぶり出すチェック項目
   if /#{@item_info_re}/.match(@d.page_source)
     @puts_num_array[5][2] = "[5-002] ◯"  #：必要な情報を適切に入力すると、商品情報（商品画像・商品名・商品の状態など）を変更できること"
+      google_spreadsheet_input("◯",69,8)
     @puts_num_array[5][7] = "[5-007] ◯"  #：編集が完了したら、商品詳細表示ページに遷移し、変更された商品情報が表示されること"
+      google_spreadsheet_input("◯",78,8)
   elsif /#{@item_info}/.match(@d.page_source)
     @puts_num_array[5][2] = "[5-002] ×：商品編集画面にて「商品説明」を編集し確定させたが、編集前の情報が表示されている"
     @puts_num_array[5][7] = "[5-007] ◯"  #：編集が完了したら、商品詳細表示ページに遷移し、変更された商品情報が表示されること"
@@ -1169,6 +1195,7 @@ def logout_item_edit_and_buy
   @wait.until {@d.find_element(:class, "item-img-content").displayed?}
   if /#{@item_image_name}/ .match(@d.page_source)
     @puts_num_array[3][2] = "[3-002] ◯"  #：商品一覧表示ページは、ログイン状況に関係なく、誰でも見ることができること"
+      google_spreadsheet_input("◯",59,8)
   else
     @puts_num_array[3][2] = "[3-002] ×：ログアウト状態だとトップ画面にて出品画像が表示されない"
   end
@@ -1333,15 +1360,21 @@ def login_user2_item_buy
 
   #：購入が完了したら、トップページまたは購入完了ページに遷移する"
   if /FURIMAが選ばれる3つの理由/ .match(@d.page_source) then @puts_num_array[7][6] = "[7-006] ◯" end
+    google_spreadsheet_input("◯",97,8)
 
   @d.get("http://" + @url_ele)
   @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
 
   @puts_num_array[7][2] = "[7-002] ◯"  #クレジットカードの情報は購入の都度入力させること"  #これは立証できていない
+    google_spreadsheet_input("◯",90,8)
   @puts_num_array[7][3] = "[7-003] ◯"  #配送先の住所情報も購入の都度入力させること"
+    google_spreadsheet_input("◯",92,8)
   @puts_num_array[7][4] = "[7-004] ◯"  #クレジットカード情報は必須であり、右記のPAY.JPテストカードの情報で決済ができること"
+    google_spreadsheet_input("◯",91,8)
   @puts_num_array[7][8] = "[7-008] ◯"  #必要な情報を適切に入力すると、商品の購入ができること
+    google_spreadsheet_input("◯",85,8)
   @puts_num_array[7][12] = "[7-012] ◯"  #ログイン状態の場合は、自身が出品していない販売中商品の商品購入ページに遷移できること
+    google_spreadsheet_input("◯",84,8)
 
   # puts "◯配送先の情報として、郵便番号・都道府県・市区町村・番地・電話番号が必須であること"  #これは立証できていない
   # puts "◯郵便番号にはハイフンが必要であること（123-4567となる）"  #これは立証できていない
@@ -1358,6 +1391,7 @@ def login_user2_after_purchase_check1
   # トップページでの表記をチェック
   if /Sold Out/ .match(@d.page_source) || display_flag
     @puts_num_array[3][1] = "[3-001] ◯"  #売却済みの商品は、「sould out」の文字が表示されるようになっている"
+    google_spreadsheet_input("◯",57,8)
   else
     # sold outの表示処理は受講生によって様々のため目視で最終確認
     @puts_num_array[3][1] = "[3-001] △：売却済みの商品は、「sould out」の文字が表示されない。画像処理している可能性あるため要目視確認"
@@ -1454,6 +1488,7 @@ def no_user_item_buy_check
   sleep(3)
   if /不適切な商品の通報/ .match(@d.page_source)
     @puts_num_array[4][2] = "[4-002] ◯"  #：ログアウト状態のユーザーでも、商品詳細表示ページを閲覧できること"
+      google_spreadsheet_input("◯",63,8)
   else
     @puts_num_array[4][2] = "[4-002] ×：ログアウト状態では商品詳細表示ページに遷移できない"
   end
@@ -1486,7 +1521,9 @@ def login_user2_after_purchase_check2
     @puts_num_array[6][2] = "[6-002] ×：削除が完了しても、トップページに遷移できない"
   else
     @puts_num_array[6][1] = "[6-001] ◯"  #：出品者だけが商品情報を削除できる"
+      google_spreadsheet_input("◯",82,8)
     @puts_num_array[6][2] = "[6-002] ○"  #：削除が完了したら、トップページに遷移すること"
+      google_spreadsheet_input("○",83,8)
   end
 end
 
@@ -1541,6 +1578,7 @@ end
 def check_dummy_item
   if /商品を出品してね！/.match(@d.page_source)
     @puts_num_array[3][3] = "[3-003] ○" #商品が出品されていない状態では、ダミーの商品情報が表示されること"
+      google_spreadsheet_input("○",6,8)
   else
     @puts_num_array[3][3] = "[3-003] × :商品が出品されていない状態では、ダミーの商品情報が表示されてない。またはデータがリセットされていない"  #：出品者だけが商品情報を削除できる"
   end

@@ -1,5 +1,24 @@
 require "./main"
 
+# スプレットシートにチェックを入れるためのコード
+require "google_drive"
+# config.jsonを読み込んでセッションを確立
+session = GoogleDrive::Session.from_config("furima-check-5f40d47090d5.json")
+# スプレッドシートをURLで取得
+sp = session.spreadsheet_by_url("https://docs.google.com/spreadsheets/d/1q_7tWEfvxIPglBNIkTIi2Uo_hIln5vd2ffIPc2f4crg/edit#gid=0")
+# 最初のシート
+@ws = sp.worksheet_by_title("シート1")
+
+# スプレットシートにチェックを入れるメソッド
+def google_spreadsheet_input(check_detail,row,column) # row:縦の数字, column:アルファベットの数字(Aなら1)
+  if check_detail == "◯"
+    # セルを指定して値を更新,[数字, アルファベットの順番]
+    @ws[row, column] = true 
+    # saveで変更を保存、実際にスプレッドシートに反映させる
+    @ws.save
+  end
+end
+
 # ログアウト状態でトップ画面にログインボタンとサインアップボタンが表示されているかチェック
 def check_1
   check_detail = {"チェック番号"=> 1 , "チェック合否"=> "" , "チェック内容"=> "ログアウト状態で、ヘッダーにログイン/新規登録ボタンが表示されること" , "チェック詳細"=> ""}
@@ -22,6 +41,7 @@ def check_1
     end
     
     check_detail["チェック合否"] = check_flag == 2 ? "◯" : "×"
+      google_spreadsheet_input(check_detail["チェック合否"],22,8)
   
   ensure
     @check_log.push(check_detail)
@@ -53,6 +73,7 @@ def check_2
     end
 
     check_detail["チェック合否"] = check_flag == 2 ? "◯" : "×"
+      google_spreadsheet_input(check_detail["チェック合否"],22,8)
 
   ensure
     @check_log.push(check_detail)
@@ -229,6 +250,7 @@ def check_4
     end
 
     check_detail["チェック合否"] = check_flag == 1 ? "◯" : "×"
+      google_spreadsheet_input(check_detail["チェック合否"],55,8)
   ensure
     @check_log.push(check_detail)
   end
@@ -267,6 +289,7 @@ def check_5
     end
 
     check_detail["チェック合否"] = check_flag == 1 ? "◯" : "×"
+      google_spreadsheet_input(check_detail["チェック合否"],87,8)
 
   ensure
     # ログアウトしておく
@@ -355,6 +378,7 @@ def check_6
     end
 
     check_detail["チェック合否"] = check_flag == 1 ? "◯" : "×"
+      google_spreadsheet_input(check_detail["チェック合否"],88,8)
 
   ensure
     # ログアウトしておく
@@ -479,6 +503,7 @@ def check_7
     }
 
     check_detail["チェック合否"] = check_flag == 9 ? "◯" : "×"
+      google_spreadsheet_input(check_detail["チェック合否"],76,8)
 
   ensure
     @check_log.push(check_detail)
@@ -524,6 +549,7 @@ def check_8
     @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
 
     check_detail["チェック合否"] = check_flag == 1 ? "◯" : "×"
+      google_spreadsheet_input(check_detail["チェック合否"],74,8)
 
   ensure
     @d.get("http://" + @url_ele)
@@ -552,6 +578,7 @@ def check_9
     end
 
     check_detail["チェック合否"] = check_flag == 1 ? "◯" : "×"
+      google_spreadsheet_input(check_detail["チェック合否"],30,8)
 
   ensure
     @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
@@ -587,6 +614,7 @@ def check_10
     # トップページでの表記をチェック
     if /Sold Out/ .match(@d.page_source) || display_flag
       @puts_num_array[4][3] = "[4-003] ◯"  #売却済みの商品は、「sould out」の文字が表示されるようになっている"
+        google_spreadsheet_input("◯",67,8)
     else
       # sold outの表示処理は受講生によって様々のため目視で最終確認
       @puts_num_array[4][3] = "[4-003] △：売却済みの商品は、「sould out」の文字が表示されない。画像処理している可能性あるため要目視確認"
@@ -612,6 +640,7 @@ def check_10
     
 
     check_detail["チェック合否"] = check_flag == 2 ? "◯" : "×"
+      google_spreadsheet_input(check_detail["チェック合否"],61,8)
 
   ensure
     # ログアウトしておく
@@ -664,6 +693,7 @@ def check_11
     @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
 
     check_detail["チェック合否"] = check_flag == 3 ? "◯" : "×"
+      google_spreadsheet_input(check_detail["チェック合否"],64,8)
 
   ensure
     @d.get("http://" + @url_ele)
@@ -794,6 +824,7 @@ def check_13
     end
 
     check_detail["チェック合否"] = check_flag == 4 ? "◯" : "×"
+      google_spreadsheet_input(check_detail["チェック合否"],45,8)
 
   ensure
     @d.get("http://" + @url_ele)
@@ -826,6 +857,7 @@ def check_14
     end
 
     check_detail["チェック合否"] = check_flag == 1 ? "◯" : "×";
+      google_spreadsheet_input(check_detail["チェック合否"],101,8)
 
   ensure
     @check_log.push(check_detail)
@@ -859,6 +891,7 @@ def check_15
     @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
 
     check_detail["チェック合否"] = check_flag == 1 ? "◯" : "×"
+      google_spreadsheet_input(check_detail["チェック合否"],73,8)
 
   ensure
     @check_log.push(check_detail)
@@ -906,6 +939,7 @@ def check_16
     @d.get("http://" + @url_ele)
 
     check_detail["チェック合否"] = check_flag == 2 ? "◯" : "×"
+      google_spreadsheet_input(check_detail["チェック合否"],75,8)
 
   ensure
     # user2にログインして元に戻しておく
@@ -969,6 +1003,7 @@ def check_17
     end
 
     check_detail["チェック合否"] = check_flag == 2 ? "◯" : "×"
+      google_spreadsheet_input(check_detail["チェック合否"],46,8)
 
   ensure
     @check_log.push(check_detail)
@@ -1004,6 +1039,7 @@ def check_22
     end
 
     check_detail["チェック合否"] = check_flag == 2 ? "◯" : "×"
+      google_spreadsheet_input(check_detail["チェック合否"],49,8)
 
   ensure
     @check_log.push(check_detail)
@@ -1104,6 +1140,7 @@ def check_18
     end
 
     check_detail["チェック合否"] = check_flag == 11 ? "◯" : "×"
+      google_spreadsheet_input(check_detail["チェック合否"],66,8)
 
   ensure
     @check_log.push(check_detail)
@@ -1444,6 +1481,7 @@ def check_20
     end
 
     check_detail["チェック合否"] = check_flag == 1 ? "◯" : "×"
+      google_spreadsheet_input(check_detail["チェック合否"],15,8)
 
   ensure
     @check_log.push(check_detail)
@@ -1517,6 +1555,7 @@ def check_21
     end
 
     check_detail["チェック合否"] = check_flag == 1 ? "◯" : "×"
+      google_spreadsheet_input(check_detail["チェック合否"],86,8)
 
   ensure
     @d.get("http://" + @url_ele)
@@ -1546,6 +1585,7 @@ def check_2_015
   select_category_any = [ "レディース","メンズ","レディース", "ベビー・キッズ","インテリア・住まい・小物","本・音楽・ゲーム","おもちゃ・ホビー・グッズ","家電・スマホ・カメラ","スポーツ・レジャー","ハンドメイド","その他"]
   if select_category_any.all? {|i| selectCategories.include?(i)}
     @puts_num_array[2][15] = "[2-015] ◯"
+      google_spreadsheet_input("◯",35,8)
   else
     false_selects =[]
     selectCategories.each{|check_select|
@@ -1579,6 +1619,7 @@ def check_2_016
   select_category_any = ["新品・未使用", "未使用に近い", "目立った傷や汚れなし", "やや傷や汚れあり", "傷や汚れあり", "全体的に状態が悪い"]
   if select_category_any.all? {|i| selectCategories.include?(i)}
     @puts_num_array[2][16] = "[2-016] ◯"
+      google_spreadsheet_input("◯",37,8)
   else
     false_selects =[]
     selectCategories.each{|check_select|
@@ -1614,6 +1655,7 @@ def check_2_017
   select_category_any = [ "着払い(購入者負担)", "送料込み(出品者負担)"]
   if select_category_any.all? {|i| selectCategories.include?(i)}
     @puts_num_array[2][17] = "[2-017] ◯"
+    google_spreadsheet_input("◯",39,8)
   else
     false_selects =[]
     selectCategories.each{|check_select|
@@ -1643,6 +1685,7 @@ def check_2_018
   select_category_any = ["北海道", "青森県", "岩手県",  "宮城県", "秋田県", "山形県", "福島県", "茨城県", "栃木県", "群馬県", "埼玉県", "千葉県", "東京都", "神奈川県", "新潟県", "富山県", "石川県", "福井県", "山梨県", "長野県", "岐阜県", "静岡県", "愛知県", "三重県", "滋賀県", "京都府", "大阪府", "兵庫県", "奈良県", "和歌山県", "鳥取県", "島根県", "岡山県", "広島県", "山口県", "徳島県", "香川県", "愛媛県", "高知県", "福岡県", "佐賀県", "長崎県", "熊本県", "大分県", "宮崎県", "鹿児島県", "沖縄県"]
   if select_category_any.all? {|i| selectCategories.include?(i)}
     @puts_num_array[2][18] = "[2-018] ◯"
+      google_spreadsheet_input("◯",41,8)
   else
     false_selects =[]
     selectCategories.each{|check_select|
@@ -1677,6 +1720,7 @@ def check_2_019
   select_category_any = [ "1~2日で発送", "2~3日で発送", "4~7日で発送"]
   if select_category_any.all? {|i| selectCategories.include?(i)}
     @puts_num_array[2][19] = "[2-019] ◯"
+      google_spreadsheet_input("◯",43,8)
   else
     false_selects =[]
     selectCategories.each{|check_select|
