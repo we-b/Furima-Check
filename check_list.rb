@@ -10,6 +10,7 @@ sp = session.spreadsheet_by_url("https://docs.google.com/spreadsheets/d/1q_7tWEf
 @ws = sp.worksheet_by_title("シート1")
 
 @check_count_4_001 = 0
+@check_count_3 = 0
 
 # スプレットシートにチェックを入れるメソッド
 def google_spreadsheet_input(check_detail,row) # row:縦の数字, column:アルファベットの数字(Aなら1)
@@ -104,6 +105,7 @@ def check_3
     if top_item_name == @item_name
       check_detail["チェック詳細"] << "◯：トップ画面に商品名が表示されている\n"
       check_flag += 1
+      @check_count_3 += 1
     else
       check_detail["チェック詳細"] << "×：トップ画面に商品名が表示されていない\n"
       check_detail["チェック詳細"] << top_item_name
@@ -112,6 +114,7 @@ def check_3
     if top_item_img.include?(@item_image_name)
       check_detail["チェック詳細"] << "◯：トップ画面に商品画像が表示されている\n"
       check_flag += 1
+      @check_count_3 += 1
     else
       check_detail["チェック詳細"] << "×：トップ画面に商品画像が表示されていない\n"
       check_detail["チェック詳細"] << top_item_img
@@ -121,6 +124,7 @@ def check_3
     if top_item_price.include?(@item_price.to_s)
       check_detail["チェック詳細"] << "◯：トップ画面に商品価格が表示されている\n"
       check_flag += 1
+      @check_count_3 += 1
     else
       check_detail["チェック詳細"] << "×：トップ画面に商品価格が表示されていない\n"
       check_detail["チェック詳細"] << top_item_price
@@ -130,10 +134,21 @@ def check_3
     if top_item_shipping_fee_status_word.include?(@item_shipping_fee_status_word)
       check_detail["チェック詳細"] << "◯：トップ画面に配送料負担が表示されている\n"
       check_flag += 1
+      @check_count_3 += 1
     else
       check_detail["チェック詳細"] << "×：トップ画面に配送料負担が表示されていない\n"
       check_detail["チェック詳細"] << top_item_shipping_fee_status_word
     end
+
+    # 一覧のチェック
+    if @check_count_3 == 4
+      google_spreadsheet_input("◯",54)
+      google_spreadsheet_input("◯",56)
+      google_spreadsheet_input("◯",58)
+    end
+
+    # 0にリセット
+    @check_count_3 = 0
     
   
     # 商品詳細画面へ遷移
@@ -149,6 +164,7 @@ def check_3
     if show_item_name == @item_name
       check_detail["チェック詳細"] << "◯：詳細画面に商品名が表示されている\n"
       check_flag += 1
+      @check_count_3 += 1
     else
       check_detail["チェック詳細"] << "×：詳細画面に商品名が表示されていない\n"
       check_detail["チェック詳細"] << show_item_name
@@ -157,6 +173,7 @@ def check_3
     if show_item_img.include?(@item_image_name)
       check_detail["チェック詳細"] << "◯：詳細画面に商品画像が表示されている\n"
       check_flag += 1
+      @check_count_3 += 1
     else
       check_detail["チェック詳細"] << "×：詳細画面に商品画像が表示されていない\n"
       check_detail["チェック詳細"] << show_item_img
@@ -165,10 +182,19 @@ def check_3
     if show_item_price.include?(@item_price.to_s)
       check_detail["チェック詳細"] << "◯：詳細画面に商品価格が表示されている\n"
       check_flag += 1
+      @check_count_3 += 1
     else
       check_detail["チェック詳細"] << "×：詳細画面に商品価格が表示されていない\n"
       check_detail["チェック詳細"] << show_item_price
     end
+
+    # 詳細のチェック
+    if @check_count_3 == 3
+      google_spreadsheet_input("◯",65)
+    end
+
+    # 0にリセット
+    @check_count_3 = 0
   
     # 商品購入画面へ遷移
     @d.find_element(:class,"item-red-btn").click
@@ -184,6 +210,7 @@ def check_3
     if purchase_item_name == @item_name
       check_detail["チェック詳細"] << "◯：購入画面に商品名が表示されている\n"
       check_flag += 1
+      @check_count_3 += 1
     else
       check_detail["チェック詳細"] << "×：購入画面に商品名が表示されていない\n"
       check_detail["チェック詳細"] << purchase_item_name
@@ -192,6 +219,7 @@ def check_3
     if purchase_item_img.include?(@item_image_name)
       check_detail["チェック詳細"] << "◯：購入画面に商品画像が表示されている\n"
       check_flag += 1
+      @check_count_3 += 1
     else
       check_detail["チェック詳細"] << "×：購入画面に商品画像が表示されていない\n"
       check_detail["チェック詳細"] << purchase_item_img
@@ -200,13 +228,19 @@ def check_3
     if purchase_item_price.include?(@item_price.to_s)
       check_detail["チェック詳細"] << "◯：購入画面に商品価格が表示されている\n"
       check_flag += 1
+      @check_count_3 += 1
     else
       check_detail["チェック詳細"] << "×：購入画面に商品価格が表示されていない\n"
       check_detail["チェック詳細"] << purchase_item_price
     end
   
     check_detail["チェック合否"] = check_flag == 10 ? "◯" : "×"
-  
+
+    # 購入のチェック
+    if @check_count_3 == 3
+      google_spreadsheet_input("◯",89)
+    end
+
     # トップ画面へ戻っておく
     @d.get("http://" + @url_ele)
     # エラー発生有無にかかわらず実行
@@ -741,6 +775,7 @@ def check_12
     end
 
     check_detail["チェック合否"] = check_flag == 2 ? "◯" : "×"
+    google_spreadsheet_input(check_detail["チェック合否"],62)
 
   ensure
     @d.get("http://" + @url_ele)
@@ -1167,6 +1202,7 @@ def check_19_1
     display_flag = @d.find_element(:class,"error-alert").displayed? rescue false
     if display_flag
       @error_log_hash["新規登録"] = "◯：【ユーザー新規登録画面】にて全項目未入力の状態で登録ボタンを押すと登録が完了せずエラーメッセージが出力される\n\n"
+        google_spreadsheet_input("◯",26)
       @error_log_hash["新規登録"] << "↓↓↓ エラーログ全文(出力された内容) ↓↓↓\n"
       # エラーログの親要素
       error_parent = @d.find_element(:class,"error-alert")
@@ -1236,6 +1272,7 @@ def check_19_2
     display_flag = @d.find_element(:class,"error-alert").displayed? rescue false
     if display_flag
       @error_log_hash["商品出品"] = "◯：【商品出品画面】にて全項目未入力の状態で出品ボタンを押すと出品が完了せずエラーメッセージが出力される\n\n"
+        google_spreadsheet_input("◯",51)
       @error_log_hash["商品出品"] << "↓↓↓ エラーログ全文(出力された内容) ↓↓↓\n"
       # エラーログの親要素
       error_parent = @d.find_element(:class,"error-alert")
@@ -1292,6 +1329,7 @@ def check_19_3
     display_flag = @d.find_element(:class,"error-alert").displayed? rescue false
     if display_flag
       @error_log_hash["商品購入"] = "◯：【商品購入画面】にて全項目未入力の状態で購入ボタンを押すと購入が完了せずエラーメッセージが出力される\n\n"
+        google_spreadsheet_input("◯",79)
       @error_log_hash["商品購入"] << "↓↓↓ エラーログ全文(出力された内容) ↓↓↓\n"
       # エラーログの親要素
       error_parent = @d.find_element(:class,"error-alert")
@@ -1352,6 +1390,7 @@ def check_19_4
     display_flag = @d.find_element(:class,"error-alert").displayed? rescue false
     if display_flag
       @error_log_hash["商品購入"] = "◯：【商品購入画面】にて全項目未入力の状態で購入ボタンを押すと購入が完了せずエラーメッセージが出力される\n\n"
+        google_spreadsheet_input("◯",98)
       @error_log_hash["商品購入"] << "↓↓↓ エラーログ全文(出力された内容) ↓↓↓\n"
       # エラーログの親要素
       error_parent = @d.find_element(:class,"error-alert")
