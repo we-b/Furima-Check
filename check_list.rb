@@ -14,13 +14,27 @@ sp = session.spreadsheet_by_url("https://docs.google.com/spreadsheets/d/1q_7tWEf
 
 # スプレットシートにチェックを入れるメソッド
 def google_spreadsheet_input(check_detail,row) # row:縦の数字, column:アルファベットの数字(Aなら1)
-  puts row
   if check_detail == "◯"
     # セルを指定して値を更新,[数字, アルファベットの順番]
     @ws[row, 8] = true 
     # saveで変更を保存、実際にスプレッドシートに反映させる
     @ws.save
     sleep 0.2
+  end
+  puts "#{row}: #{@ws[row, 8]}"
+end
+
+# 重複したエラーメッセージが表示されていないことを確認するメソッド
+def errors_messages_duplication_check(implementation,row)
+  # エラー文の要素取得
+  errors_messages = @d.find_elements(:class, "error-alert")
+
+  # 重複しているかどうかチェック
+  if errors_messages.uniq.length == errors_messages.length
+    puts "#{implementation}機能に重複する文字列は含まれていません。"
+      google_spreadsheet_input("◯",row)
+  else
+    puts "配列には重複する文字列が含まれています。"
   end
 end
 
@@ -165,6 +179,9 @@ def check_3
       check_detail["チェック詳細"] << "◯：詳細画面に商品名が表示されている\n"
       check_flag += 1
       @check_count_3 += 1
+      
+      # 詳細画面に商品名が表示されていることが確認できればページ遷移が行われている
+      google_spreadsheet_input("◯",68)
     else
       check_detail["チェック詳細"] << "×：詳細画面に商品名が表示されていない\n"
       check_detail["チェック詳細"] << show_item_name
@@ -568,7 +585,7 @@ def check_8
 
     # ログアウト状態でコート編集画面に直接遷移する
     @d.get(@edit_url_coat)
-    sleep 5
+    sleep 8
 
     # 編集画面に遷移した時も想定した判定基準を追加
     # 編集画面のロゴ画像にはクラス名が振られていないため
@@ -1195,6 +1212,9 @@ def check_19_1
   @d.find_element(:class,"register-red-btn").click
   @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
 
+  puts "ユーザー新規登録のエラーチェック====================================="
+  errors_messages_duplication_check("ユーザー新規登録",27)
+
   # 念の為登録できてしまわないかチェック
   if /会員情報入力/ .match(@d.page_source)
     # 登録できなかった場合
@@ -1265,6 +1285,9 @@ def check_19_2
   @d.find_element(:class,"sell-btn").click
   @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
 
+  puts "出品のエラーチェック====================================="
+  errors_messages_duplication_check("出品",53)
+
   # 念の為出品できてしまわないかチェック
   if /商品の情報を入力/ .match(@d.page_source)
     # 出品できなかった場合
@@ -1322,6 +1345,9 @@ def check_19_3
   @d.find_element(:class,"buy-red-btn").click
   @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
 
+  puts "購入のエラーチェック====================================="
+  errors_messages_duplication_check("購入",100)
+
   # 念の為購入できてしまわないかチェック
   if /クレジットカード情報入力/ .match(@d.page_source)
     # 購入できなかった場合
@@ -1329,7 +1355,7 @@ def check_19_3
     display_flag = @d.find_element(:class,"error-alert").displayed? rescue false
     if display_flag
       @error_log_hash["商品購入"] = "◯：【商品購入画面】にて全項目未入力の状態で購入ボタンを押すと購入が完了せずエラーメッセージが出力される\n\n"
-        google_spreadsheet_input("◯",79)
+        google_spreadsheet_input("◯",98)
       @error_log_hash["商品購入"] << "↓↓↓ エラーログ全文(出力された内容) ↓↓↓\n"
       # エラーログの親要素
       error_parent = @d.find_element(:class,"error-alert")
@@ -1377,11 +1403,15 @@ def check_19_3
   end
 end
 
+# これは編集のエラーハンドリングなのか？
 # 商品編集画面でのエラーハンドリングログを取得
 def check_19_4
   # 全項目未入力でいきなり「購入する」ボタンをクリック
   @d.find_element(:class,"buy-red-btn").click
   @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
+
+  puts "編集のエラーチェック====================================="
+  errors_messages_duplication_check("編集",81)
 
   # 念の為購入できてしまわないかチェック
   if /クレジットカード情報入力/ .match(@d.page_source)
@@ -1390,7 +1420,7 @@ def check_19_4
     display_flag = @d.find_element(:class,"error-alert").displayed? rescue false
     if display_flag
       @error_log_hash["商品購入"] = "◯：【商品購入画面】にて全項目未入力の状態で購入ボタンを押すと購入が完了せずエラーメッセージが出力される\n\n"
-        google_spreadsheet_input("◯",98)
+        google_spreadsheet_input("◯",79)
       @error_log_hash["商品購入"] << "↓↓↓ エラーログ全文(出力された内容) ↓↓↓\n"
       # エラーログの親要素
       error_parent = @d.find_element(:class,"error-alert")
@@ -1586,6 +1616,7 @@ def check_21
   
     # ログアウト状態でコート編集画面に直接遷移する
     @d.get(@edit_url_coat)
+    sleep 8
 
     # 編集画面に遷移した時も想定した判定基準を追加
     @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}

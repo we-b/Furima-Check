@@ -1538,7 +1538,7 @@ def login_user2_after_purchase_check2
       google_spreadsheet_input("◯",82)
     @puts_num_array[6][2] = "[6-002] ○"  #：削除が完了したら、トップページに遷移すること"
       puts "6-002=================================="
-      google_spreadsheet_input("○",83)
+      google_spreadsheet_input("◯",83)
   end
 end
 
@@ -1594,7 +1594,7 @@ def check_dummy_item
   if /商品を出品してね！/.match(@d.page_source)
     @puts_num_array[3][3] = "[3-003] ○" #商品が出品されていない状態では、ダミーの商品情報が表示されること"
       puts "3-003一覧=========================="
-      google_spreadsheet_input("○",6)
+      google_spreadsheet_input("◯",6)
   else
     @puts_num_array[3][3] = "[3-003] × :商品が出品されていない状態では、ダミーの商品情報が表示されてない。またはデータがリセットされていない"  #：出品者だけが商品情報を削除できる"
   end
