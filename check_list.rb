@@ -38,6 +38,24 @@ def errors_messages_duplication_check(implementation,row)
   end
 end
 
+def text_input_element_by_id(id)
+  input_element = @d.find_element(:id,id)
+  return input_element.attribute("value")
+end
+
+def form_with_model_option(id, eq_string, row)
+  text_element = text_input_element_by_id(id)
+  puts text_element
+  puts eq_string
+  if text_element == eq_string
+    puts "modelオプション指定されています！====================="
+    google_spreadsheet_input("◯",row)
+  else
+    puts "#{row}のmodelオプションコードがうまく行きませんでした====================="
+  end
+end
+
+
 # input要素のname属性からカラムを取得するためのメソッド
 def get_colmun_by_input_element_by_id(id, columns)
   # idから要素取得
@@ -620,6 +638,10 @@ def check_7
 
     check_detail["チェック合否"] = check_flag == 9 ? "◯" : "×"
       google_spreadsheet_input(check_detail["チェック合否"],76)
+      # 編集ページを開いたときに入力欄にすでに入力されていたらmodelオプションがあるとわかる
+      form_with_model_option("item-name", @item_name, 70)
+      form_with_model_option("item-name", @item_name, 77)
+      form_with_model_option("item-name", @item_name, 80)
 
   ensure
     @check_log.push(check_detail)
@@ -1347,8 +1369,9 @@ def check_19_2
   @d.find_element(:class,"sell-btn").click
   @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
 
-  puts "出品のエラーチェック====================================="
+  puts "出品・編集のエラーチェック====================================="
   errors_messages_duplication_check("出品",53)
+  errors_messages_duplication_check("編集",81)
 
   # 念の為出品できてしまわないかチェック
   if /商品の情報を入力/ .match(@d.page_source)

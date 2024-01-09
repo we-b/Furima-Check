@@ -541,6 +541,7 @@ def input_purchase_information_error_postal_code(card_number, card_expiry, card_
   if /クレジットカード情報入力/ .match(@d.page_source) && display_flag
     @puts_num_array[7][10] = "[7-010] ◯"  #郵便番号の保存にはハイフンが必要であること（123-4567となる）"
       google_spreadsheet_input("◯",95)
+      form_with_model_option("postal-code", @postal_code_error, 99)
 
   # カード情報入力画面にリダイレクトのみ
   elsif /クレジットカード情報入力/ .match(@d.page_source)
@@ -728,6 +729,8 @@ def sign_up_password_short
   else
     @puts_num_array[1][17] = "[1-017] ◯"  #：パスワードは、6文字以上での入力が必須であること(6文字が入力されていれば、登録が可能なこと
       google_spreadsheet_input("◯",12)
+      form_with_model_option("nickname", @nickname, 28)
+
     # パスワードの上書きでも登録が成功しない場合は処理を終了
   end
     # 登録できてしまった場合、ログアウトしておく
@@ -1020,6 +1023,8 @@ def item_new_price_uninput
     @puts_num_array[2][3] = "[2-003] ◯"  #：必須項目が一つでも欠けている場合は、出品ができない"
     @puts_num_array[2][14] = "[2-014] ◯" #:ログイン状態のユーザーだけが、商品出品ページへ遷移できること
       google_spreadsheet_input("◯",29)
+      form_with_model_option("item-name", @item_name, 52)
+
   elsif /FURIMAが選ばれる3つの理由/.match(@d.page_source)
     @puts_num_array[2][12] = "[2-012] ×：価格の入力なしで商品出品を行うと、商品出品ページにリダイレクトされずトップページへ遷移してしまう"
     @puts_num_array[2][3] = "[2-003] ×：価格の入力なしで商品出品を行うと、出品できてしまう"
