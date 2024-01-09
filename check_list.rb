@@ -38,6 +38,68 @@ def errors_messages_duplication_check(implementation,row)
   end
 end
 
+# input要素のname属性からカラムを取得するためのメソッド
+def get_colmun_by_input_element_by_id(id, columns)
+  # idから要素取得
+  input_element = @d.find_element(:id,id)
+  # それぞれのname属性の値を取得
+  name_attribute = input_element.attribute("name")
+  # name属性の値からカラム名を取得
+  match_data = name_attribute.match(/\[([^\]]+)\]/)
+
+  if match_data
+    column_data = match_data[1]
+    columns << column_data
+    return column_data
+  else
+    return "カラムの取得ができませんでした"
+  end
+end
+
+# カラム名をエラーメッセージに合わせて先頭を大文字にする
+def head_word_capitalize(columns)
+  capitalize_columns = columns.map do |column|
+    column.split('_').map.with_index { |word, index|
+      index.zero? ? word.capitalize : word
+    }.join(' ')
+  end
+
+  return capitalize_columns
+end
+
+# チェックシートの93,94をチェックするためのメソッド
+def manual_check_93_94(error_messages,columns)
+  # カラム名をエラーメッセージに合わせて先頭を大文字にする
+  human_readable_columns = head_word_capitalize(columns)
+
+  # チェックシートにチェックを入れるかどうか判断をするための変数
+  check_count_93_line = []
+  check_count_94_line = []
+
+  human_readable_columns.each do |column|
+    # 一つ一つのエラー文にカラム名が含まれているか確認
+    error_messages.each do |error_message|
+      if error_message.text.include?(column)
+        puts "「#{column}」カラムはエラーメッセージの中に含まれています。"
+        check_count_93_line << column
+        break
+      else
+        puts "「#{column}」カラムはエラーメッセージの中に含まれていません。"
+        check_count_94_line << column
+      end
+    end
+  end
+
+  if check_count_93_line.length == 5
+    google_spreadsheet_input("◯",93)
+  end
+
+  if check_count_94_line.length == 1
+    google_spreadsheet_input("◯",94)
+  end
+end
+
+
 # ログアウト状態でトップ画面にログインボタンとサインアップボタンが表示されているかチェック
 def check_1
   check_detail = {"チェック番号"=> 1 , "チェック合否"=> "" , "チェック内容"=> "ログアウト状態で、ヘッダーにログイン/新規登録ボタンが表示されること" , "チェック詳細"=> ""}
@@ -179,7 +241,7 @@ def check_3
       check_detail["チェック詳細"] << "◯：詳細画面に商品名が表示されている\n"
       check_flag += 1
       @check_count_3 += 1
-      
+
       # 詳細画面に商品名が表示されていることが確認できればページ遷移が行われている
       google_spreadsheet_input("◯",68)
     else
@@ -1347,6 +1409,20 @@ def check_19_3
 
   puts "購入のエラーチェック====================================="
   errors_messages_duplication_check("購入",100)
+
+  puts "エラー文検証"
+  columns = []
+  ids = ["postal-code", "prefecture", "city", "addresses", "building", "phone-number"]
+  # カラム取得
+  ids.each do |id|
+    get_colmun_by_input_element_by_id(id, columns)
+  end
+  
+  # エラーメッセージとカラムを比較
+  error_messages = @d.find_elements(:class, "error-alert")
+  manual_check_93_94(error_messages,columns)
+
+  puts "エラー文検証done"
 
   # 念の為購入できてしまわないかチェック
   if /クレジットカード情報入力/ .match(@d.page_source)
