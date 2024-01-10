@@ -200,6 +200,7 @@ def check_3
       check_detail["チェック詳細"] << "◯：トップ画面に商品名が表示されている\n"
       check_flag += 1
       @check_count_3 += 1
+      google_spreadsheet_input("◯",47)
     else
       check_detail["チェック詳細"] << "×：トップ画面に商品名が表示されていない\n"
       check_detail["チェック詳細"] << top_item_name
@@ -674,7 +675,7 @@ def check_8
     # 編集画面に遷移した時も想定した判定基準を追加
     # 編集画面のロゴ画像にはクラス名が振られていないため
     @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
-
+    sleep 5
     if /会員情報入力/ .match(@d.page_source)
       check_detail["チェック詳細"] << "◯：ログアウト状態のユーザーが、URLを直接入力して商品編集ページに遷移しようとすると、ログインページに遷移する\n"
       check_flag += 1
@@ -967,6 +968,21 @@ def check_13
     check_detail["チェック合否"] = check_flag == 4 ? "◯" : "×"
       google_spreadsheet_input(check_detail["チェック合否"],45)
 
+    # ５００円に再設定して再出品
+    @item_price3 = "５００"
+    clear_item_new_method
+    input_item_new_method(@item_name3, @item_info3, @item_price3, @item_image3)
+    @d.find_element(:class,"sell-btn").click
+    @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
+
+    if /商品の情報を入力/.match(@d.page_source)
+      check_detail["チェック詳細"] << "◯：商品出品の際、価格を全角にすると出品できない\n"
+      google_spreadsheet_input("◯",48)
+    else
+      check_detail["チェック詳細"] << "×：商品出品の際、価格を半角にすると出品できる\n"
+      # 出品した際は削除し出品画面へ戻ってくる
+      return_purchase_before_delete_item(@item_name3)
+    end
   ensure
     @d.get("http://" + @url_ele)
     @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
@@ -1371,7 +1387,7 @@ def check_19_2
 
   puts "出品・編集のエラーチェック====================================="
   errors_messages_duplication_check("出品",53)
-  errors_messages_duplication_check("編集",81)
+  errors_messages_duplication_check("編集",81) 
 
   # 念の為出品できてしまわないかチェック
   if /商品の情報を入力/ .match(@d.page_source)
@@ -1509,8 +1525,6 @@ def check_19_4
   @d.find_element(:class,"buy-red-btn").click
   @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
 
-  puts "編集のエラーチェック====================================="
-  errors_messages_duplication_check("編集",81)
 
   # 念の為購入できてしまわないかチェック
   if /クレジットカード情報入力/ .match(@d.page_source)
@@ -1519,7 +1533,6 @@ def check_19_4
     display_flag = @d.find_element(:class,"error-alert").displayed? rescue false
     if display_flag
       @error_log_hash["商品購入"] = "◯：【商品購入画面】にて全項目未入力の状態で購入ボタンを押すと購入が完了せずエラーメッセージが出力される\n\n"
-        google_spreadsheet_input("◯",79)
       @error_log_hash["商品購入"] << "↓↓↓ エラーログ全文(出力された内容) ↓↓↓\n"
       # エラーログの親要素
       error_parent = @d.find_element(:class,"error-alert")
@@ -1584,7 +1597,7 @@ def check_19
     check_detail["チェック詳細"] << @error_log_hash["商品購入"]
 
     check_detail["チェック合否"] = check_flag == 3 ? "◯：出力内容を目視で確認が必要" : "×：異常あり"
-
+      google_spreadsheet_input("◯",79)
   ensure
     @check_log.push(check_detail)
   end
@@ -1708,6 +1721,7 @@ def check_21
     # ログイン状態であればログアウトしておく
     if display_flag
       @d.find_element(:class,"logout").click
+      sleep 3
       @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
       @d.get("http://" + @url_ele)
       @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
@@ -1719,6 +1733,7 @@ def check_21
 
     # 編集画面に遷移した時も想定した判定基準を追加
     @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
+    sleep 3
 
     if /会員情報入力/ .match(@d.page_source)
       check_detail["チェック詳細"] << "◯：ログアウト状態のユーザーが、URLを直接入力して商品購入ページに遷移しようとすると、ログインページに遷移する\n"
