@@ -31,7 +31,6 @@ def errors_messages_duplication_check(implementation,row)
 
   # 重複しているかどうかチェック
   if errors_messages.uniq.length == errors_messages.length
-    puts "#{implementation}機能に重複する文字列は含まれていません。"
       google_spreadsheet_input("◯",row)
   else
     puts "配列には重複する文字列が含まれています。"
@@ -45,10 +44,7 @@ end
 
 def form_with_model_option(id, eq_string, row)
   text_element = text_input_element_by_id(id)
-  puts text_element
-  puts eq_string
   if text_element == eq_string
-    puts "modelオプション指定されています！====================="
     google_spreadsheet_input("◯",row)
   else
     puts "#{row}のmodelオプションコードがうまく行きませんでした====================="
@@ -117,6 +113,16 @@ def manual_check_93_94(error_messages,columns)
   end
 end
 
+# turbo問題でクレジットカード情報が入力できなかったときに画面をリロードするメソッド
+def input_purchase_refresh(numframe)
+  puts "購入ページでリロードを行わないとクレジットカード情報の入力ができない可能性があります"
+  @ws[91, 9] = "リロードしないと入力できない可能性があります"
+  @d.navigate.refresh
+  sleep 3
+  # numframe再定義
+  numframe = @d.find_element(:css,'#number-form > iframe') rescue false || numframe = @d.find_element(:css,'#card-number > iframe') rescue false
+  return numframe
+end
 
 # ログアウト状態でトップ画面にログインボタンとサインアップボタンが表示されているかチェック
 def check_1

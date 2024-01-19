@@ -468,6 +468,10 @@ end
 def input_purchase_information_clera
   @wait.until {@d.find_element(:id, 'number-form').displayed? rescue false || @d.find_element(:id,'card-number').displayed? rescue false }
   numframe = @d.find_element(:css,'#number-form > iframe') rescue false || numframe = @d.find_element(:css,'#card-number > iframe') rescue false
+  
+  # 購入画面をリロードする
+  numframe = input_purchase_refresh(numframe) if numframe == false
+
   @d.switch_to.frame numframe
   @d.find_element(:id, 'cardNumber').clear
   @d.switch_to.default_content
@@ -500,6 +504,10 @@ end
 def input_purchase_information_error_postal_code(card_number, card_expiry, card_cvc)
   @wait.until {@d.find_element(:id, 'number-form').displayed? rescue false || @d.find_element(:id,'card-number').displayed? rescue false }
   numframe = @d.find_element(:css,'#number-form > iframe') rescue false || numframe = @d.find_element(:css,'#card-number > iframe') rescue false
+  
+  # 購入画面をリロードする
+  numframe = input_purchase_refresh(numframe) if numframe == false
+
   @d.switch_to.frame numframe
   @d.find_element(:id, 'cardNumber').send_keys(card_number)
   @d.switch_to.default_content
@@ -564,6 +572,10 @@ end
 def input_purchase_information_error_phone_number(card_number, card_expiry, card_cvc)
   @wait.until {@d.find_element(:id, 'number-form').displayed? rescue false || @d.find_element(:id,'card-number').displayed? rescue false }
   numframe = @d.find_element(:css,'#number-form > iframe') rescue false || numframe = @d.find_element(:css,'#card-number > iframe') rescue false
+  
+  # 購入画面をリロードする
+  numframe = input_purchase_refresh(numframe) if numframe == false
+
   @d.switch_to.frame numframe
   @d.find_element(:id, 'cardNumber').send_keys(card_number)
   @d.switch_to.default_content
@@ -630,6 +642,10 @@ def input_purchase_information(card_number, card_expiry, card_cvc)
   # カード番号を入力した状態で再度決済を行う
   @wait.until {@d.find_element(:id, 'number-form').displayed? rescue false || @d.find_element(:id,'card-number').displayed? rescue false }
   numframe = @d.find_element(:css,'#number-form > iframe') rescue false || numframe = @d.find_element(:css,'#card-number > iframe') rescue false
+  
+  # 購入画面をリロードする
+  numframe = input_purchase_refresh(numframe) if numframe == false
+
   @d.switch_to.frame numframe
   @d.find_element(:id, 'cardNumber').send_keys(card_number)
   @d.switch_to.default_content
@@ -1325,6 +1341,10 @@ def login_user2_item_buy
 
   # カード番号の項目のみ削除
   numframe = @d.find_element(:css,'#number-form > iframe') rescue false || numframe = @d.find_element(:css,'#card-number > iframe') rescue false
+  
+  # 購入画面をリロードする
+  numframe = input_purchase_refresh(numframe) if numframe == false
+  
   @d.switch_to.frame numframe
   @d.find_element(:id, 'cardNumber').clear
   @d.switch_to.default_content
