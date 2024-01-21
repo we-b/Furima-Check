@@ -316,9 +316,6 @@ end
 # 商品出品時の入力必須項目へ入力するメソッド
 # あくまで項目の入力までを行う。入力後の出品ボタンは押さない
 def input_item_new_method(name, info, price, image)
-  # 画面のリロード
-  # @d.navigate.refresh
-
   # 以下、各項目の入力を行う
   # 商品画像
   @wait.until {@d.find_element(:id,"item-image").displayed?}
@@ -362,15 +359,10 @@ def input_item_new_method(name, info, price, image)
   item_scheduled_delivery = select_new(item_scheduled_delivery_element)
   item_scheduled_delivery.select_by(:value, @value)
 
-  puts "ここから"
-  sleep(10)
   # 価格
   @wait.until {@d.find_element(:id,"item-price").displayed?}
   @d.find_element(:id,"item-price").send_keys(price)
-
-  # element = @d.find_element(:id, 'item-price')
-  # @d.execute_script("arguments[0].value = '40000';", element)
-  # @d.execute_script("arguments[0].dispatchEvent(new Event('input'));", element)
+  sleep(3)
 end
 
 # 再出品するために必須項目を全クリア
@@ -1011,6 +1003,9 @@ def item_new_price_uninput
   @wait.until {@d.find_element(:class,"purchase-btn").displayed?}
   # トップ画面で出品ボタンをクリック
   click_purchase_btn(true)
+  
+  # 出品画面のURL取得
+  @new_item_page_url = @d.current_url
 
   check_2_015
   check_2_016
@@ -1026,7 +1021,8 @@ def item_new_price_uninput
 
   sleep 1
   # 入力された販売価格によって、販売手数料や販売利益が変わること(JavaScriptを使用して実装すること)
-  check_17
+  # check_17
+  new_check_17
 
   # 商品価格のみ空白
   @d.find_element(:id,"item-price").clear
@@ -1315,7 +1311,7 @@ def login_user2_item_buy
   @wait.until {@d.find_element(:class, "item-red-btn").displayed?}
   @d.find_element(:class,"item-red-btn").click
   @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
-
+  sleep 2
   @order_url_coat = @d.current_url
   @puts_num_array[0].push("売却済みのコート(user1出品)購入画面のURL→  " + @order_url_coat)
 

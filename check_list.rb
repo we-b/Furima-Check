@@ -692,6 +692,7 @@ def check_8
     end
 
     @d.get("http://" + @url_ele)
+    sleep 2
     @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
 
     check_detail["チェック合否"] = check_flag == 1 ? "◯" : "×"
@@ -1168,6 +1169,51 @@ def check_17
     check_detail["チェック合否"] = check_flag == 2 ? "◯" : "×"
       
       google_spreadsheet_input(check_detail["チェック合否"],46)
+
+  ensure
+    @check_log.push(check_detail)
+  end
+end
+
+# このメソッドが呼ばれる時点で入力は全て行っている。あとはjsが反応していることと、反応していない場合再度出品画面に遷移し、入力を行う
+def new_check_17
+  check_detail = {"チェック番号"=> 17 , "チェック合否"=> "" , "チェック内容"=> "入力された販売価格によって、販売手数料や販売利益が変わること(JavaScriptを使用して実装すること)" , "チェック詳細"=> ""}
+
+  begin
+    puts "ここから======================================"
+    puts @new_item_page_url
+    
+    # 価格
+    add_tax_price = @d.find_element(:id,"add-tax-price").text.delete(',').to_i
+    puts add_tax_price
+
+    profit = @d.find_element(:id,"profit").text.delete(',').to_i
+    puts profit
+
+    if @item_price * 0.1 == add_tax_price || @item_price * 0.9 == profit
+      puts "販売手数料・販売手利益が等しく入力されています"
+      google_spreadsheet_input("◯",46)
+    else
+      puts "販売手数料が等しく入力されていない可能性があります。"
+      puts "入力した金額#{@item_price} \n 表示されている販売手数料#{add_tax_price} \n 表示されている販売利益#{profit}"
+      # 出品ページに直接移動
+      puts "画面のリロードを行います"
+      @d.get(@new_item_page_url)
+      sleep 3
+
+      # 値の入力
+      input_item_new_method(@item_name, @item_info, @item_price, @item_image)
+
+      # 価格の取得
+      add_tax_price = @d.find_element(:id,"add-tax-price").text.delete(',').to_i
+      profit = @d.find_element(:id,"profit").text.delete(',').to_i
+
+      if @item_price * 0.1 == add_tax_price || @item_price * 0.9 == profit
+        puts "リロードを行うとjsが反応していますのでturbo関連のエラーが発生している可能性があります"
+      else
+        puts "リロードを行ってもjsが反応しなかった可能性があります。手動で確認をお願いいたします"
+      end
+    end
 
   ensure
     @check_log.push(check_detail)
