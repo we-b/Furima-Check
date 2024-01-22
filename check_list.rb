@@ -21,7 +21,7 @@ def google_spreadsheet_input(check_detail,row) # row:縦の数字, column:アル
     @ws.save
     sleep 0.2
   end
-  puts "#{row}: #{@ws[row, 8]}"
+  # puts "#{row}: #{@ws[row, 8]}"
 end
 
 # 重複したエラーメッセージが表示されていないことを確認するメソッド
@@ -94,11 +94,11 @@ def manual_check_93_94(error_messages,columns)
     # 一つ一つのエラー文にカラム名が含まれているか確認
     error_messages.each do |error_message|
       if error_message.text.include?(column)
-        puts "「#{column}」カラムはエラーメッセージの中に含まれています。"
+        # puts "「#{column}」カラムはエラーメッセージの中に含まれています。"
         check_count_93_line << column
         break
       else
-        puts "「#{column}」カラムはエラーメッセージの中に含まれていません。"
+        # puts "「#{column}」カラムはエラーメッセージの中に含まれていません。"
         check_count_94_line << column
       end
     end
@@ -1180,15 +1180,15 @@ def new_check_17
   check_detail = {"チェック番号"=> 17 , "チェック合否"=> "" , "チェック内容"=> "入力された販売価格によって、販売手数料や販売利益が変わること(JavaScriptを使用して実装すること)" , "チェック詳細"=> ""}
 
   begin
-    puts "ここから======================================"
-    puts @new_item_page_url
+    # puts "ここから======================================"
+    # puts @new_item_page_url
     
     # 価格
     add_tax_price = @d.find_element(:id,"add-tax-price").text.delete(',').to_i
-    puts add_tax_price
+    # puts add_tax_price
 
     profit = @d.find_element(:id,"profit").text.delete(',').to_i
-    puts profit
+    # puts profit
 
     if @item_price * 0.1 == add_tax_price || @item_price * 0.9 == profit
       puts "販売手数料・販売手利益が等しく入力されています"
@@ -1364,7 +1364,7 @@ def check_19_1
   @d.find_element(:class,"register-red-btn").click
   @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
 
-  puts "ユーザー新規登録のエラーチェック====================================="
+  # puts "ユーザー新規登録のエラーチェック====================================="
   errors_messages_duplication_check("ユーザー新規登録",27)
 
   # 念の為登録できてしまわないかチェック
@@ -1437,7 +1437,7 @@ def check_19_2
   @d.find_element(:class,"sell-btn").click
   @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
 
-  puts "出品・編集のエラーチェック====================================="
+  # puts "出品・編集のエラーチェック====================================="
   errors_messages_duplication_check("出品",53)
   errors_messages_duplication_check("編集",81) 
 
@@ -1498,10 +1498,10 @@ def check_19_3
   @d.find_element(:class,"buy-red-btn").click
   @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
 
-  puts "購入のエラーチェック====================================="
+  # puts "購入のエラーチェック====================================="
   errors_messages_duplication_check("購入",100)
 
-  puts "エラー文検証"
+  # puts "エラー文検証"
   columns = []
   ids = ["postal-code", "prefecture", "city", "addresses", "building", "phone-number"]
   # カラム取得
@@ -1513,7 +1513,7 @@ def check_19_3
   error_messages = @d.find_elements(:class, "error-alert")
   manual_check_93_94(error_messages,columns)
 
-  puts "エラー文検証done"
+  # puts "エラー文検証done"
 
   # 念の為購入できてしまわないかチェック
   if /クレジットカード情報入力/ .match(@d.page_source)

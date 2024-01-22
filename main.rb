@@ -1003,7 +1003,7 @@ def item_new_price_uninput
   @wait.until {@d.find_element(:class,"purchase-btn").displayed?}
   # トップ画面で出品ボタンをクリック
   click_purchase_btn(true)
-  
+
   # 出品画面のURL取得
   @new_item_page_url = @d.current_url
 
@@ -1558,7 +1558,7 @@ def login_user2_after_purchase_check2
     @puts_num_array[6][1] = "[6-001] ◯"  #：出品者だけが商品情報を削除できる"
       google_spreadsheet_input("◯",82)
     @puts_num_array[6][2] = "[6-002] ○"  #：削除が完了したら、トップページに遷移すること"
-      puts "6-002=================================="
+      # puts "6-002=================================="
       google_spreadsheet_input("◯",83)
   end
 end
@@ -1577,13 +1577,13 @@ def login_user2_item_new_2nd
   sleep 10
 
   @d.get("http://" + @url_ele)
-  puts "http://" + @url_ele
+  # puts "http://" + @url_ele
   @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
 
   # サングラスの詳細画面へ
   item_name_click_from_top(@item_name2)
 
-  puts "編集ボタン"
+  # puts "編集ボタン"
   sleep 5
   @wait.until {@d.find_element(:class,"item-red-btn").displayed?}
   # 商品編集ボタンクリック
@@ -1614,7 +1614,7 @@ end
 def check_dummy_item
   if /商品を出品してね！/.match(@d.page_source)
     @puts_num_array[3][3] = "[3-003] ○" #商品が出品されていない状態では、ダミーの商品情報が表示されること"
-      puts "3-003一覧=========================="
+      # puts "3-003一覧=========================="
       google_spreadsheet_input("◯",6)
   else
     @puts_num_array[3][3] = "[3-003] × :商品が出品されていない状態では、ダミーの商品情報が表示されてない。またはデータがリセットされていない"  #：出品者だけが商品情報を削除できる"
