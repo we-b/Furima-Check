@@ -3,7 +3,8 @@
 ## 概要
 最終課題であるFurimaアプリの動作確認をする自動チェックツール
 
-## image gif（アプリの動作画像を入れる gifだとベスト）
+## image gif
+[![Image from Gyazo](https://i.gyazo.com/baeb7cfcaea474db35386ca660ec9c6c.gif)](https://gyazo.com/baeb7cfcaea474db35386ca660ec9c6c)
 
 ## 動作環境
 以下の環境を前提で進めます  
