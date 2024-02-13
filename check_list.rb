@@ -118,9 +118,10 @@ def manual_check_93_94(error_messages,columns)
 end
 
 # turbo問題でクレジットカード情報が入力できなかったときに画面をリロードするメソッド
+@purchase_refresh_count = 0
 def input_purchase_refresh(numframe)
-  puts "購入ページでリロードを行わないとクレジットカード情報の入力ができない可能性があります"
-  @ws[91, 9] = "リロードしないと入力できない可能性があります"
+  @purchase_refresh_count += 1
+  @puts_text << "■スプレットシート91行目\n購入ページでリロードを行わないとクレジットカード情報の入力ができない可能性があります。手動で確認をお願いいたします。" if @purchase_refresh_count == 1
   @d.navigate.refresh
   sleep 3
   # numframe再定義
@@ -1233,7 +1234,6 @@ def new_check_17
       end
     end
 
-    # ここ
     check_detail["チェック合否"] = check_flag == 2 ? "◯" : "×"
       google_spreadsheet_input(check_detail["チェック合否"],46)
 
