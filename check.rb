@@ -12,6 +12,8 @@ require "json"
 options = Selenium::WebDriver::Chrome::Options.new
 options.add_argument('--headless')
 @wait = Selenium::WebDriver::Wait.new(:timeout => 90)
+# @d = Selenium::WebDriver.for :chrome
+@d = Selenium::WebDriver.for :chrome, options: options
 
 
 # チェック用のドライバー
@@ -220,6 +222,10 @@ ensure
     puts $@
     # 手動確認項目
     puts "【手動での確認が必要な項目一覧】"
+    puts "以下の内容が実装に不備がある、またはチェックツールで確認ができなかった項目になります。手動で確認をお願いします。"
+    @puts_text.each do |text|
+      puts text
+    end
     # puts "何も編集せずに「更新する」ボタンを押しても、画像無しの商品にならないこと" # form_with_model_option("item-name", @item_name, 70)
     # puts "商品名やカテゴリーの情報など、すでに登録されている商品情報は商品情報編集画面を開いた時点で表示されること（商品画像・販売手数料・販売利益に関しては、表示されない状態で良い）" # form_with_model_option("item-name", @item_name, 77)
     # puts "配送先の情報として、郵便番号・都道府県・市区町村・番地・電話番号が必須であること" # google_spreadsheet_input("◯",93)

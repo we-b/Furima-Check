@@ -12,6 +12,8 @@ sp = session.spreadsheet_by_url("https://docs.google.com/spreadsheets/d/1q_7tWEf
 @check_count_4_001 = 0
 @check_count_3 = 0
 
+@puts_text = []
+
 # スプレットシートにチェックを入れるメソッド
 def google_spreadsheet_input(check_detail,row) # row:縦の数字, column:アルファベットの数字(Aなら1)
   if check_detail == "◯"
@@ -20,6 +22,9 @@ def google_spreadsheet_input(check_detail,row) # row:縦の数字, column:アル
     # saveで変更を保存、実際にスプレッドシートに反映させる
     @ws.save
     sleep 0.2
+  end
+  if @ws[row, 8] == "false"
+    @puts_text << "■スプレットシート#{row}行目\n#{@ws[row, 5]}"
   end
   # puts "#{row}: #{@ws[row, 8]}"
 end
