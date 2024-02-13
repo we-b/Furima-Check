@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "furima-check",
+  "private_key_id": "5f40d47090d54756080f7801ff302573e9b52e18",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC6+FTVnAZNiBGt\nGKo1jaHF3z4tL8DGnegFoWo9ivNzRtJ5C6oQaTfC7dza9WTlyy6ac084QTmTTzwu\nUSdleYYCI9UkX34Dot3RmtFs8DecdJ1ohAAMb8KpySkOxynPJUWO5RtNy73ldSdO\nemJuonMXwYHIdZ7cPnODjoeLzgE5V4O6uwqQeL85BMe5vCVFaJ4mjmSJPl9DcGVg\n579NS7a/Mqq1VyL51yaiwfvWbZ9fJjbBvNnWV226Y/kOu6uYu0m4EJgnjeWhCes5\noZ4fTKUS7QNYq9W2d4qLWDnX7ZtbCgEaAeQHkSHXcOdRuTwHMqWdX64OeMYVqHuA\nGjwUTLprAgMBAAECggEAUrlSK6rbXQ1xqLELiiNOqtJR28NPm3E9OdSHwZALk/sH\nX7gp+BXdrpj4iUZe7I8/4OVY7S5qr4M0wNd2Q18HzEWXZf78LdavJzDFLVqBeG9e\nP+J7dQUzz1RqHpg/JuA6TPWQZZTaQb5adE4Q5BtrKd0bs5pa/d6B1HjI/zHX98q/\nTGIQb2Va95t1kuGHEWP9/oJFreIhW30IHxni/wHJbg1+MgVP4yep1OgS71KSDpQv\n0cVR0nsGQykgIbNvonJCvZ1smCkHYF+Pa/MT5KCx5dCDf80P+ZPogfyioSo3R/hv\ntRNz+6w4Xtl9HbwQZ2smYX7f07rvKC5jhFhXdDFlRQKBgQDo0QZAMh7v3VmXfGlg\nAr7vYJ4NduLzq7J8T0RWfTHQjHlmD6pyNgkBUqrz6gAWlv0trnANbPuKBY6wTx8w\nVj/FzIxsT5N/xHxw3IkvvVWo1FudZlpZeQYj/nuD6VlAdIH3ULwVBCl1U5lWRjMv\nfJqlpxa74mpmksonCO84FDjrLQKBgQDNlpXuemR4x72qSusmLFkOWigDDo/+JteO\ngyKN7NF6dGaV7HHqH/nWwB85r+lthslQ7F+MulPuxp+1lvIluE1AZAajpK/duF1U\nDTfc0Yb6/Ho6pMaU6jP7upkEFb6plrEls8qJvzuVTco1idnpP750bsjzI039Kvcx\nr/fpqgRa9wKBgC4bb0R5aJ0SVjLlBa1o/c1EciiyecHOKBvsStliE+J8X3Jx+cyC\nnQfxCkAiAIB4yI0qdbCC+9HaxeZu1PtqqViP6ONuYwSzsf1b/6M/uN4lqDsk0RHV\nIP0x4d4+8VkNecuz5nu3BkrhEoX+gxaNc8cIrzzoWzATNAvE/jM59gfFAoGBALuQ\nKgOjmCx1Fr3ZkgWGqk0kxaJcU9RsfXagfxL6vva4YatgR2FxgM+DAjnwGsf5E4wH\nyviqOc77WVQjfZIaPiiD2WbM5kIjZMo9MPz+D+bGF4GPOTk9HuYHjHikmglA2Sdr\ni1n2pRaHHPeRZ8ScilbRh/YC/LD/1Px47XY5zbVrAoGAZQRtPB8F0TAOgABtK+GY\n0OMOTTDbebjZpc85dz6Lj1exjRHENI4HEs+IDUeSO3zeyBdpKaU5oLUYTzv8/p82\nzK9VQ+3ynOgdfMqvZL9uCWioDwMF3cbWUInwQ2XK8pIERJc9GuPhRixm+/m9rZtb\nXpLK6IBJM2H+dq4+9eAUumo=\n-----END PRIVATE KEY-----\n",
+  "client_email": "furima-check@furima-check.iam.gserviceaccount.com",
+  "client_id": "113045713502351982476",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/furima-check%40furima-check.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

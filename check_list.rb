@@ -1,5 +1,134 @@
 require "./main"
 
+# スプレットシートにチェックを入れるためのコード
+require "google_drive"
+# config.jsonを読み込んでセッションを確立
+session = GoogleDrive::Session.from_config("furima-check-5f40d47090d5.json")
+# スプレッドシートをURLで取得
+sp = session.spreadsheet_by_url("https://docs.google.com/spreadsheets/d/1q_7tWEfvxIPglBNIkTIi2Uo_hIln5vd2ffIPc2f4crg/edit#gid=0")
+# 最初のシート
+@ws = sp.worksheet_by_title("シート1")
+
+@check_count_4_001 = 0
+@check_count_3 = 0
+
+@puts_text = []
+
+# スプレットシートにチェックを入れるメソッド
+def google_spreadsheet_input(check_detail,row) # row:縦の数字, column:アルファベットの数字(Aなら1)
+  if check_detail == "◯"
+    # セルを指定して値を更新,[数字, アルファベットの順番]
+    @ws[row, 8] = true 
+    # saveで変更を保存、実際にスプレッドシートに反映させる
+    @ws.save
+    sleep 0.2
+  else
+    @puts_text << "■スプレットシート#{row}行目\n#{@ws[row, 5]}"
+  end
+  # puts "#{row}: #{@ws[row, 8]}"
+end
+
+# 重複したエラーメッセージが表示されていないことを確認するメソッド
+def errors_messages_duplication_check(implementation,row)
+  # エラー文の要素取得
+  errors_messages = @d.find_elements(:class, "error-alert")
+
+  # 重複しているかどうかチェック
+  if errors_messages.uniq.length == errors_messages.length
+      google_spreadsheet_input("◯",row)
+  else
+    puts "配列には重複する文字列が含まれています。"
+  end
+end
+
+def text_input_element_by_id(id)
+  input_element = @d.find_element(:id,id)
+  return input_element.attribute("value")
+end
+
+def form_with_model_option(id, eq_string, row)
+  text_element = text_input_element_by_id(id)
+  if text_element == eq_string
+    google_spreadsheet_input("◯",row)
+  else
+    puts "#{row}のmodelオプションコードがうまく行きませんでした====================="
+  end
+end
+
+
+# input要素のname属性からカラムを取得するためのメソッド
+def get_colmun_by_input_element_by_id(id, columns)
+  # idから要素取得
+  input_element = @d.find_element(:id,id)
+  # それぞれのname属性の値を取得
+  name_attribute = input_element.attribute("name")
+  # name属性の値からカラム名を取得
+  match_data = name_attribute.match(/\[([^\]]+)\]/)
+
+  if match_data
+    column_data = match_data[1]
+    columns << column_data
+    return column_data
+  else
+    return "カラムの取得ができませんでした"
+  end
+end
+
+# カラム名をエラーメッセージに合わせて先頭を大文字にする
+def head_word_capitalize(columns)
+  capitalize_columns = columns.map do |column|
+    column.split('_').map.with_index { |word, index|
+      index.zero? ? word.capitalize : word
+    }.join(' ')
+  end
+
+  return capitalize_columns
+end
+
+# チェックシートの93,94をチェックするためのメソッド
+def manual_check_93_94(error_messages,columns)
+  # カラム名をエラーメッセージに合わせて先頭を大文字にする
+  human_readable_columns = head_word_capitalize(columns)
+
+  # チェックシートにチェックを入れるかどうか判断をするための変数
+  check_count_93_line = []
+  check_count_94_line = []
+
+  human_readable_columns.each do |column|
+    # 一つ一つのエラー文にカラム名が含まれているか確認
+    error_messages.each do |error_message|
+      if error_message.text.include?(column)
+        # puts "「#{column}」カラムはエラーメッセージの中に含まれています。"
+        check_count_93_line << column
+        break
+      else
+        # puts "「#{column}」カラムはエラーメッセージの中に含まれていません。"
+        check_count_94_line << column
+      end
+    end
+  end
+
+  if check_count_93_line.length == 5
+    google_spreadsheet_input("◯",93)
+  end
+
+  if check_count_94_line.length == 1
+    google_spreadsheet_input("◯",94)
+  end
+end
+
+# turbo問題でクレジットカード情報が入力できなかったときに画面をリロードするメソッド
+@purchase_refresh_count = 0
+def input_purchase_refresh(numframe)
+  @purchase_refresh_count += 1
+  @puts_text << "■スプレットシート91行目\n購入ページでリロードを行わないとクレジットカード情報の入力ができない可能性があります。手動で確認をお願いいたします。" if @purchase_refresh_count == 1
+  @d.navigate.refresh
+  sleep 3
+  # numframe再定義
+  numframe = @d.find_element(:css,'#number-form > iframe') rescue false || numframe = @d.find_element(:css,'#card-number > iframe') rescue false
+  return numframe
+end
+
 # ログアウト状態でトップ画面にログインボタンとサインアップボタンが表示されているかチェック
 def check_1
   check_detail = {"チェック番号"=> 1 , "チェック合否"=> "" , "チェック内容"=> "ログアウト状態で、ヘッダーにログイン/新規登録ボタンが表示されること" , "チェック詳細"=> ""}
@@ -22,6 +151,7 @@ def check_1
     end
     
     check_detail["チェック合否"] = check_flag == 2 ? "◯" : "×"
+      google_spreadsheet_input(check_detail["チェック合否"],22)
   
   ensure
     @check_log.push(check_detail)
@@ -53,7 +183,7 @@ def check_2
     end
 
     check_detail["チェック合否"] = check_flag == 2 ? "◯" : "×"
-
+      google_spreadsheet_input(check_detail["チェック合否"],23)
   ensure
     @check_log.push(check_detail)
   end
@@ -80,6 +210,8 @@ def check_3
     if top_item_name == @item_name
       check_detail["チェック詳細"] << "◯：トップ画面に商品名が表示されている\n"
       check_flag += 1
+      @check_count_3 += 1
+      google_spreadsheet_input("◯",47)
     else
       check_detail["チェック詳細"] << "×：トップ画面に商品名が表示されていない\n"
       check_detail["チェック詳細"] << top_item_name
@@ -88,6 +220,7 @@ def check_3
     if top_item_img.include?(@item_image_name)
       check_detail["チェック詳細"] << "◯：トップ画面に商品画像が表示されている\n"
       check_flag += 1
+      @check_count_3 += 1
     else
       check_detail["チェック詳細"] << "×：トップ画面に商品画像が表示されていない\n"
       check_detail["チェック詳細"] << top_item_img
@@ -97,6 +230,7 @@ def check_3
     if top_item_price.include?(@item_price.to_s)
       check_detail["チェック詳細"] << "◯：トップ画面に商品価格が表示されている\n"
       check_flag += 1
+      @check_count_3 += 1
     else
       check_detail["チェック詳細"] << "×：トップ画面に商品価格が表示されていない\n"
       check_detail["チェック詳細"] << top_item_price
@@ -106,10 +240,21 @@ def check_3
     if top_item_shipping_fee_status_word.include?(@item_shipping_fee_status_word)
       check_detail["チェック詳細"] << "◯：トップ画面に配送料負担が表示されている\n"
       check_flag += 1
+      @check_count_3 += 1
     else
       check_detail["チェック詳細"] << "×：トップ画面に配送料負担が表示されていない\n"
       check_detail["チェック詳細"] << top_item_shipping_fee_status_word
     end
+
+    # 一覧のチェック
+    if @check_count_3 == 4
+      google_spreadsheet_input("◯",54)
+      google_spreadsheet_input("◯",56)
+      google_spreadsheet_input("◯",58)
+    end
+
+    # 0にリセット
+    @check_count_3 = 0
     
   
     # 商品詳細画面へ遷移
@@ -125,6 +270,10 @@ def check_3
     if show_item_name == @item_name
       check_detail["チェック詳細"] << "◯：詳細画面に商品名が表示されている\n"
       check_flag += 1
+      @check_count_3 += 1
+
+      # 詳細画面に商品名が表示されていることが確認できればページ遷移が行われている
+      google_spreadsheet_input("◯",68)
     else
       check_detail["チェック詳細"] << "×：詳細画面に商品名が表示されていない\n"
       check_detail["チェック詳細"] << show_item_name
@@ -133,6 +282,7 @@ def check_3
     if show_item_img.include?(@item_image_name)
       check_detail["チェック詳細"] << "◯：詳細画面に商品画像が表示されている\n"
       check_flag += 1
+      @check_count_3 += 1
     else
       check_detail["チェック詳細"] << "×：詳細画面に商品画像が表示されていない\n"
       check_detail["チェック詳細"] << show_item_img
@@ -141,10 +291,19 @@ def check_3
     if show_item_price.include?(@item_price.to_s)
       check_detail["チェック詳細"] << "◯：詳細画面に商品価格が表示されている\n"
       check_flag += 1
+      @check_count_3 += 1
     else
       check_detail["チェック詳細"] << "×：詳細画面に商品価格が表示されていない\n"
       check_detail["チェック詳細"] << show_item_price
     end
+
+    # 詳細のチェック
+    if @check_count_3 == 3
+      google_spreadsheet_input("◯",65)
+    end
+
+    # 0にリセット
+    @check_count_3 = 0
   
     # 商品購入画面へ遷移
     @d.find_element(:class,"item-red-btn").click
@@ -160,6 +319,7 @@ def check_3
     if purchase_item_name == @item_name
       check_detail["チェック詳細"] << "◯：購入画面に商品名が表示されている\n"
       check_flag += 1
+      @check_count_3 += 1
     else
       check_detail["チェック詳細"] << "×：購入画面に商品名が表示されていない\n"
       check_detail["チェック詳細"] << purchase_item_name
@@ -168,6 +328,7 @@ def check_3
     if purchase_item_img.include?(@item_image_name)
       check_detail["チェック詳細"] << "◯：購入画面に商品画像が表示されている\n"
       check_flag += 1
+      @check_count_3 += 1
     else
       check_detail["チェック詳細"] << "×：購入画面に商品画像が表示されていない\n"
       check_detail["チェック詳細"] << purchase_item_img
@@ -176,13 +337,19 @@ def check_3
     if purchase_item_price.include?(@item_price.to_s)
       check_detail["チェック詳細"] << "◯：購入画面に商品価格が表示されている\n"
       check_flag += 1
+      @check_count_3 += 1
     else
       check_detail["チェック詳細"] << "×：購入画面に商品価格が表示されていない\n"
       check_detail["チェック詳細"] << purchase_item_price
     end
   
     check_detail["チェック合否"] = check_flag == 10 ? "◯" : "×"
-  
+
+    # 購入のチェック
+    if @check_count_3 == 3
+      google_spreadsheet_input("◯",89)
+    end
+
     # トップ画面へ戻っておく
     @d.get("http://" + @url_ele)
     # エラー発生有無にかかわらず実行
@@ -229,6 +396,7 @@ def check_4
     end
 
     check_detail["チェック合否"] = check_flag == 1 ? "◯" : "×"
+      google_spreadsheet_input(check_detail["チェック合否"],55)
   ensure
     @check_log.push(check_detail)
   end
@@ -267,6 +435,7 @@ def check_5
     end
 
     check_detail["チェック合否"] = check_flag == 1 ? "◯" : "×"
+      google_spreadsheet_input(check_detail["チェック合否"],87)
 
   ensure
     # ログアウトしておく
@@ -355,6 +524,7 @@ def check_6
     end
 
     check_detail["チェック合否"] = check_flag == 1 ? "◯" : "×"
+      google_spreadsheet_input(check_detail["チェック合否"],88)
 
   ensure
     # ログアウトしておく
@@ -479,6 +649,11 @@ def check_7
     }
 
     check_detail["チェック合否"] = check_flag == 9 ? "◯" : "×"
+      google_spreadsheet_input(check_detail["チェック合否"],76)
+      # 編集ページを開いたときに入力欄にすでに入力されていたらmodelオプションがあるとわかる
+      form_with_model_option("item-name", @item_name, 70)
+      form_with_model_option("item-name", @item_name, 77)
+      form_with_model_option("item-name", @item_name, 80)
 
   ensure
     @check_log.push(check_detail)
@@ -506,11 +681,12 @@ def check_8
 
     # ログアウト状態でコート編集画面に直接遷移する
     @d.get(@edit_url_coat)
+    sleep 8
 
     # 編集画面に遷移した時も想定した判定基準を追加
     # 編集画面のロゴ画像にはクラス名が振られていないため
     @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
-
+    sleep 5
     if /会員情報入力/ .match(@d.page_source)
       check_detail["チェック詳細"] << "◯：ログアウト状態のユーザーが、URLを直接入力して商品編集ページに遷移しようとすると、ログインページに遷移する\n"
       check_flag += 1
@@ -521,9 +697,11 @@ def check_8
     end
 
     @d.get("http://" + @url_ele)
+    sleep 2
     @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
 
     check_detail["チェック合否"] = check_flag == 1 ? "◯" : "×"
+      google_spreadsheet_input(check_detail["チェック合否"],74)
 
   ensure
     @d.get("http://" + @url_ele)
@@ -541,6 +719,7 @@ def check_9
   check_flag = 0
   begin
     @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
+    sleep 3
 
     if /会員情報入力/ .match(@d.page_source)
       check_detail["チェック詳細"] << "◯：!ログアウト状態で商品出品ページへアクセスすると、ログインページへ遷移しました\n"
@@ -552,6 +731,7 @@ def check_9
     end
 
     check_detail["チェック合否"] = check_flag == 1 ? "◯" : "×"
+      google_spreadsheet_input(check_detail["チェック合否"],30)
 
   ensure
     @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
@@ -587,6 +767,7 @@ def check_10
     # トップページでの表記をチェック
     if /Sold Out/ .match(@d.page_source) || display_flag
       @puts_num_array[4][3] = "[4-003] ◯"  #売却済みの商品は、「sould out」の文字が表示されるようになっている"
+        google_spreadsheet_input("◯",67)
     else
       # sold outの表示処理は受講生によって様々のため目視で最終確認
       @puts_num_array[4][3] = "[4-003] △：売却済みの商品は、「sould out」の文字が表示されない。画像処理している可能性あるため要目視確認"
@@ -612,6 +793,7 @@ def check_10
     
 
     check_detail["チェック合否"] = check_flag == 2 ? "◯" : "×"
+      google_spreadsheet_input(check_detail["チェック合否"],61)
 
   ensure
     # ログアウトしておく
@@ -664,6 +846,7 @@ def check_11
     @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
 
     check_detail["チェック合否"] = check_flag == 3 ? "◯" : "×"
+      google_spreadsheet_input(check_detail["チェック合否"],64)
 
   ensure
     @d.get("http://" + @url_ele)
@@ -706,6 +889,7 @@ def check_12
     end
 
     check_detail["チェック合否"] = check_flag == 2 ? "◯" : "×"
+    google_spreadsheet_input(check_detail["チェック合否"],62)
 
   ensure
     @d.get("http://" + @url_ele)
@@ -794,7 +978,23 @@ def check_13
     end
 
     check_detail["チェック合否"] = check_flag == 4 ? "◯" : "×"
+      google_spreadsheet_input(check_detail["チェック合否"],45)
 
+    # ５００円に再設定して再出品
+    @item_price3 = "５００"
+    clear_item_new_method
+    input_item_new_method(@item_name3, @item_info3, @item_price3, @item_image3)
+    @d.find_element(:class,"sell-btn").click
+    @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
+
+    if /商品の情報を入力/.match(@d.page_source)
+      check_detail["チェック詳細"] << "◯：商品出品の際、価格を全角にすると出品できない\n"
+      google_spreadsheet_input("◯",48)
+    else
+      check_detail["チェック詳細"] << "×：商品出品の際、価格を半角にすると出品できる\n"
+      # 出品した際は削除し出品画面へ戻ってくる
+      return_purchase_before_delete_item(@item_name3)
+    end
   ensure
     @d.get("http://" + @url_ele)
     @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
@@ -826,6 +1026,7 @@ def check_14
     end
 
     check_detail["チェック合否"] = check_flag == 1 ? "◯" : "×";
+      google_spreadsheet_input(check_detail["チェック合否"],101)
 
   ensure
     @check_log.push(check_detail)
@@ -859,6 +1060,7 @@ def check_15
     @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
 
     check_detail["チェック合否"] = check_flag == 1 ? "◯" : "×"
+      google_spreadsheet_input(check_detail["チェック合否"],73)
 
   ensure
     @check_log.push(check_detail)
@@ -906,6 +1108,7 @@ def check_16
     @d.get("http://" + @url_ele)
 
     check_detail["チェック合否"] = check_flag == 2 ? "◯" : "×"
+      google_spreadsheet_input(check_detail["チェック合否"],75)
 
   ensure
     # user2にログインして元に戻しておく
@@ -969,6 +1172,70 @@ def check_17
     end
 
     check_detail["チェック合否"] = check_flag == 2 ? "◯" : "×"
+      
+      google_spreadsheet_input(check_detail["チェック合否"],46)
+
+  ensure
+    @check_log.push(check_detail)
+  end
+end
+
+# このメソッドが呼ばれる時点で入力は全て行っている。あとはjsが反応していることと、反応していない場合再度出品画面に遷移し、入力を行う
+def new_check_17
+  check_detail = {"チェック番号"=> 17 , "チェック合否"=> "" , "チェック内容"=> "入力された販売価格によって、販売手数料や販売利益が変わること(JavaScriptを使用して実装すること)" , "チェック詳細"=> ""}
+  check_flag = 0
+
+  begin
+    # puts "ここから======================================"
+    # puts @new_item_page_url
+    
+    # 価格(販売手数料)
+    add_tax_price = @d.find_element(:id,"add-tax-price").text.delete(',').to_i
+    # puts add_tax_price
+
+    # 価格(販売利益)
+    profit = @d.find_element(:id,"profit").text.delete(',').to_i
+    # puts profit
+
+    check_detail["チェック詳細"] << "!価格設定：#{@item_price}円、販売手数料(10%)：#{add_tax_price}円、販売利益：#{profit}円\n"
+
+    if @item_price * 0.1 == add_tax_price
+      check_detail["チェック詳細"] << "◯：入力された販売価格によって、非同期的に販売利益が表示されている\n"
+      check_flag += 1
+    else
+      check_detail["チェック詳細"] << "×：入力された販売価格によって、非同期的に販売利益が表示されていない\n"
+    end
+
+    if @item_price * 0.9 == profit
+      check_detail["チェック詳細"] << "◯：入力された販売価格によって、非同期的に販売手数料が表示されている\n"
+      check_flag += 1
+    else
+      check_detail["チェック詳細"] << "×：入力された販売価格によって、非同期的に販売手数料が表示されていない\n"
+    end
+
+    # jsが反応していない場合画面をリロード
+    if @item_price * 0.1 != add_tax_price || @item_price * 0.9 != profit
+      check_detail["チェック詳細"] << "販売手数料・販売手利益が等しく入力されていない可能性があります。"
+      # 出品ページに直接移動
+      @d.get(@new_item_page_url)
+      sleep 3
+
+      # 値の入力
+      input_item_new_method(@item_name, @item_info, @item_price, @item_image)
+
+      # 価格の取得
+      add_tax_price = @d.find_element(:id,"add-tax-price").text.delete(',').to_i
+      profit = @d.find_element(:id,"profit").text.delete(',').to_i
+
+      if @item_price * 0.1 == add_tax_price || @item_price * 0.9 == profit
+        check_detail["チェック詳細"] << "リロードを行うとjsが反応していますのでturbo関連のエラーが発生している可能性があります"
+      else
+        check_detail["チェック詳細"] << "リロードを行ってもjsが反応しなかった可能性があります。手動で確認をお願いいたします"
+      end
+    end
+
+    check_detail["チェック合否"] = check_flag == 2 ? "◯" : "×"
+      google_spreadsheet_input(check_detail["チェック合否"],46)
 
   ensure
     @check_log.push(check_detail)
@@ -1004,6 +1271,7 @@ def check_22
     end
 
     check_detail["チェック合否"] = check_flag == 2 ? "◯" : "×"
+      google_spreadsheet_input(check_detail["チェック合否"],49)
 
   ensure
     @check_log.push(check_detail)
@@ -1104,6 +1372,7 @@ def check_18
     end
 
     check_detail["チェック合否"] = check_flag == 11 ? "◯" : "×"
+      google_spreadsheet_input(check_detail["チェック合否"],66)
 
   ensure
     @check_log.push(check_detail)
@@ -1117,6 +1386,9 @@ def check_19_1
   @d.find_element(:class,"register-red-btn").click
   @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
 
+  # puts "ユーザー新規登録のエラーチェック====================================="
+  errors_messages_duplication_check("ユーザー新規登録",27)
+
   # 念の為登録できてしまわないかチェック
   if /会員情報入力/ .match(@d.page_source)
     # 登録できなかった場合
@@ -1124,6 +1396,7 @@ def check_19_1
     display_flag = @d.find_element(:class,"error-alert").displayed? rescue false
     if display_flag
       @error_log_hash["新規登録"] = "◯：【ユーザー新規登録画面】にて全項目未入力の状態で登録ボタンを押すと登録が完了せずエラーメッセージが出力される\n\n"
+        google_spreadsheet_input("◯",26)
       @error_log_hash["新規登録"] << "↓↓↓ エラーログ全文(出力された内容) ↓↓↓\n"
       # エラーログの親要素
       error_parent = @d.find_element(:class,"error-alert")
@@ -1186,6 +1459,10 @@ def check_19_2
   @d.find_element(:class,"sell-btn").click
   @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
 
+  # puts "出品・編集のエラーチェック====================================="
+  errors_messages_duplication_check("出品",53)
+  errors_messages_duplication_check("編集",81) 
+
   # 念の為出品できてしまわないかチェック
   if /商品の情報を入力/ .match(@d.page_source)
     # 出品できなかった場合
@@ -1193,6 +1470,7 @@ def check_19_2
     display_flag = @d.find_element(:class,"error-alert").displayed? rescue false
     if display_flag
       @error_log_hash["商品出品"] = "◯：【商品出品画面】にて全項目未入力の状態で出品ボタンを押すと出品が完了せずエラーメッセージが出力される\n\n"
+        google_spreadsheet_input("◯",51)
       @error_log_hash["商品出品"] << "↓↓↓ エラーログ全文(出力された内容) ↓↓↓\n"
       # エラーログの親要素
       error_parent = @d.find_element(:class,"error-alert")
@@ -1242,6 +1520,23 @@ def check_19_3
   @d.find_element(:class,"buy-red-btn").click
   @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
 
+  # puts "購入のエラーチェック====================================="
+  errors_messages_duplication_check("購入",100)
+
+  # puts "エラー文検証"
+  columns = []
+  ids = ["postal-code", "prefecture", "city", "addresses", "building", "phone-number"]
+  # カラム取得
+  ids.each do |id|
+    get_colmun_by_input_element_by_id(id, columns)
+  end
+  
+  # エラーメッセージとカラムを比較
+  error_messages = @d.find_elements(:class, "error-alert")
+  manual_check_93_94(error_messages,columns)
+
+  # puts "エラー文検証done"
+
   # 念の為購入できてしまわないかチェック
   if /クレジットカード情報入力/ .match(@d.page_source)
     # 購入できなかった場合
@@ -1249,6 +1544,7 @@ def check_19_3
     display_flag = @d.find_element(:class,"error-alert").displayed? rescue false
     if display_flag
       @error_log_hash["商品購入"] = "◯：【商品購入画面】にて全項目未入力の状態で購入ボタンを押すと購入が完了せずエラーメッセージが出力される\n\n"
+        google_spreadsheet_input("◯",98)
       @error_log_hash["商品購入"] << "↓↓↓ エラーログ全文(出力された内容) ↓↓↓\n"
       # エラーログの親要素
       error_parent = @d.find_element(:class,"error-alert")
@@ -1296,11 +1592,13 @@ def check_19_3
   end
 end
 
+# これは編集のエラーハンドリングなのか？
 # 商品編集画面でのエラーハンドリングログを取得
 def check_19_4
   # 全項目未入力でいきなり「購入する」ボタンをクリック
   @d.find_element(:class,"buy-red-btn").click
   @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
+
 
   # 念の為購入できてしまわないかチェック
   if /クレジットカード情報入力/ .match(@d.page_source)
@@ -1373,7 +1671,7 @@ def check_19
     check_detail["チェック詳細"] << @error_log_hash["商品購入"]
 
     check_detail["チェック合否"] = check_flag == 3 ? "◯：出力内容を目視で確認が必要" : "×：異常あり"
-
+      google_spreadsheet_input("◯",79)
   ensure
     @check_log.push(check_detail)
   end
@@ -1390,13 +1688,16 @@ def check_20
     # ログイン状態であればログアウトしておく
     if display_flag
       @d.find_element(:class,"logout").click
+      sleep(3)
       @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
       @d.get("http://" + @url_ele)
       @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
+      sleep(3)
     end
 
     # 新規登録画面へ
     @d.find_element(:class,"sign-up").click
+    sleep(3)
     @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
 
     # 新規登録に必要な項目入力を行うメソッド
@@ -1441,6 +1742,7 @@ def check_20
     end
 
     check_detail["チェック合否"] = check_flag == 1 ? "◯" : "×"
+      google_spreadsheet_input(check_detail["チェック合否"],15)
 
   ensure
     @check_log.push(check_detail)
@@ -1493,6 +1795,7 @@ def check_21
     # ログイン状態であればログアウトしておく
     if display_flag
       @d.find_element(:class,"logout").click
+      sleep 3
       @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
       @d.get("http://" + @url_ele)
       @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false }
@@ -1500,9 +1803,11 @@ def check_21
   
     # ログアウト状態でコート編集画面に直接遷移する
     @d.get(@edit_url_coat)
+    sleep 8
 
     # 編集画面に遷移した時も想定した判定基準を追加
     @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
+    sleep 3
 
     if /会員情報入力/ .match(@d.page_source)
       check_detail["チェック詳細"] << "◯：ログアウト状態のユーザーが、URLを直接入力して商品購入ページに遷移しようとすると、ログインページに遷移する\n"
@@ -1514,7 +1819,7 @@ def check_21
     end
 
     check_detail["チェック合否"] = check_flag == 1 ? "◯" : "×"
-
+      google_spreadsheet_input(check_detail["チェック合否"],86)
   ensure
     @d.get("http://" + @url_ele)
     @wait.until {@d.find_element(:class,"furima-icon").displayed? rescue false || @d.find_element(:class,"second-logo").displayed? rescue false || /商品の情報を入力/ .match(@d.page_source)}
@@ -1543,6 +1848,7 @@ def check_2_015
   select_category_any = [ "レディース","メンズ","レディース", "ベビー・キッズ","インテリア・住まい・小物","本・音楽・ゲーム","おもちゃ・ホビー・グッズ","家電・スマホ・カメラ","スポーツ・レジャー","ハンドメイド","その他"]
   if select_category_any.all? {|i| selectCategories.include?(i)}
     @puts_num_array[2][15] = "[2-015] ◯"
+      google_spreadsheet_input("◯",35)
   else
     false_selects =[]
     selectCategories.each{|check_select|
@@ -1576,6 +1882,7 @@ def check_2_016
   select_category_any = ["新品・未使用", "未使用に近い", "目立った傷や汚れなし", "やや傷や汚れあり", "傷や汚れあり", "全体的に状態が悪い"]
   if select_category_any.all? {|i| selectCategories.include?(i)}
     @puts_num_array[2][16] = "[2-016] ◯"
+      google_spreadsheet_input("◯",37)
   else
     false_selects =[]
     selectCategories.each{|check_select|
@@ -1611,6 +1918,7 @@ def check_2_017
   select_category_any = [ "着払い(購入者負担)", "送料込み(出品者負担)"]
   if select_category_any.all? {|i| selectCategories.include?(i)}
     @puts_num_array[2][17] = "[2-017] ◯"
+    google_spreadsheet_input("◯",39)
   else
     false_selects =[]
     selectCategories.each{|check_select|
@@ -1640,6 +1948,7 @@ def check_2_018
   select_category_any = ["北海道", "青森県", "岩手県",  "宮城県", "秋田県", "山形県", "福島県", "茨城県", "栃木県", "群馬県", "埼玉県", "千葉県", "東京都", "神奈川県", "新潟県", "富山県", "石川県", "福井県", "山梨県", "長野県", "岐阜県", "静岡県", "愛知県", "三重県", "滋賀県", "京都府", "大阪府", "兵庫県", "奈良県", "和歌山県", "鳥取県", "島根県", "岡山県", "広島県", "山口県", "徳島県", "香川県", "愛媛県", "高知県", "福岡県", "佐賀県", "長崎県", "熊本県", "大分県", "宮崎県", "鹿児島県", "沖縄県"]
   if select_category_any.all? {|i| selectCategories.include?(i)}
     @puts_num_array[2][18] = "[2-018] ◯"
+      google_spreadsheet_input("◯",41)
   else
     false_selects =[]
     selectCategories.each{|check_select|
@@ -1674,6 +1983,7 @@ def check_2_019
   select_category_any = [ "1~2日で発送", "2~3日で発送", "4~7日で発送"]
   if select_category_any.all? {|i| selectCategories.include?(i)}
     @puts_num_array[2][19] = "[2-019] ◯"
+      google_spreadsheet_input("◯",43)
   else
     false_selects =[]
     selectCategories.each{|check_select|
