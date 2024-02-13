@@ -1178,23 +1178,41 @@ end
 # このメソッドが呼ばれる時点で入力は全て行っている。あとはjsが反応していることと、反応していない場合再度出品画面に遷移し、入力を行う
 def new_check_17
   check_detail = {"チェック番号"=> 17 , "チェック合否"=> "" , "チェック内容"=> "入力された販売価格によって、販売手数料や販売利益が変わること(JavaScriptを使用して実装すること)" , "チェック詳細"=> ""}
+  check_flag = 0
 
   begin
     # puts "ここから======================================"
     # puts @new_item_page_url
     
-    # 価格
+    # 価格(販売手数料)
     add_tax_price = @d.find_element(:id,"add-tax-price").text.delete(',').to_i
     # puts add_tax_price
 
+    # 価格(販売利益)
     profit = @d.find_element(:id,"profit").text.delete(',').to_i
     # puts profit
 
-    if @item_price * 0.1 == add_tax_price || @item_price * 0.9 == profit
-      puts "販売手数料・販売手利益が等しく入力されています"
-      google_spreadsheet_input("◯",46)
+    check_detail["チェック詳細"] << "!価格設定：#{@item_price}円、販売手数料(10%)：#{add_tax_price}円、販売利益：#{profit}円\n"
+
+    if @item_price * 0.1 == add_tax_price
+      puts "販売手数料が等しく入力されています"
+      check_detail["チェック詳細"] << "◯：入力された販売価格によって、非同期的に販売利益が表示されている\n"
+      check_flag += 1
     else
-      puts "販売手数料が等しく入力されていない可能性があります。"
+      check_detail["チェック詳細"] << "×：入力された販売価格によって、非同期的に販売利益が表示されていない\n"
+    end
+
+    if @item_price * 0.9 == profit
+      puts "販売手利益が等しく入力されています"
+      check_detail["チェック詳細"] << "◯：入力された販売価格によって、非同期的に販売手数料が表示されている\n"
+      check_flag += 1
+    else
+      check_detail["チェック詳細"] << "×：入力された販売価格によって、非同期的に販売手数料が表示されていない\n"
+    end
+
+    # jsが反応していない場合画面をリロード
+    if @item_price * 0.1 != add_tax_price || @item_price * 0.9 != profit
+      puts "販売手数料・販売手利益が等しく入力されていない可能性があります。"
       puts "入力した金額#{@item_price} \n 表示されている販売手数料#{add_tax_price} \n 表示されている販売利益#{profit}"
       # 出品ページに直接移動
       puts "画面のリロードを行います"
@@ -1214,6 +1232,10 @@ def new_check_17
         puts "リロードを行ってもjsが反応しなかった可能性があります。手動で確認をお願いいたします"
       end
     end
+
+    # ここ
+    check_detail["チェック合否"] = check_flag == 2 ? "◯" : "×"
+      google_spreadsheet_input(check_detail["チェック合否"],46)
 
   ensure
     @check_log.push(check_detail)
