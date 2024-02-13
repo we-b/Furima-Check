@@ -22,8 +22,7 @@ def google_spreadsheet_input(check_detail,row) # row:縦の数字, column:アル
     # saveで変更を保存、実際にスプレッドシートに反映させる
     @ws.save
     sleep 0.2
-  end
-  if @ws[row, 8] == "false"
+  else
     @puts_text << "■スプレットシート#{row}行目\n#{@ws[row, 5]}"
   end
   # puts "#{row}: #{@ws[row, 8]}"
@@ -1200,7 +1199,6 @@ def new_check_17
     check_detail["チェック詳細"] << "!価格設定：#{@item_price}円、販売手数料(10%)：#{add_tax_price}円、販売利益：#{profit}円\n"
 
     if @item_price * 0.1 == add_tax_price
-      puts "販売手数料が等しく入力されています"
       check_detail["チェック詳細"] << "◯：入力された販売価格によって、非同期的に販売利益が表示されている\n"
       check_flag += 1
     else
@@ -1208,7 +1206,6 @@ def new_check_17
     end
 
     if @item_price * 0.9 == profit
-      puts "販売手利益が等しく入力されています"
       check_detail["チェック詳細"] << "◯：入力された販売価格によって、非同期的に販売手数料が表示されている\n"
       check_flag += 1
     else
@@ -1217,10 +1214,8 @@ def new_check_17
 
     # jsが反応していない場合画面をリロード
     if @item_price * 0.1 != add_tax_price || @item_price * 0.9 != profit
-      puts "販売手数料・販売手利益が等しく入力されていない可能性があります。"
-      puts "入力した金額#{@item_price} \n 表示されている販売手数料#{add_tax_price} \n 表示されている販売利益#{profit}"
+      check_detail["チェック詳細"] << "販売手数料・販売手利益が等しく入力されていない可能性があります。"
       # 出品ページに直接移動
-      puts "画面のリロードを行います"
       @d.get(@new_item_page_url)
       sleep 3
 
@@ -1232,9 +1227,9 @@ def new_check_17
       profit = @d.find_element(:id,"profit").text.delete(',').to_i
 
       if @item_price * 0.1 == add_tax_price || @item_price * 0.9 == profit
-        puts "リロードを行うとjsが反応していますのでturbo関連のエラーが発生している可能性があります"
+        check_detail["チェック詳細"] << "リロードを行うとjsが反応していますのでturbo関連のエラーが発生している可能性があります"
       else
-        puts "リロードを行ってもjsが反応しなかった可能性があります。手動で確認をお願いいたします"
+        check_detail["チェック詳細"] << "リロードを行ってもjsが反応しなかった可能性があります。手動で確認をお願いいたします"
       end
     end
 
