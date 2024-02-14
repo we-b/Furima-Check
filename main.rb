@@ -62,18 +62,22 @@ def main
   # ユーザー状態：user1
   # 出品：コート = user1,サングラス = なし
   # 購入：コート = なし,サングラス = なし
+  puts "ユーザー機能チェック完了（1/7)"
 
   # 出品
   # 価格未入力で出品トライ
   item_new_price_uninput
   # 入力必須項目を全て入力した状態で出品
   item_new_require_input
+  puts "出品機能チェック完了（2/7)"
 
   # 自分で出品した商品の商品編集(エラーハンドリング)
   item_edit
+  puts "詳細、編集機能チェック完了（3/7)"
 
   # ログアウトしてから商品の編集や購入ができるかチェック
   logout_item_edit_and_buy
+  puts "一覧機能チェック完了（4/7)"
 
   # ユーザー状態：user2
   # 出品：コート = user1,サングラス = なし
@@ -96,9 +100,9 @@ def main
   # ログアウト状態のユーザーは、URLを直接入力して売却済みの商品情報編集ページへ遷移しようとすると、ログインページに遷移すること
   # check_21
 
-
   # 購入後の商品状態や表示方法をチェック
   login_user2_after_purchase_check1
+  puts "購入機能チェック完了（5/7)"
 
 
   # ユーザー状態：user2
@@ -131,6 +135,7 @@ def main
 
   # user2(サングラスの出品者)によるサングラスの画面遷移チェック
   login_user2_after_purchase_check2
+  puts "削除機能チェック完了（6/7)"
 
   # LCが自動チェックツール実行後に手動で確認しやすいように商品を出品し、商品編集URLと商品購入URLを取得しておく
   # user2による出品(サングラス)→user1でログインして購入画面URLの取得
@@ -154,13 +159,11 @@ def start
   puts <<-EOT
 ----------------------------
 自動チェックツールを起動します
-まず初めに以下の3項目を入力してください
+チェック結果は以下スプシにも自動で保存されます。使用する場合はスプシ右上の「チェックを外す」を今の時点でクリックしてください
+https://docs.google.com/spreadsheets/d/1q_7tWEfvxIPglBNIkTIi2Uo_hIln5vd2ffIPc2f4crg/edit?usp=sharing
+----------------------------
 
-①動作チェックするアプリの本番環境URL
-②basic認証[ユーザー名]
-③basic認証[パスワード]
-
-「①動作チェックするアプリの本番環境URL」を入力しenterキーを押してください (例：https://afternoon-bayou-26262.herokuapp.com/)
+「動作チェックするアプリの本番環境URL」を入力しenterキーを押してください (例：https://furima2020.herokuapp.com/)：
 EOT
 
   input_url = gets.chomp
@@ -170,9 +173,9 @@ EOT
   elsif input_url.include?("http")
     @url_ele = input_url.gsub(/http:\/\//,"")
   end
-  puts "次に「②basic認証[ユーザー名]」を入力しenterキーを押してください (例：admin)"
+  puts "「basic認証[ユーザー名]」を入力しenterキーを押してください (例：admin)："
   @b_id = gets.chomp
-  puts "次に「③basic認証[パスワード]」を入力しenterキーを押してください (例：2222)"
+  puts "「basic認証[パスワード]」を入力しenterキーを押してください (例：2222)："
   @b_password = gets.chomp
 
   puts "自動チェックを開始します"
